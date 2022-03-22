@@ -1,6 +1,6 @@
 === Wallet Up ===
 Contributors: walletup
-Tags: zelle, facebook pay, cash, check, money, pay, cashapp, cash app, processing, sending money, pear to pear, finance, payments, money, transfer, receive, send, money transfer, usa product, wallet up, walup, walletup
+Tags: zelle, facebook pay, cash, check, money, pay, cashapp, cash app, funds, processing, sending money, peer-to-peer, finance, payments, money, transfer, receive, send, money transfer, usa product, wallet up, walup, walletup
 Requires at least: 4.8
 Tested up to: 5.9.2
 Requires PHP: 5.1
