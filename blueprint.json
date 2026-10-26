@@ -1,0 +1,42 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/admin.php?page=wallet-up",
+    "preferredVersions": {
+        "php": "8.2",
+        "wp": "latest"
+    },
+    "features": {
+        "networking": true
+    },
+    "steps": [
+        {
+            "step": "login",
+            "username": "admin",
+            "password": "password"
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "wallet-up"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "woocommerce"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php require '/wordpress/wp-load.php'; update_option('woocommerce_onboarding_profile', array('skipped' => true)); update_option('woocommerce_task_list_hidden', 'yes'); update_option('woocommerce_task_list_complete', 'yes'); update_option('woocommerce_coming_soon', 'no'); update_option('wc_admin_note_launch_checklist', 'actioned'); delete_transient('_wc_activation_redirect'); update_option('wallet_up_activated_at', time()); ?>"
+        }
+    ]
+}

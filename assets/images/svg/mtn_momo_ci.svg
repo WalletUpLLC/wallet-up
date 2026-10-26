@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 428">
+  <rect width="428" height="428" rx="80" fill="#FDCC00"/>
+  <g transform="translate(214,214)">
+    <!-- MTN oval -->
+    <ellipse cx="0" cy="-30" rx="120" ry="70" fill="none" stroke="#003C71" stroke-width="14"/>
+    <!-- MTN text inside oval -->
+    <text x="0" y="-10" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="72" fill="#003C71">MTN</text>
+    <!-- MoMo text below -->
+    <text x="0" y="90" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="56" fill="#003C71">MoMo</text>
+  </g>
+</svg>

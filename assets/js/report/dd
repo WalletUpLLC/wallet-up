@@ -1,0 +1,118 @@
+// wp-content/plugins/wallet-up-pro/assets/js/analytics.js
+class ConsentManager {
+    static STORAGE_KEY = 'walletup_consent';
+
+    static hasConsent() {
+        return localStorage.getItem(this.STORAGE_KEY) === 'yes';
+    }
+
+    static showBanner(callback) {
+        if (document.getElementById('walletup-consent')) return;
+
+        const banner = document.createElement('div');
+        banner.id = 'walletup-consent';
+        banner.style.cssText = `
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 999999;
+            transform: translateY(100%); transition: transform 0.3s ease-out;
+        `;
+        banner.innerHTML = `
+            <div style="max-width: 1200px; margin: 0 auto; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <p style="margin: 0; font-size: 14px;">We use analytics to improve our payment system. No personal data is collected.</p>
+                <div>
+                    <button id="walletup-decline" style="padding: 8px 16px; margin-right: 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer;">Decline</button>
+                    <button id="walletup-accept" style="padding: 8px 16px; background: #674FBF; color: white; border: none; border-radius: 4px; cursor: pointer;">Accept</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(banner);
+        setTimeout(() => banner.style.transform = 'translateY(0)', 100);
+
+        banner.querySelector('#walletup-accept').addEventListener('click', () => {
+            localStorage.setItem(this.STORAGE_KEY, 'yes');
+            banner.style.transform = 'translateY(100%)';
+            setTimeout(() => banner.remove(), 300);
+            callback();
+        });
+
+        banner.querySelector('#walletup-decline').addEventListener('click', () => {
+            localStorage.setItem(this.STORAGE_KEY, 'no');
+            banner.style.transform = 'translateY(100%)';
+            setTimeout(() => banner.remove(), 300);
+        });
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    };
+}
+
+export function trackEvent({ method, trackingData, nonce, ajaxUrl }) {
+    if (!ConsentManager.hasConsent()) {
+        ConsentManager.showBanner(() => initializeTracking(method, trackingData, nonce, ajaxUrl));
+        return;
+    }
+    initializeTracking(method, trackingData, nonce, ajaxUrl);
+}
+
+function initializeTracking(method, trackingData, nonce, ajaxUrl) {
+    const trackSingleEvent = debounce((type) => {
+        console.log(`📍 Tracking ${type.toUpperCase()} for ${method.toUpperCase()}`);
+        const jsonStr = JSON.stringify(trackingData);
+        try {
+            JSON.parse(jsonStr);
+        } catch (error) {
+            console.error('Invalid JSON:', error.message);
+            return;
+        }
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: 'wallet_up_track_usage',
+                type,
+                method,
+                tracking_data: jsonStr,
+                nonce
+            })
+        })
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(data => console.log(`✅ ${type.toUpperCase()} tracked:`, data))
+        .catch(error => console.error(`❌ ${type.toUpperCase()} tracking failed:`, error));
+    }, 500);
+
+    const observer = new IntersectionObserver(
+        entries => entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                trackSingleEvent('impression');
+                observer.unobserve(entry.target);
+            }
+        }),
+        { threshold: 0.5 }
+    );
+
+    document.addEventListener('click', debounce(e => {
+        const element = e.target.closest(`[data-wallet-up-method="${method}"]`);
+        if (!element) return;
+        const isQR = element.querySelector('img[data-walletup-qr]');
+        const link = element.closest('a');
+        if (isQR) {
+            e.preventDefault();
+            console.log(`🎯 QR Code clicked for ${method}`);
+            trackSingleEvent('scan').then(() => {
+                trackSingleEvent('click');
+                if (link?.href) window.open(link.href, '_blank', 'noopener,noreferrer');
+            });
+        } else {
+            console.log(`🖱️ Regular click for ${method}`);
+            trackSingleEvent('click');
+        }
+    }, 100));
+
+    document.querySelectorAll(`[data-wallet-up-method="${method}"]`).forEach(el => observer.observe(el));
+}

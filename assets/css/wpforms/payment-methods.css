@@ -1,0 +1,427 @@
+
+:root {
+    --walletup-primary-color: #674FBF;
+    --walletup-primary-color-light: #F4F4FF;
+    --walletup-background-color: #ffffff;
+    --walletup-text-color: #333333;
+    --walletup-text-color-light: #666666;
+    --walletup-error-color: #dc3545;
+    --walletup-error-background: #fff2f2;
+    --walletup-border-radius: 12px;
+    --walletup-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --walletup-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --walletup-font-family: 'Inter', sans-serif;
+    --walletup-font-family-fallback: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.wallet-up-wpforms-methods-container,
+.wallet-up-wpforms-qr-display,
+.wallet-up-wpforms-qr-wrapper {
+    font-family: var(--walletup-font-family), var(--walletup-font-family-fallback);
+    box-sizing: border-box;
+    justify-content: center !important;
+}
+
+.wallet-up-wpforms-methods-container {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjusted for consistency */
+    gap: 1rem;
+    margin: 1.25rem 0;
+    padding: 1.25rem;
+    background: var(--walletup-background-color, #ffffff);
+    border-radius: var(--walletup-border-radius, 12px);
+    box-shadow: var(--walletup-box-shadow, 0 2px 10px rgba(0, 0, 0, 0.08));
+    transition: var(--walletup-transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+    overflow: hidden;
+}
+
+.wallet-up-wpforms-methods-container.wallet-up-active {
+    display: grid;
+}
+
+.wallet-up-wpforms-methods-container.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(50%);
+}
+
+.wallet-up-wpforms-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0rem !important;
+    border-radius: 26px !important;
+    background: var(--walletup-background-color);
+    box-shadow: var(--walletup-box-shadow);
+    cursor: pointer;
+    transition: var(--walletup-transition);
+    border: 2px solid transparent;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 108px;
+}
+
+.wallet-up-wpforms-method:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.wallet-up-wpforms-method.selected {
+    border-color: var(--walletup-primary-color);
+    box-shadow: 0 2px 6px rgba(103, 79, 191, 0.2); /* Shadow with accent color */
+    border-radius: 14px;
+    padding: 12px;
+}
+
+.wallet-up-wpforms-method-icon {
+    width: 45px !important;
+    height: 55px !important;
+    object-fit: contain;
+    margin-bottom: 0.5rem !important;
+}
+
+.wallet-up-wpforms-method-name {
+    font-size: 0.9rem !important;
+    font-weight: 100;
+    color: var(--walletup-text-color);
+    text-align: center;
+    margin: 5px !important;
+}
+
+.wallet-up-loading {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.wallet-up-error {
+    padding: 12px;
+    background: #fff1f0;
+    border-left: 4px solid #ff4d4f;
+    color: #cf1322;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.wallet-up-retry-button {
+    background: #674fbf;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.wallet-up-retry-button:hover {
+    background: #5a43a9;
+}
+.wallet-up-wpforms-qr-display {
+    margin-top: 2.5rem !important;
+    display: flex;
+    justify-content: center;
+    background-color: #f4f4ff !important;
+    align-items: center;
+    padding: 14px !important;
+    border-radius: 26px !important;
+}
+
+.wallet-up-wpforms-qr-display .generating {
+    text-align: center; /* Keep text centered */
+    padding: 1.25rem;
+    color: var(--walletup-text-color-light);
+    background: var(--walletup-primary-color-light);
+    border-radius: var(--walletup-border-radius);
+    display: flex;  /* Use flexbox for centering */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.0rem !important;
+    font-weight: 100 !important;
+}
+
+.wallet-up-wpforms-qr-display .generating::after {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-left: 0.625rem;
+    border: 3px solid var(--walletup-primary-color);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s ease-in-out infinite;
+    font-size: 1.0rem !important;
+    font-weight: 100 !important;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.wallet-up-wpforms-qr-display .error {
+    color: var(--walletup-error-color);
+    text-align: center;
+    padding: 0.625rem;
+    background: var(--walletup-error-background);
+    border-radius: calc(var(--walletup-border-radius) / 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem !important;
+    font-weight: 100 !important;
+}
+
+.wallet-up-payment-instructions {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--walletup-primary-color, #674FBF);
+    margin: 1rem 0;
+    border-radius: var(--walletup-border-radius, 8px);
+    font-family: var(--walletup-font-family, 'Inter', sans-serif);
+    color: var(--walletup-text-color, #333);
+}
+
+ .wallet-up-instructions-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.wallet-up-instruction-item {
+    display: flex;         /* Use flexbox for easy alignment */
+    align-items: center;  /* Vertically center icon and text */
+    margin-bottom: 0.5rem; /* Space between items */
+}
+
+.wallet-up-instruction-item i {
+    margin-right: 0.5rem; /* Space between icon and text */
+    font-size: 1.2em;    /* Slightly larger icon */
+    color: var(--walletup-primary-color, #674FBF); /* Use your primary color */
+}
+.wallet-up-payment-instructions p:not(.wallet-up-instructions-title){
+    margin-bottom: 0.25rem;
+    margin-top: 0;
+}
+.wallet-up-account-prompt {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--walletup-primary-color-light, #F4F4FF);
+    border-radius: var(--walletup-border-radius, 12px);
+    box-shadow: 0 2px 8px rgba(103, 79, 191, 0.1);
+}
+
+.wallet-up-account-prompt p {
+    margin-bottom: 1.25rem;
+    color: var(--walletup-text-color, #333);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.wallet-up-account-details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.wallet-up-account-details dt {
+    font-weight: 600;
+    color: var(--walletup-primary-color, #674FBF);
+    display: flex;
+    align-items: center;
+}
+
+.wallet-up-account-details dd {
+    margin: 0;
+    font-family: monospace;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.wallet-up-selected-method {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--walletup-primary-color, #674FBF);
+}
+
+.wallet-up-method-highlight {
+    color: var(--walletup-primary-color, #674FBF);
+    font-weight: 600;
+    margin-bottom: 0.5rem !important;
+}
+
+.wallet-up-current-method {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.wallet-up-account-value {
+    font-family: monospace;
+    background: var(--walletup-primary-color-light, #F4F4FF);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
+.wallet-up-amount {
+    font-size: 1.1rem;
+    color: var(--walletup-text-color, #333);
+}
+.wallet-up-account-prompt {
+    margin-top: 1rem; /* Spacing from the QR code */
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: var(--walletup-border-radius, 8px);
+    background-color: #f8f9fa;
+}
+
+.wallet-up-account-prompt p {
+    margin-bottom: 0.5rem; /* Spacing between the text and the input */
+    text-align: center; /* Center the text */
+}
+#wallet-up-account-name{
+    margin-bottom: 0.5rem; /* Spacing between the text and the input */
+    text-align: center; /* Center the text */
+    display: block;
+    margin: 0 auto;
+    width: 80%;
+}
+
+.wallet-up-wpforms-notice,
+.wallet-up-wpforms-error {
+    padding: 0.625rem;
+    margin: 0.625rem 0;
+    border-radius: calc(var(--walletup-border-radius) / 2); /* Consistent radius */
+}
+
+.wallet-up-wpforms-notice {
+    background: #f8f9fa;  /* Standard light gray */
+    border-left: 4px solid var(--walletup-text-color-light);
+}
+
+.wallet-up-wpforms-error {
+    background: var(--walletup-error-background);
+    border-left: 4px solid var(--walletup-error-color);
+    color: var(--walletup-error-color);
+}
+
+.wallet-up-wpforms-qr-wrapper {
+    background: var(--walletup-primary-color-light);
+    border-radius: var(--walletup-border-radius);
+    padding: 1.25rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(103, 79, 191, 0.15);
+}
+
+.wallet-up-wpforms-qr-wrapper img {
+    max-width: 100%;
+    height: auto;
+    border-radius: calc(var(--walletup-border-radius) / 2);
+    margin: 0.625rem auto;
+    display: block;
+}
+.wallet-up-wpforms-title{
+    font-size: 1.9rem !important;
+    font-weight: 100 !important;
+    color: var(--walletup-text-color);
+    text-align: center;
+    margin: 5px !important;   
+}
+
+@media (max-width: 768px) {
+    .wallet-up-wpforms-methods-container {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .wallet-up-wpforms-method {
+        padding: 0.75rem;
+    }
+
+    .wallet-up-wpforms-method-icon {
+        width: 22px;
+        height: 22px;
+        margin-bottom: 0.3rem;
+    }
+
+    .wallet-up-wpforms-method-name {
+        font-size: 0.8rem;
+    }
+    .wallet-up-wpforms-title{
+        font-size: 1.2rem !important;
+        font-weight: 100 !important;
+        color: var(--walletup-text-color);
+        text-align: center;
+        margin: 5px !important;   
+    }
+    .wallet-up-wpforms-method {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 0rem !important;
+        border-radius: 16px !important;
+        background: var(--walletup-background-color);
+        box-shadow: var(--walletup-box-shadow);
+        cursor: pointer;
+        transition: var(--walletup-transition);
+        border: 2px solid transparent;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        min-height: 90px !important;
+    }
+    .wallet-up-account-details {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .wallet-up-account-details dt {
+        margin-top: 0.5rem;
+    }
+
+    .wallet-up-account-prompt {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .wallet-up-selected-method {
+        margin-top: 1rem;
+        padding: 0.75rem;
+    }
+}
+
+@media print {
+    .wallet-up-account-prompt {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+        box-shadow: none;
+    }
+    
+}
+
+.wpforms-form .wallet-up-wpforms-methods-container,
+.wpforms-form .wallet-up-wpforms-qr-display {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wpforms-field-radio input[type="radio"][value="3"] {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0;
+    border: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+}

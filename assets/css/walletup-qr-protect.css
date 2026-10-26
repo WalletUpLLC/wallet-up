@@ -1,0 +1,14 @@
+.walletup-qr-container img,
+.walletup-container img,
+.walletup-content img,
+a.walletup-qr-link img {
+    max-width: none !important;
+    object-fit: contain !important;
+    image-rendering: pixelated;
+    box-sizing: content-box !important;
+}
+
+.walletup-container,
+.walletup-qr-container {
+    overflow: visible !important;
+}

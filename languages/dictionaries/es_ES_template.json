@@ -1,0 +1,18 @@
+{
+    "meta": {
+        "language": "es_ES",
+        "name": "Spanish (Spain)",
+        "version": "1.0.0",
+        "updated": "2025-08-02 21:37:30",
+        "source": "Extracted from existing WalletUp Pro translations",
+        "total_strings": 487
+    },
+    "translations": {
+        "Settings": "Configuración",
+        "Save Changes": "Guardar cambios",
+        "Cancel": "Cancelar",
+        "Delete": "Eliminar",
+        "Edit": "Editar",
+        "Loading...": "Cargando..."
+    }
+}

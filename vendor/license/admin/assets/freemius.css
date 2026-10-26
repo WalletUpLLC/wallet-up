@@ -1,0 +1,562 @@
+/* WalletUp Override Styles for Freemius */
+
+/* Tags and Badges */
+label.fs-tag, span.fs-tag {
+    background: #674FBF;
+    border-radius: 9999px;
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 12px;
+    vertical-align: baseline;
+    transition: all 0.2s ease;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+label.fs-tag.fs-warn, span.fs-tag.fs-warn {
+    background: #D97706;
+}
+
+label.fs-tag.fs-info, span.fs-tag.fs-info {
+    background: #2563EB;
+}
+
+label.fs-tag.fs-success, span.fs-tag.fs-success {
+    background: #059669;
+}
+
+label.fs-tag.fs-error, span.fs-tag.fs-error {
+    background: #DC2626;
+}
+
+/* Notices */
+.fs-notice[data-id=license_not_whitelabeled].success,
+.fs-notice[data-id=license_whitelabeled].success {
+    border-left-color: #674FBF;
+    background-color: #F5F3FF;
+    color: #674FBF;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.fs-notice[data-id=license_not_whitelabeled].success label.fs-plugin-title,
+.fs-notice[data-id=license_whitelabeled].success label.fs-plugin-title {
+    display: none;
+}
+
+/* Account Container */
+#fs_account .postbox, #fs_account .widefat {
+    max-width: 800px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* Headers */
+#fs_account h3 {
+    background: linear-gradient(135deg, #F5F3FF 0%, #EFF6FF 100%);
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px 24px;
+    color: #1F2937;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+#fs_account h3 .dashicons {
+    font-size: 1.25rem;
+    height: 24px;
+    width: 24px;
+    color: #674FBF;
+    margin-right: 8px;
+}
+
+#fs_account i.dashicons {
+    font-size: 1.125rem;
+    height: 1.125rem;
+    width: 1.125rem;
+    color: #6B7280;
+}
+
+#fs_account .dashicons {
+    vertical-align: middle;
+}
+
+/* Header Actions */
+#fs_account .fs-header-actions {
+    font-size: 0.875rem;
+    position: absolute;
+    right: 24px;
+    top: 22px;
+}
+
+#fs_account .fs-header-actions ul {
+    margin: 0;
+    list-style: none;
+}
+
+#fs_account .fs-header-actions li {
+    float: left;
+    margin-left: 12px;
+}
+
+#fs_account .fs-header-actions li:first-child {
+    margin-left: 0;
+}
+
+#fs_account .fs-header-actions li form {
+    display: inline-block;
+}
+
+#fs_account .fs-header-actions li a {
+    color: #674FBF;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+#fs_account .fs-header-actions li a:hover {
+    background: #F5F3FF;
+    color: #5A3DAA;
+}
+
+#fs_account_details .button-group {
+    float: right;
+    gap: 8px;
+    display: flex;
+}
+
+/* RTL Support */
+.rtl #fs_account .fs-header-actions {
+    left: 24px;
+    right: auto;
+}
+
+/* Key-Value Table */
+.fs-key-value-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fs-key-value-table form {
+    display: inline-block;
+}
+
+.fs-key-value-table tr td:first-child {
+    text-align: right;
+    padding-right: 16px;
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+.fs-key-value-table tr td:first-child nobr {
+    font-weight: 600;
+    color: #4B5563;
+}
+
+.fs-key-value-table tr td:first-child form {
+    display: block;
+}
+
+.fs-key-value-table tr td.fs-right {
+    text-align: right;
+}
+
+.fs-key-value-table tr.fs-odd {
+    background: #F9FAFB;
+}
+
+.fs-key-value-table td, .fs-key-value-table th {
+    padding: 12px 16px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.fs-key-value-table tr:last-child td {
+    border-bottom: none;
+}
+
+.fs-key-value-table code {
+    line-height: 1.75;
+    padding: 2px 6px;
+    background: #F3F4F6;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.fs-key-value-table code,
+.fs-key-value-table input[type=text],
+.fs-key-value-table var {
+    background: #F9FAFB;
+    color: #674FBF;
+    font-size: 14px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.fs-key-value-table input[type=text] {
+    font-weight: 500;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.fs-key-value-table input[type=text]:focus {
+    outline: none;
+    border-color: #674FBF;
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.1);
+}
+
+/* Beta Program Field */
+.fs-field-beta_program label {
+    margin-left: 8px;
+    font-size: 0.875rem;
+    color: #4B5563;
+}
+
+/* Additional Tags Styling */
+label.fs-tag {
+    border-radius: 9999px;
+    color: #fff;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 12px;
+    vertical-align: baseline;
+    transition: all 0.2s ease;
+}
+
+label.fs-tag, label.fs-tag.fs-warn {
+    background: #D97706;
+}
+
+label.fs-tag.fs-success {
+    background: #059669;
+}
+
+label.fs-tag.fs-error {
+    background: #DC2626;
+}
+
+/* Sites Section */
+#fs_sites .fs-scrollable-table .fs-table-body {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow: auto;
+    background: white;
+}
+
+#fs_sites .fs-scrollable-table .fs-table-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#fs_sites .fs-scrollable-table .fs-table-body::-webkit-scrollbar-track {
+    background: #F3F4F6;
+    border-radius: 4px;
+}
+
+#fs_sites .fs-scrollable-table .fs-table-body::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
+}
+
+#fs_sites .fs-scrollable-table .fs-table-body::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+#fs_sites .fs-scrollable-table .fs-table-body > table.widefat {
+    border: none !important;
+    margin: 0;
+}
+
+#fs_sites .fs-scrollable-table .fs-main-column {
+    width: 100%;
+}
+
+#fs_sites .fs-scrollable-table .fs-site-details td:first-of-type {
+    color: #6B7280;
+    text-align: right;
+    width: 1px;
+    font-size: 0.875rem;
+}
+
+#fs_sites .fs-scrollable-table .fs-site-details td:last-of-type {
+    text-align: right;
+}
+
+#fs_sites .fs-scrollable-table .fs-install-details table tr td {
+    white-space: nowrap;
+    width: 1px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+}
+
+#fs_sites .fs-scrollable-table .fs-install-details table tr td:last-of-type {
+    width: auto;
+}
+
+/* Addons Section */
+#fs_addons h3 {
+    border: none;
+    margin-bottom: 0;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #F5F3FF 0%, #EFF6FF 100%);
+    font-weight: 600;
+    color: #1F2937;
+}
+
+#fs_addons td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+#fs_addons thead {
+    white-space: nowrap;
+    background: #F9FAFB;
+}
+
+#fs_addons td:first-child, #fs_addons th:first-child {
+    font-weight: 600;
+    text-align: left;
+    color: #4B5563;
+}
+
+#fs_addons td:last-child, #fs_addons th:last-child {
+    text-align: right;
+}
+
+#fs_addons th {
+    font-weight: 600;
+    padding: 12px 16px;
+    color: #374151;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Billing Address */
+#fs_billing_address {
+    width: 100%;
+}
+
+#fs_billing_address tr td {
+    padding: 8px;
+    width: 50%;
+}
+
+#fs_billing_address tr:first-of-type td {
+    padding-top: 0;
+}
+
+#fs_billing_address span {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+#fs_billing_address input, #fs_billing_address select {
+    display: block;
+    margin-top: 6px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #1F2937;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+#fs_billing_address input:focus, #fs_billing_address select:focus {
+    outline: none;
+    border-color: #674FBF;
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.1);
+}
+
+#fs_billing_address input::-moz-placeholder,
+#fs_billing_address select::-moz-placeholder {
+    color: #9CA3AF;
+}
+
+#fs_billing_address input::placeholder,
+#fs_billing_address select::placeholder {
+    color: #9CA3AF;
+}
+
+#fs_billing_address input.fs-read-mode,
+#fs_billing_address select.fs-read-mode {
+    background: #F9FAFB;
+    border-color: transparent;
+    border-bottom: 1px dashed #D1D5DB;
+    color: #4B5563;
+    padding-left: 0;
+    border-radius: 0;
+}
+
+#fs_billing_address.fs-read-mode td span {
+    display: none;
+}
+
+#fs_billing_address.fs-read-mode input,
+#fs_billing_address.fs-read-mode select {
+    background: transparent;
+    border-color: transparent;
+    border-bottom: 1px dashed #D1D5DB;
+    color: #4B5563;
+    padding-left: 0;
+    border-radius: 0;
+}
+
+#fs_billing_address.fs-read-mode input::-moz-placeholder,
+#fs_billing_address.fs-read-mode select::-moz-placeholder {
+    color: #D1D5DB;
+}
+
+#fs_billing_address.fs-read-mode input::placeholder,
+#fs_billing_address.fs-read-mode select::placeholder {
+    color: #D1D5DB;
+}
+
+#fs_billing_address button {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: #674FBF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+}
+
+#fs_billing_address button:hover {
+    background: #5A3DAA;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(103, 79, 191, 0.25);
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 639px) {
+    #fs_account .fs-header-actions {
+        margin: 0 0 16px;
+        padding: 0 20px 16px;
+        position: static;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    #fs_account .fs-header-actions li {
+        display: inline-block;
+        float: none;
+        margin: 4px 8px 4px 0;
+    }
+
+    #fs_account #fs_account_details,
+    #fs_account #fs_account_details tbody,
+    #fs_account #fs_account_details td,
+    #fs_account #fs_account_details th,
+    #fs_account #fs_account_details tr {
+        display: block;
+    }
+
+    #fs_account #fs_account_details tr td:first-child {
+        text-align: left;
+        padding-bottom: 4px;
+        font-weight: 600;
+    }
+
+    #fs_account #fs_account_details tr td:nth-child(2) {
+        padding: 0 16px 16px;
+    }
+
+    #fs_account #fs_account_details tr td:nth-child(2) code {
+        margin: 0;
+        padding: 4px 8px;
+        display: inline-block;
+    }
+
+    #fs_account #fs_account_details tr td:nth-child(2) label {
+        margin-left: 0;
+    }
+
+    #fs_account #fs_account_details tr td:nth-child(3) {
+        text-align: left;
+        padding: 0 16px 16px;
+    }
+
+    #fs_account #fs_account_details tr.fs-field-plan td:nth-child(2) .button-group {
+        float: none;
+        margin: 12px 0;
+        flex-wrap: wrap;
+    }
+
+    .fs-key-value-table td, .fs-key-value-table th {
+        padding: 8px 12px;
+    }
+}
+
+/* Additional Enhancements */
+.fs-key-value-table tbody tr:hover {
+    background: #F5F3FF;
+    transition: background 0.2s ease;
+}
+
+#fs_account .button {
+    background: #674FBF;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+#fs_account .button:hover {
+    background: #5A3DAA;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(103, 79, 191, 0.25);
+}
+
+#fs_account .button.button-secondary {
+    background: white;
+    color: #374151;
+    border: 1px solid #E5E7EB;
+}
+
+#fs_account .button.button-secondary:hover {
+    background: #F9FAFB;
+    border-color: #D1D5DB;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Smooth Transitions */
+#fs_account input,
+#fs_account select,
+#fs_account textarea,
+#fs_account button,
+#fs_account .button,
+#fs_account a {
+    transition: all 0.2s ease;
+}

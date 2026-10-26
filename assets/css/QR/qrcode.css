@@ -1,0 +1,682 @@
+
+:root {
+    --walletup-qr-primary: #674FBF;
+    --walletup-qr-primary-light: #F4F4FF;
+    --walletup-qr-primary-dark: #4A3A80;
+    --walletup-qr-secondary: #F59E0B;
+    --walletup-qr-success: #10B981;
+    --walletup-qr-error: #EF4444;
+    --walletup-qr-warning: #F97316;
+    --walletup-qr-info: #3B82F6;
+    --walletup-qr-text: #1F2937;
+    --walletup-qr-text-light: #6B7280;
+    --walletup-qr-border: #E5E7EB;
+    --walletup-qr-background: #FFFFFF;
+    --walletup-qr-background-alt: #F9FAFB;
+    --walletup-qr-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --walletup-qr-radius: 0.75rem;
+    --walletup-qr-transition: all 0.2s ease;
+  }
+  
+  .walletup-qrcode-container {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    max-width: 100%;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: var(--walletup-qr-background);
+    border-radius: var(--walletup-qr-radius);
+    box-shadow: var(--walletup-qr-shadow);
+    color: var(--walletup-qr-text);
+    transition: var(--walletup-qr-transition);
+  }
+  
+  .walletup-qrcode-dark-mode {
+    --walletup-qr-background: #1F2937;
+    --walletup-qr-background-alt: #111827;
+    --walletup-qr-text: #F9FAFB;
+    --walletup-qr-text-light: #D1D5DB;
+    --walletup-qr-border: #374151;
+    color: var(--walletup-qr-text);
+  }
+  
+  .walletup-qrcode-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem auto;
+    border-radius: calc(var(--walletup-qr-radius) / 2);
+    transition: transform 0.3s ease;
+  }
+  
+  .walletup-qrcode-image:hover {
+    transform: scale(1.02);
+  }
+  
+  .walletup-qrcode-caption {
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--walletup-qr-text);
+  }
+  
+  .walletup-qrcode-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    justify-content: center;
+  }
+  
+  .walletup-qrcode-download,
+  .walletup-qrcode-generate,
+  .walletup-qrcode-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--walletup-qr-primary);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    line-height: 1.5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .walletup-qrcode-download:hover,
+  .walletup-qrcode-generate:hover,
+  .walletup-qrcode-copy:hover {
+    background-color: var(--walletup-qr-primary-dark);
+    transform: translateY(-1px);
+  }
+  
+  .walletup-qrcode-download:active,
+  .walletup-qrcode-generate:active,
+  .walletup-qrcode-copy:active {
+    transform: translateY(1px);
+  }
+  
+  .walletup-qrcode-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--walletup-qr-error);
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .walletup-error-icon::before {
+    content: "⚠️";
+    font-size: 1rem;
+  }
+  
+  .walletup-qrcode-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: var(--walletup-qr-text-light);
+    font-size: 0.875rem;
+  }
+  
+  .walletup-loading {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid rgba(103, 79, 191, 0.2);
+    border-top-color: var(--walletup-qr-primary);
+    border-radius: 50%;
+    animation: walletup-spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes walletup-spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .walletup-qrcode-generator {
+    margin-top: 2rem;
+    border-top: 1px solid var(--walletup-qr-border);
+    padding-top: 1.5rem;
+  }
+  
+  .walletup-qrcode-generator h3 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    color: var(--walletup-qr-text);
+    text-align: center;
+  }
+  
+  .walletup-qrcode-field {
+    margin-bottom: 1rem;
+  }
+  
+  .walletup-qrcode-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--walletup-qr-text);
+  }
+  
+  .walletup-qrcode-field input[type="text"],
+  .walletup-qrcode-field input[type="url"],
+  .walletup-qrcode-field select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid var(--walletup-qr-border);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background-color: var(--walletup-qr-background);
+    color: var(--walletup-qr-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .walletup-qrcode-field input[type="text"]:focus,
+  .walletup-qrcode-field input[type="url"]:focus,
+  .walletup-qrcode-field select:focus {
+    outline: none;
+    border-color: var(--walletup-qr-primary);
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.1);
+  }
+  
+  .walletup-qrcode-field input[type="color"] {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--walletup-qr-border);
+    border-radius: 0.375rem;
+    padding: 0;
+    background-color: var(--walletup-qr-background);
+  }
+  
+  .walletup-qrcode-field input[type="file"] {
+    width: 100%;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    color: var(--walletup-qr-text);
+  }
+  
+  .walletup-field-description {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--walletup-qr-text-light);
+    margin-top: 0.25rem;
+  }
+  
+  .walletup-qrcode-field-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+.walletup-logo-with-border {
+    padding: 2px;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.walletup-logo-preview-border-1 {
+    padding: 1px;
+}
+
+.walletup-logo-preview-border-5 {
+    padding: 5px;
+}
+
+.walletup-logo-preview-border-10 {
+    padding: 10px;
+}
+
+.walletup-finder-patterns-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    margin: 10px auto;
+    width: 120px;
+}
+
+.walletup-finder-box {
+    width: 30px;
+    height: 30px;
+    background-color: var(--walletup-qr-primary);
+    margin: 0 auto;
+}
+
+.walletup-finder-rounded {
+    border-radius: 6px;
+}
+
+.walletup-finder-square {
+    border-radius: 0;
+}
+  .walletup-qrcode-field input[type="range"] {
+    width: 100%;
+    margin: 0.5rem 0;
+    background-color: transparent;
+    -webkit-appearance: none;
+  }
+  
+  .walletup-qrcode-field input[type="range"]:focus {
+    outline: none;
+  }
+  
+  .walletup-qrcode-field input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 0.375rem;
+    background-color: var(--walletup-qr-border);
+    border-radius: 1rem;
+    cursor: pointer;
+  }
+  
+  .walletup-qrcode-field input[type="range"]::-webkit-slider-thumb {
+    height: 1rem;
+    width: 1rem;
+    background-color: var(--walletup-qr-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -0.3125rem;
+  }
+  
+  .walletup-qrcode-field input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 0.375rem;
+    background-color: var(--walletup-qr-border);
+    border-radius: 1rem;
+    cursor: pointer;
+  }
+  
+  .walletup-qrcode-field input[type="range"]::-moz-range-thumb {
+    height: 1rem;
+    width: 1rem;
+    background-color: var(--walletup-qr-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .walletup-range-value {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.75rem;
+    color: var(--walletup-qr-text-light);
+    margin-top: 0.25rem;
+  }
+  
+  .walletup-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .walletup-checkbox-label input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid var(--walletup-qr-border);
+    border-radius: 0.25rem;
+    background-color: var(--walletup-qr-background);
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+  }
+  
+  .walletup-checkbox-label input[type="checkbox"]:checked {
+    background-color: var(--walletup-qr-primary);
+    border-color: var(--walletup-qr-primary);
+  }
+  
+  .walletup-checkbox-label input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 0.3125rem;
+    top: 0.125rem;
+    width: 0.375rem;
+    height: 0.625rem;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .walletup-style-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.625rem;
+    margin: 0.5rem 0 1rem;
+  }
+  
+  .walletup-style-option {
+    cursor: pointer;
+    padding: 0.625rem;
+    border-radius: 0.375rem;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    background-color: var(--walletup-qr-background-alt);
+  }
+  
+  .walletup-style-option:hover {
+    background-color: rgba(103, 79, 191, 0.05);
+  }
+  
+  .walletup-style-option.selected {
+    border-color: var(--walletup-qr-primary);
+    background-color: rgba(103, 79, 191, 0.1);
+  }
+  
+  .walletup-style-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 0.25rem;
+    padding: 0.25rem;
+  }
+  
+  .walletup-style-label {
+    font-size: 0.75rem;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .walletup-logo-preview-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 1rem auto;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--walletup-qr-border);
+  }
+  
+  .walletup-logo-preview-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    z-index: 1;
+  }
+  
+  .walletup-logo-preview-img {
+    position: relative;
+    z-index: 2;
+    max-width: 90%;
+    max-height: 90%;
+    display: block;
+  }
+  
+  .walletup-logo-punchout-preview .walletup-logo-preview-bg {
+    background-color: transparent;
+    background-image: linear-gradient(45deg, #ddd 25%, transparent 25%), 
+                      linear-gradient(-45deg, #ddd 25%, transparent 25%), 
+                      linear-gradient(45deg, transparent 75%, #ddd 75%), 
+                      linear-gradient(-45deg, transparent 75%, #ddd 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  }
+  
+  .walletup-qrcode-section-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--walletup-qr-border);
+  }
+  
+  .walletup-qrcode-section-toggle h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--walletup-qr-text);
+  }
+  
+  .walletup-toggle-advanced,
+  .walletup-toggle-logo {
+    background: none;
+    border: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--walletup-qr-text-light);
+    transition: transform 0.2s ease;
+    padding: 0;
+  }
+  
+  .walletup-toggle-icon::before {
+    content: "";
+    display: block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+  
+  .walletup-toggle-advanced.open .walletup-toggle-icon::before,
+  .walletup-toggle-logo.open .walletup-toggle-icon::before {
+    transform: rotate(-135deg);
+  }
+  
+  .walletup-logo-position-control {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.25rem;
+    width: 120px;
+    height: 120px;
+    margin: 1rem auto;
+    border: 1px solid var(--walletup-qr-border);
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    background-color: var(--walletup-qr-background-alt);
+  }
+  
+  .walletup-position-cell {
+    cursor: pointer;
+    border-radius: 0.25rem;
+    border: 1px solid var(--walletup-qr-border);
+    transition: background-color 0.2s ease;
+    background-color: var(--walletup-qr-background);
+  }
+  
+  .walletup-position-cell:hover {
+    background-color: rgba(103, 79, 191, 0.1);
+  }
+  
+  .walletup-position-cell.selected {
+    background-color: var(--walletup-qr-primary);
+    border-color: var(--walletup-qr-primary);
+  }
+  
+  .walletup-qrcode-preview-area {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .walletup-qrcode-preview-container {
+    padding: 1rem;
+    border-radius: var(--walletup-qr-radius);
+    background-color: var(--walletup-qr-background-alt);
+    box-shadow: var(--walletup-qr-shadow);
+    display: inline-block;
+    min-width: 200px;
+  }
+  
+  .walletup-qrcode-placeholder {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--walletup-qr-border);
+    border-radius: 0.5rem;
+    color: var(--walletup-qr-text-light);
+    font-size: 0.875rem;
+    margin: 1rem auto;
+  }
+  
+  .sp-container {
+    border-color: var(--walletup-qr-border) !important;
+    background-color: var(--walletup-qr-background) !important;
+    border-radius: 0.375rem !important;
+    box-shadow: var(--walletup-qr-shadow) !important;
+  }
+  
+  .sp-picker-container {
+    border-left: none !important;
+  }
+  
+  .sp-button-container .sp-cancel,
+  .sp-button-container .sp-choose {
+    border-radius: 0.25rem !important;
+    padding: 0.25rem 0.75rem !important;
+    text-shadow: none !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .sp-button-container .sp-cancel {
+    color: var(--walletup-qr-text) !important;
+    background-color: var(--walletup-qr-background) !important;
+    border: 1px solid var(--walletup-qr-border) !important;
+  }
+  
+  .sp-button-container .sp-choose {
+    background-color: var(--walletup-qr-primary) !important;
+    border: 1px solid var(--walletup-qr-primary-dark) !important;
+  }
+  
+  @media (max-width: 768px) {
+    .walletup-qrcode-container {
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .walletup-qrcode-field-group {
+      grid-template-columns: 1fr;
+    }
+    
+    .walletup-style-preview {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .walletup-qrcode-caption {
+      font-size: 1rem;
+    }
+    
+    .walletup-qrcode-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .walletup-qrcode-download,
+    .walletup-qrcode-generate,
+    .walletup-qrcode-copy {
+      padding: 0.75rem;
+    }
+    
+    .walletup-qrcode-preview-container {
+      min-width: auto;
+      width: 100%;
+    }
+  }
+  
+  @media print {
+    .walletup-qrcode-container {
+      box-shadow: none;
+      border: 1px solid #e5e7eb;
+      break-inside: avoid;
+    }
+    
+    .walletup-qrcode-generator,
+    .walletup-qrcode-actions {
+      display: none;
+    }
+    
+    .walletup-qrcode-image {
+      max-width: 80%;
+    }
+  }
+  
+  .walletup-text-center {
+    text-align: center;
+  }
+  
+  .walletup-mb-1 {
+    margin-bottom: 0.25rem;
+  }
+  
+  .walletup-mb-2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .walletup-mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .walletup-mt-1 {
+    margin-top: 0.25rem;
+  }
+  
+  .walletup-mt-2 {
+    margin-top: 0.5rem;
+  }
+  
+  .walletup-mt-4 {
+    margin-top: 1rem;
+  }
+  
+  .walletup-flex {
+    display: flex;
+  }
+  
+  .walletup-flex-col {
+    flex-direction: column;
+  }
+  
+  .walletup-items-center {
+    align-items: center;
+  }
+  
+  .walletup-justify-center {
+    justify-content: center;
+  }
+  
+  .walletup-justify-between {
+    justify-content: space-between;
+  }
+  
+  .walletup-gap-2 {
+    gap: 0.5rem;
+  }
+  
+  .walletup-hidden {
+    display: none;
+  }

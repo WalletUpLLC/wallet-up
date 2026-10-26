@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="PayTo">
+  <rect width="64" height="64" rx="14" fill="#003057"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 27 32 17l16 10"/>
+    <path d="M21 30v14M32 30v14M43 30v14"/>
+    <path d="M16 48h32"/>
+  </g>
+</svg>

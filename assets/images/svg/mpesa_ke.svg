@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 428">
+  <rect width="428" height="428" rx="80" fill="#4DB848"/>
+  <g transform="translate(214,214)">
+    <!-- M-Pesa "M" letterform -->
+    <text x="0" y="-20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="180" fill="#ffffff">M</text>
+    <!-- PESA text below -->
+    <text x="0" y="80" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="60" fill="#ffffff" letter-spacing="8">PESA</text>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+{
+    "meta": {
+        "language": "es_ES",
+        "name": "Spanish (Spain)",
+        "version": "1.0.0",
+        "updated": "2025-08-02 21:38:10",
+        "source": "Extracted from WalletUp Pro translations",
+        "total_expected": 487,
+        "total_processed": 9
+    },
+    "translations": {
+        "Scan complete. Found %d new strings.": "Escáner completo. Encontrado %d nuevas cuerdas.",
+        "seconds": "segundos",
+        "minute": "minuto",
+        "minutes": "minutos",
+        "hour": "hora",
+        "hours": "horas",
+        "day": "día",
+        "days": "días",
+        "week": "semana"
+    }
+}
