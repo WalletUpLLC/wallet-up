@@ -1,0 +1,458 @@
+
+.dismissal-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999998;
+    display: none;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.dismissal-modal-overlay.active {
+    display: block;
+}
+
+.dismissal-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 999999;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: none;
+    animation: slideIn 0.3s ease-out;
+}
+
+.dismissal-modal.active {
+    display: block;
+}
+
+.dismissal-modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px 30px;
+    position: relative;
+}
+
+.dismissal-modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dismissal-modal-title .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.dismissal-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.dismissal-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.dismissal-modal-close .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.dismissal-modal-body {
+    padding: 30px;
+    max-height: calc(90vh - 200px);
+    overflow-y: auto;
+}
+
+.dismissal-preview {
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.dismissal-preview-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dismissal-string-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.dismissal-string-item {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 13px;
+    color: #1f2937;
+    word-break: break-all;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dismissal-string-item:last-child {
+    margin-bottom: 0;
+}
+
+.dismissal-string-item .recommendation-badge {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dismissal-options {
+    margin-bottom: 24px;
+}
+
+.dismissal-option {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dismissal-option:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.dismissal-option.selected {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.dismissal-option-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dismissal-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.dismissal-option-content {
+    flex: 1;
+}
+
+.dismissal-option-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dismissal-option-title .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.language-badge {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dismissal-option-description {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.dismissal-warning {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.dismissal-warning .dashicons {
+    color: #f59e0b;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.dismissal-warning-text {
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.dismissal-modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 20px 30px;
+    background: #f9fafb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.dismissal-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.dismissal-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dismissal-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.dismissal-btn-cancel {
+    background: #ffffff;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.dismissal-btn-cancel:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.dismissal-btn-dismiss-language {
+    background: #3b82f6;
+    color: white;
+}
+
+.dismissal-btn-dismiss-language:hover {
+    background: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.dismissal-btn-dismiss-global {
+    background: #674FBF;
+    color: white;
+}
+
+.dismissal-btn-dismiss-global:hover {
+    background: #5030A5;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.dismissal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dismissal-modal-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.dismissal-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .dismissal-modal {
+        width: 95%;
+        max-width: none;
+        margin: 20px;
+    }
+    
+    .dismissal-modal-header {
+        padding: 20px;
+    }
+    
+    .dismissal-modal-body {
+        padding: 20px;
+        max-height: calc(100vh - 180px);
+    }
+    
+    .dismissal-modal-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .dismissal-modal-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .dismissal-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .dismissal-modal-title {
+        font-size: 18px;
+    }
+    
+    .dismissal-option-title {
+        font-size: 14px;
+    }
+    
+    .dismissal-string-list {
+        max-height: 150px;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .dismissal-modal {
+        background: #1f2937;
+        color: #f3f4f6;
+    }
+    
+    .dismissal-modal-header {
+        background: linear-gradient(135deg, #4c63d2 0%, #5a3896 100%);
+    }
+    
+    .dismissal-preview {
+        background: #111827;
+        border-color: #374151;
+    }
+    
+    .dismissal-string-list {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dismissal-string-item {
+        background: #111827;
+        color: #e5e7eb;
+    }
+    
+    .dismissal-option {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .dismissal-option:hover,
+    .dismissal-option.selected {
+        border-color: #667eea;
+        background: #1e293b;
+    }
+    
+    .dismissal-modal-footer {
+        background: #111827;
+        border-color: #374151;
+    }
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 428 428">
+  <rect width="428" height="428" rx="80" fill="#FF4949"/>
+  <g transform="translate(214,214)">
+    <!-- Airtel wave/swoosh -->
+    <path d="M-80,-60 C-40,-100 40,-100 80,-60 C60,-40 -60,-40 -80,-60 Z" fill="#ffffff"/>
+    <!-- airtel text -->
+    <text x="0" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="72" fill="#ffffff">airtel</text>
+    <!-- Money text below -->
+    <text x="0" y="95" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="600" font-size="44" fill="#ffffff" opacity="0.9">Money</text>
+  </g>
+</svg>

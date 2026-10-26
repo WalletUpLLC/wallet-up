@@ -1,0 +1,13 @@
+# Deny direct access to .wup files
+<FilesMatch "\.(wup)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Disable PHP execution
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+Options -Indexes

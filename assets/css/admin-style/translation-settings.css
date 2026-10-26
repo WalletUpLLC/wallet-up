@@ -1,0 +1,153 @@
+
+.wallet-up-translation-settings .form-table {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin: 20px 0;
+}
+
+.wallet-up-translation-settings .form-table td,
+.wallet-up-translation-settings .form-table th {
+    padding: 15px 20px;
+}
+
+.wallet-up-translation-settings h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.wallet-up-translation-settings .translation-provider-settings {
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.wallet-up-translation-settings .translation-provider-settings.active {
+    display: table-row;
+}
+
+.wallet-up-translation-settings .toggle-password {
+    margin-left: 5px;
+    vertical-align: middle;
+    padding: 4px 8px;
+    min-height: 30px;
+    line-height: 1;
+}
+
+.wallet-up-translation-settings .toggle-password .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.wallet-up-translation-settings .translation-test-section {
+    margin-top: 30px;
+    padding: 25px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    border-radius: 4px;
+}
+
+.wallet-up-translation-settings .translation-test-section h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.wallet-up-translation-settings .translation-test-section p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.wallet-up-translation-settings #translation-result {
+    padding: 15px;
+    background: #f0f0f1;
+    border-radius: 3px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+}
+
+.wallet-up-translation-settings #translation-result strong {
+    display: inline-block;
+    min-width: 100px;
+    color: #23282d;
+}
+
+.wallet-up-translation-settings #translation-result.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.wallet-up-translation-settings #translation-result.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.wallet-up-translation-settings .description {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.wallet-up-translation-settings .description a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.wallet-up-translation-settings .description a:hover {
+    color: #00a0d2;
+    text-decoration: underline;
+}
+
+.wallet-up-translation-settings input[type="password"],
+.wallet-up-translation-settings input[type="text"],
+.wallet-up-translation-settings input[type="url"],
+.wallet-up-translation-settings input[type="number"],
+.wallet-up-translation-settings select {
+    max-width: 400px;
+}
+
+.wallet-up-translation-settings .submit {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.wallet-up-translation-settings .translation-provider-settings[data-provider="google"] th {
+    color: #4285f4;
+}
+
+.wallet-up-translation-settings .translation-provider-settings[data-provider="deepl"] th {
+    color: #0f2b46;
+}
+
+.wallet-up-translation-settings .translation-provider-settings[data-provider="libre"] th {
+    color: #2a7ae4;
+}
+
+.wallet-up-translation-settings .button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+@media screen and (max-width: 782px) {
+    .wallet-up-translation-settings .form-table td,
+    .wallet-up-translation-settings .form-table th {
+        display: block;
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .wallet-up-translation-settings input[type="password"],
+    .wallet-up-translation-settings input[type="text"],
+    .wallet-up-translation-settings input[type="url"],
+    .wallet-up-translation-settings select {
+        width: 100%;
+        max-width: none;
+    }
+}

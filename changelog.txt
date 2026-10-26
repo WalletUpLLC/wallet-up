@@ -1,0 +1,473 @@
+== Changelog ==
+
+= 6.3.1 - October 16, 2026 =
+* New: Charities, nonprofits and churches can apply for a free lifetime Wallet Up Pro licence from the dashboard.
+* Improved: Live previews show a clear note in place of steps that need your own site.
+* Improved: On nonprofit forms, donors giving by PayPal, Venmo or on a schedule can still cover processing fees.
+* Improved (Pro): Card setup status in the dashboard reads in plain language.
+* Improved: Dashboard sections you fold away stay out of the way for keyboard and screen reader users.
+* Improved: Tighter security around built-in diagnostics.
+
+= 6.3.0 - October 15, 2026 =
+* New (Pro): Nonprofits in the WalletUp program can invite donors to cover the processing fee on their gift.
+* New (Pro): Donation receipts show the gift and any fee the donor covered on separate lines.
+* Improved: Setting up card payments now gives clear, friendly guidance when your site still needs an account connected, and a calm note when you are exploring a live preview.
+
+= 6.2.9 - October 11, 2026 =
+* Improved: Activating Pro after purchase takes fewer steps, with a one-click download of the Pro version from the upgrade prompt.
+* Improved: Reliability and consistency fixes across trials and all plan tiers.
+
+= 6.2.8 - October 10, 2026 =
+* Improved: Upgrading and activating Pro now happen right inside WordPress, for a smoother, more reliable setup.
+* Improved: If you have already purchased Pro, a clear in-dashboard prompt helps you activate it on your site without buying again.
+
+= 6.2.7 - October 9, 2026 =
+* New: Set up several payment methods at once, each with its own handle.
+* New: Guided first-run welcome, with optional free setup help.
+* Improved (Pro): Payment methods on your WooCommerce checkout, cards and wallets together.
+* Improved: Setup adapts to your business type and plan.
+* Improved: Cleaner, more consistent admin.
+
+= 6.2.6 - October 7, 2026 =
+* New: Collect donations from setup: a quick Tip Jar, or (Pro) a full form and campaigns with goals and donor management.
+* New: A matched offer on deactivation, based on how you use Wallet Up.
+* New: Pause 30 days instead of deactivating, keeps taking payments with one-click resume.
+* Improved: Security and reliability updates to licensing and setup.
+
+= 6.2.5 - October 6, 2026 =
+* New: Add Wallet Up to your WPForms forms as a payment field, so a form can take card, bank and wallet payments right where visitors fill it in.
+* New: The admin dashboard and every settings page now adapt to phones and tablets, with a slide-in menu for small screens.
+* New: "More by WalletUp" is available in the free admin, introducing the Widewalk accessibility toolbar and the Beacon theme.
+* Improved: Manage every Wallet Up payment option for WPForms from one settings page, with the form builder previewing the exact methods your visitors will see.
+* Improved: A smoother card step on WPForms forms, with a clear status while a payment goes through and an easy retry if a card is declined.
+* Improved: The order confirmation page names the exact card or wallet used for the payment.
+* Improved: The setup assistant highlights Stripe Connect as the one-step way to take cards at your WooCommerce checkout, and makes clear which options the checkout supports.
+* New: When you set up donations, choose where supporters land: a quick Tip Jar, or a full donation form page with suggested amounts, recurring gifts and tax receipts.
+* Improved: Setup checks your payment username as you enter it, so the link and QR you share always point to a working page.
+* Improved: Wallet Up points out when a setting still needs attention while you are setting up, so nothing is quietly left half done.
+* Improved: A smoother experience when trying Wallet Up from the WordPress.org plugin preview.
+
+= 6.2.4 - September 29, 2026 =
+* New: A "More by WalletUp" page introduces free companion tools, the Widewalk accessibility toolbar and the Beacon theme.
+
+= 6.2.1 - September 25, 2026 =
+* Improved: Cash App, Venmo and PayPal shortcodes guide you straight to turning the method on, so setup is clear from the first try.
+* Improved: Steadier handling of payment notifications for sites that are still completing their setup.
+
+= 6.2.0 - September 21, 2026 =
+* Improved: Security hardening now applies only where it belongs, so your cart, theme and other plugins load and work exactly as they should.
+* Improved: The payment QR appears instantly and always matches your checkout total, including shipping, for every payment method.
+* Improved: The checkout payment QR sits perfectly centered at every screen width, with a steady payment area and no layout shift.
+* Improved: A cleaner, consistent WordPress toolbar and admin menu that line up neatly with your theme and other plugins, on desktop and mobile.
+* Improved: Full payment options on Pay for order pages and payment links.
+* Improved: Accurate per-method checkout analytics.
+* Improved: Orders in Activity show customer, shipping and items, and open in full.
+* New: Find a transaction by order number; open any from its reference.
+* Improved: Order alerts open straight to that order in Activity.
+* Improved: Activity totals and charts count active orders, methods named correctly.
+* Improved: Uploaded payment QR shows in the same framed card as built-in codes.
+
+= 6.1.0 - September 13, 2026 =
+* New: A one-click setup check that names what is missing when payments are not showing up yet.
+* Improved: A single site can now run more than one set of payment credentials, for agencies and multi-brand stores.
+
+= 6.0.4 - September 11, 2026 =
+* Improved: Card setup on the donation form and the pay page explains where it stands at every step, with a retry if you need one.
+* Improved: Typing a custom donation amount is smoother, with the card prepared once you have finished rather than on every keystroke.
+* Improved: Fee wording is read from one place, so the plugin, the merchant portal and the terms always say the same thing.
+* Improved: Card payments offer whatever your connected Stripe account supports, including Klarna, Link and Cash App Pay where Stripe allows them.
+
+= 6.0.3 - September 3, 2026 =
+* Improved: Setup names the account format each wallet expects, so a PayPal.Me handle, a Cashtag or a Venmo username is clear at the point you enter it.
+* New: A licence you have already paid for is recognised on Wallet Up screens, with a one-click download of the Pro version and the steps to install it.
+
+= 6.0.2 - September 3, 2026 =
+* Improved: Payment account fields accept a pasted wallet link or handle, so setup takes your details in the form your wallet presents them.
+* Improved: Zambian mobile money accounts accept both the local and the international number format.
+* Improved: Crypto payout addresses accept the full range of Bitcoin, BNB and Dogecoin formats.
+* Improved: The PayPal connection check recognises a configured PayPal.Me account.
+
+= 6.0.1 - September 2, 2026 =
+* Improved: Wallet Up notices stay on Wallet Up's own screens, keeping the rest of your admin clear.
+* Improved: Locked payment methods point to one clear upgrade path wherever they appear.
+
+= 6.0.0 - August 19, 2026 =
+* New: (Pro) Canadian and Australian payments built in — accept Interac e-Transfer, PayID, BPAY and PayTo, each with clear pay-and-confirm instructions for your customers and donors.
+* New: (Pro) Memberships — offer recurring membership tiers with a guided setup that takes you from zero to a live sign-up page in a few clicks.
+* New: (Pro) Ready-made tier sets for nonprofits, creators, clubs and professional bodies — start from a template and adjust names and prices to fit.
+* New: (Pro) One-click membership page — publish a branded sign-up page, or drop the form into any page or post with a shortcode.
+* New: (Pro) Member management — search across thousands of members by name, email or ID, filter by tier and status, page through the list, and open any member to see their full record.
+* New: (Pro) More ways to give in one step — donation forms present card, Klarna, Cash App and Link right in the form, matched to the donor's country.
+* Improved: (Pro) Consistent Stripe experience everywhere — card availability and Test/Live mode follow your connected Stripe account across WooCommerce checkout, express checkout, donations and forms.
+* Improved: (Pro) Activity → Transactions brings every payment into one place — WooCommerce, donations, memberships and payment links, across every method, with filtering and search.
+* Improved: (Pro) Worldwide currency support — amounts are handled correctly for every currency, including zero-decimal currencies such as Japanese yen and Korean won.
+* New: Card payments in the free version — connect Stripe in about a minute and take Visa, Mastercard and Amex on your WooCommerce checkout. A 2% platform fee applies to card transactions only; the peer-to-peer methods stay free.
+* New: A card switch on the Sell with cards screen — turn card payments on for your checkout when your Stripe account is ready, and see at a glance whether they are showing.
+* New: (Pro) Show every payment method Stripe offers — one switch swaps the card fields for Stripe's Payment Element, so cards, Apple Pay, Google Pay, Link and the local methods your account supports all appear at checkout.
+* New: Pay-by-bank instruction pages now carry the amount and the reference your bank asks for, including the BPAY Customer Reference Number.
+* Improved: The setup assistant reads your live payment catalogue, so every method you can use appears in it, and it offers the right steps for your plan.
+* Improved: The assistant can put your chosen method straight onto your WooCommerce checkout as you finish setup.
+* Improved: The admin reads and works properly on a phone — scrollable tabs, readable tables, and dialogs that fit the screen.
+* Improved: PayPal Commerce now carries its own PayPal mark at checkout, distinct from PayPal.me.
+* Improved: Updated styles and scripts reach your visitors as soon as they ship.
+
+= 5.9.7 - August 12, 2026 =
+* Improved: (Pro) Display methods WooCommerce checkout conflicts resolution
+* Improved: (Pro) Minor Fixes
+
+= 5.9.5 - August 8, 2026 =
+* Improved: (Pro) One polished, uniform WooCommerce checkout — every payment method in a single clean list with centered QR codes, consistent across all themes and checkout styles.
+* Improved: (Pro) Stripe connection status in Payments shows connected, verifying, and action-needed states at a glance.
+
+= 5.9.3 - July 31, 2026 =
+
+* Improved: Cleaner payment method layout on mobile checkout — gateway logos and labels stay tidy and easy to tap on smaller screens.
+
+= 5.9.2 - July 24, 2026 =
+
+* New: Activate your Pro license right from the plugin if you've already purchased it — no need to buy again.
+* New: A Get Help page where you can share secure, temporary access with our team and copy a diagnostics summary in one click, so support can sort things out fast.
+
+= 5.9.1 - July 23, 2026 =
+
+* New (Pro): Build multi-column donation forms — drag a Columns block (2, 3, or 4 columns) into the form and drag any field into it. Add your logo and group fields into named sections too, all from the drag-and-drop builder.
+* New (Pro): Full color control for donation forms, including a surface color for inputs and cards, with a live preview.
+* Improved (Pro): Refined donation form styling — clearer amount selection, tidier spacing, and brand-matched focus states.
+
+= 5.9.0 - July 19, 2026 =
+
+* New (Pro): Confirmation Display (Beta) under Seller lets you set the order and content of every section on the order confirmation page, with a live preview.
+* New (Pro): Branded, professional email design — set your logo, accent color, and footer address in Emails > Settings.
+* New (Pro): Audit Log under Activity records who changed key settings, and when.
+* Improved: Security and stability improvements.
+* Improved: Minor improvements and fixes.
+
+= 5.8.1 - July 17, 2026 =
+
+* New (Pro): Send all your site's email — WordPress and WooCommerce included — through your chosen provider (SMTP, Resend, SendGrid, Mailgun, or Postmark). Turn it on in Emails > Delivery. Attachments, Cc and Bcc are supported, and it steps aside if you already run a dedicated email plugin.
+* New (Pro): Card and PayPal donations without WooCommerce. Add your keys and turn on card payments in Payments > Stripe.
+* New (Pro): Recurring monthly card and PayPal donations.
+
+= 5.8.0 - July 14, 2026 =
+Donation system overhaul.
+
+* New (Pro): App-based donations (Cash App, Venmo, Zelle, and more) now show a scannable QR code and a pay button so donors can complete payment.
+* New (Pro): App-based donations are held as "Awaiting confirmation" and kept out of the raised total until confirmed from the Activity page.
+* New (Pro): A Donations tab under the Donations menu lists your donation transactions, where you can confirm app-based payments (other transactions are not shown there).
+* New (Pro): Full form appearance control — background, text and accent colors, corner radius, and a Custom CSS field.
+* Improved (Pro): Donation and receipt emails populate all placeholders and apply your From name, reply-to and test mode from Email Settings.
+* Improved (Pro): Receipts > Customize opens an editor for your tax receipt template.
+* Improved (Pro): Email Settings load reliably and keep your saved values.
+* Improved (Pro): Tax receipts use a dedicated table (migrated automatically), with receipt list paging and emailed receipts.
+* Improved (Pro): Fundraising thermometer shows live progress toward your goal.
+* Improved (Pro): Donors screen shows full donor details, history, notes and segments; overview counters cover your whole donor base.
+* Improved (Pro): CSV and PDF export with working report filters.
+* Improved (Pro): Donation forms and campaign pages load with full styling.
+* Improved (Pro): Form builder Preview shows your live form, including configured amounts, custom fields, multi-option checkboxes and file-type limits.
+* Improved (Pro): Embed shortcode and iframe embed.
+* Improved (Pro): Campaign-page donations save donor name and email; duplicating a campaign gives the copy its own URL.
+* Improved (Pro): Analytics estimates processing fees and net amount for card payments.
+* Improved (Pro): Public campaign page is fully translatable; anonymous donors are never named on the public donor list.
+* Security (Pro): Server-side amount validation and rate limiting on public donation endpoints.
+* Performance (Pro): Donation database setup runs once instead of on every request.
+
+= 5.7.18 - July 13, 2026 =
+* New (Pro): Option to show only your Zelle QR code and keep your Zelle phone or email off the checkout page. Turn on "Show QR only" in the Zelle settings — customers pay by scanning the code from their banking app.
+
+= 5.7.17 - July 6, 2026 =
+* FIX: Resolved issues with custom variables in venmo processing
+* Optimization: Additional minor fixes
+* Update: Freemius SDK
+
+= 5.7.16 - June 27, 2026 =
+* Improved: Zelle and Cash App confirmations accept a payment without a Transaction ID/Reference.
+* Performance: Lower memory use on sites running Redis or Memcached object caching.
+* Improved: Steadier caching during updates and daily cleanup.
+
+= 5.7.15 - June 20, 2026 =
+* New (Pro): Connect your own Stripe account with one click - no API keys to copy. Card payments at WooCommerce checkout then run on your connected account and confirm automatically.
+
+= 5.7.14 - June 17, 2026 =
+* New (Pro): Option to show the WooCommerce payment QR on the order confirmation page instead of the checkout page. Turn off "Show payment QR on the checkout page" in the seller settings, and customers pick a method at checkout, then see the QR and instructions after they place the order.
+
+= 5.7.13 - June 15, 2026 =
+* Fixed (Pro): Zelle now shows a single code that scans in any bank's Zelle scanner.
+* Removed (Pro): Unused Zelle code from the old bank-selector feature.
+
+= 5.7.12 - June 15, 2026 =
+* Fixed (Pro): Your Zelle name and uploaded code now stay in place after you save.
+
+= 5.7.11 - June 15, 2026 =
+* Improved (Pro): Setting your exact Zelle name builds a code that scans directly in your bank's app.
+
+= 5.7.10 - June 15, 2026 =
+* Fixed (Pro): The generated Zelle code now opens correctly when scanned in your bank's app.
+
+= 5.7.9 - June 14, 2026 =
+* New (Pro): Zelle shows a scannable code that opens your customer's banking app to pay you, built from your Zelle email or phone. A "See how" guide is included, and you can upload your bank's own code instead.
+* New (Pro): Option to show the order number in checkout payment details so customers can add it to their note. Toggle it next to the discount-label setting.
+* Fixed: Counted text like "1 item" / "2 items" no longer reverts to English alongside other translated plugins.
+
+= 5.7.8 - June 14, 2026 =
+* Fixed: Adding your account details on the Payments page now turns that method on right away. Existing sites are corrected automatically on update.
+
+= 5.7.7 - June 12, 2026 =
+* Fixed: Removing the free plugin while Pro is active no longer causes an error.
+* New: Payment setting changes now clear caches automatically, so updates show right away.
+* New: Choose when customers see payment details at checkout - on the page, or after the order is placed.
+* Fixed: The Seller tab's Save Settings bar now stays pinned while scrolling.
+
+= 5.7.6 - June 12, 2026 =
+* New (Pro): Cryptocurrency payments now show the wallet address with a one-tap Copy button under the QR code. Pay from the same device showing the code, or paste the address into any wallet app - no need to scan.
+
+= 5.7.5 - June 12, 2026 =
+* Improved: The dashboard recognizes your configured methods and completes setup, showing your payment link and QR code.
+
+= 5.7.4 - June 11, 2026 =
+* Added: After you buy Pro, a clear reminder now shows you the one step left - installing the Pro version - so your features unlock right away. The reminder disappears on its own once Pro is active.
+
+= 5.7.3 - June 10, 2026 =
+* Improved: Compatibility with certain other plugins (such as SliceWP) — translation handling safely ignores anything that isn't regular text.
+
+= 5.7.2 - June 9, 2026 =
+* Fixed: A turned-off payment method no longer prints its shortcode as plain text on the page. Site admins now see a short note on how to turn it on; visitors see nothing.
+* Fixed: Corrected the shortcode examples in this readme to the right format.
+
+= 5.7.1 - June 4, 2026 =
+* Fixed: The dashboard payment preview shows the QR code for every method again.
+* Improved: PayPal is now labeled "PayPal.me" to match the link it uses.
+* Fixed: A turned-off method's block now says to turn it on, instead of an upgrade message.
+
+= 5.7.0 - June 3, 2026 =
+* New (Pro): WalletUp Pay - a one-tap express checkout button at the top of your cart and checkout. It shows each shopper your best payment options and takes them straight to pay. With Stripe connected, Apple Pay and Google Pay finish the order in one tap; otherwise it opens your WalletUp methods. Turn on or off under Wallet Up → Payments.
+* New (Pro): Apple Pay works with no extra setup - your store's domain is verified with Stripe automatically.
+
+= 5.6.5 - June 2, 2026 =
+* Improved: Turning off "Enable Wallet Up gateway" from the dashboard hides every Wallet Up payment option at checkout, including individual methods (Cash App, Venmo, Zelle, and others). Your per-method settings are kept, so switching Wallet Up back on restores everything.
+* Improved: When Wallet Up is switched off from the dashboard, the WooCommerce > Settings > Payments screen now shows a clear note on the Wallet Up rows explaining they are paused from the Wallet Up dashboard, with a one-click link back to re-enable.
+
+= 5.6.4 - June 2, 2026 =
+* Improved: When the gateway is on, the "Enable Wallet Up at WooCommerce checkout" admin notice shows a green "Wallet Up is enabled" indicator with a one-click Disable button, keeping the global enable/disable control on WC Settings. Disabling here turns off the grouped gateway and every per-method gateway in one step.
+* Fixed: Selected payment method radio at WooCommerce checkout no longer shows the harsh black browser-default focus outline. Focus state now uses a soft Wallet Up purple ring, keeping keyboard accessibility intact while looking right inside the checkout.
+
+= 5.6.3 - June 2, 2026 =
+* Improved: At the legacy WooCommerce checkout, cart totals refresh only when you switch into or out of a discounted method, so toggling between non-discounted methods is silent.
+* Improved: In Grouped display mode, a Wallet Up sub-method (Cash App / Venmo / Zelle / etc.) stays selected through the cart refresh.
+* Improved: The "Enable Wallet Up at your WooCommerce checkout" admin notice hides on WC Settings → General once any Wallet Up gateway is enabled (grouped, individual, or card).
+
+= 5.6.2 - June 2, 2026 =
+* Improved: Payment method icons on the legacy WooCommerce checkout show at a compact inline 32 × 32, keeping each radio row on a single tidy line — across all three display modes (Grouped, Individual, Mixed).
+* Improved: Payment method radios at the WooCommerce checkout (Zelle, Card, Klarna, Affirm, Wallet Up, and others) stay selected after the page recalculates, on stores with multiple gateways enabled.
+* Improved: Payment QR codes on the WooCommerce checkout and thank-you pages open Cash App, Venmo, Zelle, PayPal, and other apps directly — including on sites with aggressive page caching or a CDN.
+
+= 5.6.1 - May 26, 2026 =
+* Fixed: Dashboard "Your payment page" card now uses a tab strip - pick any of your configured methods, see its QR, link, and actions instantly. Stays compact whether you have 1 method or 20.
+* New: Per-method "Add only this" action - drop just the selected method onto a fresh draft page.
+* New: "Build full payment page" button creates a page with one block per configured method, respecting your display preference (QR / Button / Link).
+* New: Shortcode Builder step 3 now has a "Create a page with this shortcode" action that drops the shortcode onto a fresh draft page.
+* Improved: Dashboard payment card, onboarding details, and block notices are fully translatable.
+
+= 5.6.0 - May 26, 2026 =
+**Major update - faster setup, blocks for the WordPress editor, and a shareable payment page on your dashboard.**
+
+* New: Four blocks for the WordPress editor - Payment Button, Payment QR Code, Tip Jar, Pay Link. Search "Wallet Up" in the block inserter.
+* New: Setup is goal-first - pick what you want to accept payments for, and we set it up in three questions.
+* New: A shareable link, a downloadable QR, and an "Add to a page" button appear when setup finishes.
+* New: Dashboard now opens with your payment page front-and-center.
+* New: Wallet Up notices on WPForms, WooCommerce, Elementor, Gravity Forms, Fluent Forms, and Forminator admin pages - see how Wallet Up plugs in.
+* Improved: Setup reminder for installs that never finished setup.
+* Improved: A backup setup form when the visual wizard can't load.
+* Improved: Tip Jar - visitors pick a preset amount or type a custom one.
+
+= 5.5.20 - May 25, 2026 =
+* Improved: Plugin description lists every supported payment method.
+
+= 5.5.19 - May 21, 2026 =
+* Improved: Shortcode Builder defaults to QR Code display.
+
+= 5.5.18 - May 21, 2026 =
+* Fixed: Setup Assistant requires the necessary fields before continuing.
+
+= 5.5.17 - May 21, 2026 =
+* Fixed: Payment QR codes at checkout open the correct payment app when scanned.
+
+= 5.5.16 - May 13, 2026 =
+* Improved: WooCommerce email preview on PHP 8.
+
+= 5.5.15 - April 30, 2026 =
+* Fixed: Free version no longer shows shortcode templates with Pro-only methods.
+* Fixed: Clearer error when previewing a Pro-only shortcode on the free version.
+* New: Two-week dismissible review request.
+* Tested up to WordPress 7.0.
+
+= 5.5.11 - April 30, 2026 =
+* Fixed: Free version no longer shows the WooCommerce step in the Setup Assistant.
+
+= 5.5.10 - April 28, 2026 =
+* Fixed: Clicking Place Order completes a PayPal card payment in one step.
+* Fixed: PayPal orders place automatically once approved.
+* Improved: Card payment shows "Completing order…" progress.
+
+= 5.5.8 - April 27, 2026 =
+* Improved: Card payments at checkout complete smoothly through to the order.
+* Improved: Card payments authorize correctly with PayPal.
+* Improved: Card errors are shown clearly; the Pay button resets after a failure.
+
+= 5.5.7 - April 27, 2026 =
+* Improved: Pro activates cleanly when the free version is installed.
+* Improved: Removing the free version keeps your Pro subscription active.
+* Improved: Free version goes dormant automatically when Pro is active.
+
+= 5.5.6 - April 25, 2026 =
+* New: PayPal at checkout now shows the official PayPal button and card fields
+* New: Cash App Pay at checkout now shows the official Cash App Pay button
+* New: Venmo at checkout now shows the official Venmo button
+* Fixed: Browser cache could keep showing old payment buttons after an update
+
+= 5.5.5 - April 23, 2026 =
+* New: Payments page shows how many methods are enabled, set up, and live at checkout
+* Improved: Setup Assistant only enables a method at checkout when its account details are filled in
+* Improved: Methods missing account details are clearly marked during setup
+* Fixed: Methods now appear at checkout as soon as they're set up
+* Fixed: WooCommerce → Payments no longer lists methods that aren't configured
+* Fixed: Per-Method Customization now correctly overrides the title and description shown at checkout
+* Improved: Individual-mode checkout now shows the step-by-step "How to pay" guide
+
+= 5.5.4 - April 23, 2026 =
+* New: Clear step-by-step "How to pay" guide on the WooCommerce thank-you page - shown for every payment method, even without admin configuration
+* Improved: Payment instructions now show your actual username, cashtag, or address automatically
+
+= 5.5.3 - April 21, 2026 =
+* New: Dedicated Shortcodes menu with a built-in builder and templates
+* New: Seller menu for WooCommerce sites
+* Changed: Default QR style is now square with a white background
+* Improved: Setup Assistant clearly separates Free and Pro features
+* Improved: Wallet Up logo appears in the loading screen
+
+= 5.5.2 - April 20, 2026 =
+* New: Guided Setup Assistant for first-time activation
+* Fixed: Short URL redirects (/go/*) now work correctly
+* Fixed: Free version no longer shows Pro payment methods during setup
+
+= 5.5.1 - April 18, 2026 =
+* Improved: Admin settings save instantly on first load.
+* Improved: Plugin deletes cleanly.
+* Improved: Faster admin page load times.
+
+= 5.5.0 - April 16, 2026 =
+**WooCommerce Discount System**
+* New: Per-method discounts now work across all three checkout display modes (Grouped, Individual, Mixed)
+* New: Discount badge in payment method labels - shows "(5% off)" or "($5 off)" next to the method name at checkout
+* New: Global toggle + per-method override for discount badge visibility (Pro)
+* New: Server-authoritative discount calculation eliminates race conditions between QR display and cart total
+* Fixed: Discount applied correctly in WC Blocks checkout via Store API namespace registration
+* Fixed: Stale discount no longer persists after page refresh - session cleared on fresh checkout load
+
+**Variable Substitution**
+* New: Template variables ({amount}, {method}, {currency}, {site_name}, {order_id}, {customer_name}) now work in all three contexts: checkout description, thank-you instructions, and order emails
+* Fixed: {amount} renders as "$97.85" instead of "&#36;97.85" in React text contexts
+* Fixed: {amount} renders bold in QR card and email HTML
+
+**Order Status Sync**
+* Improved: WooCommerce orders advance from on-hold to processing when payment is confirmed, across all display modes (Grouped, Individual, Mixed)
+* Fixed: WC Analytics tab excluded checkout-draft and failed orders from totals
+* Fixed: "Completed" counter now includes both processing and completed WC order statuses
+
+**Thank You Page**
+* Improved: QR code, order reference chip, confirmation button, and verify form now stack in a centered 480px column instead of spreading across the full width
+
+**Admin**
+* Improved: Unified save orchestration - single "Saved" pill transition and single toast notification after all settings (accounts, display, WC, per-method) finish saving
+* Fixed: Save button no longer shows "Saved" badge before all child saves complete
+
+= 5.4.0 - April 8, 2026 =
+**Payment Display Redesign**
+* New: Payment method logo now appears above the QR code
+* New: Method-colored accent bar at the top of the payment card
+* New: Three new display toggles: Method Logo, Accent Color Bar, Powered by WalletUp
+* New: Sticky save bar on the Payments page
+
+**Auto-Save Reliability**
+* Fixed: Rapid toggling of multiple switches no longer triggers overlapping saves
+
+**Shortcode Builder**
+* Fixed: Empty amount fields no longer produce invalid shortcodes
+* Improved: Templates only show shortcodes for configured methods
+
+= 5.3.0 - April 6, 2026 =
+**Multiple Recipients**
+* New: Each recipient can have its own payment addresses
+* New: CSV import/export for bulk management
+* New: "All Links" view for copying payment links
+
+**WooCommerce Checkout**
+* Fixed: Only configured payment methods appear at checkout
+* Fixed: Confirmation form works correctly on thank-you page
+* Fixed: Duplicate transaction prevention on payment confirmation
+
+= 5.2.0 - March 24, 2026 =
+* New: Wave (Cote d'Ivoire) as 8th mobile money provider (Pro)
+* New: Native mobile money payment processing via provider APIs (Pro)
+* New: Merchant balance dashboard (Pro)
+* New: Shareable payment links from merchant portal (Pro)
+
+= 5.1.5 - March 14, 2026 =
+* New: Complete Donation V2 admin experience (Pro)
+* Security: Webhook signature verification, encrypted credential storage, strengthened access control
+
+= 5.1.0 - March 9, 2026 =
+* Improved: Compatibility on sites without WooCommerce
+* Improved: Responsive layout on payment method grids
+
+= 5.0.0 - March 8, 2026 =
+* Major Release: Redesigned admin with unified Dashboard
+* New: WooCommerce checkout display modes (Grouped, Individual, Mixed)
+* New: Per-method checkout customization (title, description, instructions, order status)
+* New: Live crypto exchange rates for 6 coins (Pro)
+* New: Zelle deep linking to banking apps
+* New: Mobile Money for Africa - 8 providers across Kenya, Cote d'Ivoire, Zambia (Pro)
+* New: Stripe card payments at WooCommerce checkout (Pro)
+* Fixed: URL shortener save and redirect reliability
+
+= 4.3.4 - January 31, 2026 =
+* Compatibility adjustment
+
+= 4.3.3 - January 13, 2026 =
+* Enhanced: ZenithQR Generator redesigned with responsive layout (Pro)
+* WordPress 6.9+ compatibility
+
+= 4.3.1 - November 7, 2025 =
+* New: Multi-language translation system (6+ languages)
+* New: Cryptocurrency exchange rate management (Pro)
+
+= 4.3.0 - August 1, 2025 =
+* New: ZenithQR Preview (Pro)
+* New: SEO configuration for donation pages (Pro)
+* Fixed: WooCommerce install link for subdomain installations
+
+= 4.2.0 - May 11, 2025 =
+* New: Premium Hub dashboard with health monitoring (Pro)
+* Enhanced: Payment method performance tracking
+
+= 4.1.0 - March 29, 2025 =
+* New: Digital Business Card Generator (Pro)
+* New: Advanced QR Code Customization with logo support (Pro)
+* New: URL Shortener with real-time analytics (Pro)
+* Enhanced: WooCommerce Blocks API support
+
+= 4.0.0 - January 4, 2025 =
+* Major release: Complete React-based admin interface
+* Requires WordPress 5.8+ and PHP 8.1+
+
+= 3.4.0 - November 19, 2024 =
+* Replaced deprecated QR code API
+
+= 3.2.0 - July 02, 2023 =
+* New: Meta Pay (formerly Facebook Pay) integration
+
+= 3.1.0 - May 07, 2023 =
+* New: Zelle integration
+
+= 3.0.0 - February 18, 2023 =
+* Initial release with Cash App, Venmo, and PayPal support
+
