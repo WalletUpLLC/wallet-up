@@ -20,6 +20,8 @@ final class MountHealth
     private const AJAX_FAILED       = 'wallet_up_mount_failed';
     private const AJAX_OK           = 'wallet_up_mount_ok';
     public const TIMEOUT_MS         = 2500;
+    /** A slow first load is not a failure; one is recorded only after this long, or when the bundle errors. */
+    public const FAIL_MS            = 10000;
 
     public static function init(): void
     {
@@ -43,6 +45,7 @@ final class MountHealth
             'fallback' => $fallbackId,
             'screen'   => $screen,
             'timeout'  => self::TIMEOUT_MS,
+            'failMs'   => self::FAIL_MS,
             'ajaxUrl'  => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('wallet_up_admin_nonce'),
             'failed'   => self::failedAt() > 0,
@@ -51,10 +54,13 @@ final class MountHealth
         ]);
         return '<script>(function(c){var r=document.getElementById(c.root),f=document.getElementById(c.fallback);if(!r||!f)return;'
             . 'function beacon(a){try{var d=new FormData();d.append("action",a);d.append("nonce",c.nonce);d.append("screen",c.screen);fetch(c.ajaxUrl,{method:"POST",credentials:"same-origin",body:d});}catch(e){}}'
-            . 'var done=false;function mounted(){return !!r.firstElementChild;}'
-            . 'function onMount(){if(done)return;done=true;f.style.display="none";if(c.failed)beacon(c.okAction);}'
+            . 'var done=false,failed=false;function mounted(){return !!r.firstElementChild;}'
+            . 'function onMount(){if(done)return;done=true;f.style.display="none";if(c.failed||failed)beacon(c.okAction);}'
+            . 'function fail(){if(done||failed)return;failed=true;beacon(c.failAction);}'
             . 'if(window.MutationObserver){new MutationObserver(function(){if(mounted())onMount();}).observe(r,{childList:true});}'
-            . 'setTimeout(function(){if(mounted()){onMount();return;}f.style.display="block";beacon(c.failAction);},c.timeout);'
+            . 'window.addEventListener("error",function(e){var s=e&&e.target&&e.target.src;if(s&&/walup-react\\/dist/.test(s))fail();},true);'
+            . 'setTimeout(function(){if(mounted()){onMount();return;}f.style.display="block";},c.timeout);'
+            . 'setTimeout(function(){if(!mounted())fail();},c.failMs);'
             . '})(' . $cfg . ');</script>';
     }
 

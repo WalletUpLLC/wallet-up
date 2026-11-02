@@ -82,7 +82,33 @@ final class DeactivationOffer
         $mount = get_option('wallet_up_admin_mount_failed_at') ? 'no' : 'yes';
         $hint = (array) get_option(\WalletUpPro\Core\Geo\SiteLocale::OPTION_HINT, []);
         $cc = (string) ($hint['country'] ?? '');
-        return sprintf('[%s %s m%d pv%d am-%s php%s %s]', WALLET_UP_PRO_VERSION, $age, $methods, $views, $mount, PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, $cc !== '' ? $cc : '??');
+        return sprintf('[%s %s m%d pv%d am%s php%s %s]', WALLET_UP_PRO_VERSION, $age, $methods, $views, $mount === 'yes' ? '1' : '0', PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, $cc !== '' ? $cc : '??');
+    }
+
+    /** The same facts in words, for the person reading the modal. */
+    public static function timelineWords(): string
+    {
+        $activated = (int) get_option('wallet_up_activated_at', 0);
+        $since = $activated > 0 ? human_time_diff($activated, time()) : __('just now', 'walletup');
+        $accounts = (array) get_option('wallet_up_transfer_call', []);
+        $methods = 0;
+        foreach (\WalletUpPro\Core\Config\PaymentMethodsConfig::getAvailableMethodIds() as $id) {
+            if (trim((string) ($accounts[$id . '_holder'] ?? '')) !== '') {
+                $methods++;
+            }
+        }
+        $views = class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') ? (int) (FreeCounter::allTime()['impressions'] ?? 0) : 0;
+        $mountOk = !get_option('wallet_up_admin_mount_failed_at');
+        $hint = (array) get_option(\WalletUpPro\Core\Geo\SiteLocale::OPTION_HINT, []);
+        $country = (string) ($hint['countryName'] ?? ($hint['country'] ?? ''));
+        return implode(' · ', array_filter([
+            sprintf(/* translators: %s: human time */ __('installed %s ago', 'walletup'), $since),
+            sprintf(/* translators: %d: methods */ _n('%d method saved', '%d methods saved', $methods, 'walletup'), $methods),
+            sprintf(/* translators: %d: page views */ _n('%d page view', '%d page views', $views, 'walletup'), $views),
+            $mountOk ? __('admin loaded', 'walletup') : __('admin failed to load', 'walletup'),
+            'PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+            $country,
+        ]));
     }
 
     public static function appendTimelineToReason(): void
@@ -94,7 +120,7 @@ final class DeactivationOffer
         $info = isset($_REQUEST['reason_info']) ? trim((string) wp_unslash($_REQUEST['reason_info'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Freemius verifies its own nonce right after this.
         $room = 128 - strlen($tag) - 1;
         if ($room > 0 && strlen($info) > $room) {
-            $info = substr($info, 0, $room);
+            $info = function_exists('mb_strcut') ? mb_strcut($info, 0, $room, 'UTF-8') : substr($info, 0, $room);
         }
         $merged = trim($info . ' ' . $tag);
         $_REQUEST['reason_info'] = $merged;
@@ -544,7 +570,7 @@ final class DeactivationOffer
             'checking'   => __('Checking', 'walletup'),
             'retry'      => __('Try again', 'walletup'),
             'gate'       => self::gateModalHtml(),
-            'timeline'   => self::timeline(),
+            'timeline'   => self::timelineWords(),
             'timelineNote' => __('Sent with your answer so we can tell how far setup got:', 'walletup'),
         ];
         wp_register_script(self::SCRIPT_HANDLE, '', [], WALLET_UP_PRO_VERSION, true);

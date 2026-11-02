@@ -16,7 +16,8 @@ final class SetupCheck
 
     private const PHP_MINIMUM = '8.1';
 
-    private const PAGE_PAYMENTS = 'wallet-up-payments';
+    /** The free build has one admin page; Payments is a route inside it. */
+    private const PAGE_PAYMENTS = 'wallet-up';
 
     private const GATEWAY_OPTIONS = [
         'wallet_up_stripe_config',
@@ -100,6 +101,11 @@ final class SetupCheck
      */
     public static function checks(): array
     {
+        static $memo = null;
+        if ($memo !== null) {
+            return $memo;
+        }
+        $premium = function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active();
         $items = [];
         $admin = static function (string $page): string {
             return admin_url('admin.php?page=' . $page);
@@ -146,11 +152,20 @@ final class SetupCheck
                     : sprintf(/* translators: %s: method names */ __('%s is on but has no username saved, so visitors see a "not configured" note instead of a code.', 'walletup'), implode(', ', $missing))),
             $admin(self::PAGE_PAYMENTS));
 
-        // 5. Payment page published
+        // 5. A published page carries the code (the generated one, or any page the owner built)
         $pageId = (int) get_option('wallet_up_payment_page_id', 0);
         $page   = $pageId ? get_post($pageId) : null;
         $pageOk = $page instanceof \WP_Post && $page->post_status === 'publish';
-        $items[] = self::item('page', __('A payment page is published', 'walletup'), $pageOk,
+        $ownPage = null;
+        if (!$pageOk) {
+            $ownPage = self::anyPublishedPostWithCode();
+            if ($ownPage instanceof \WP_Post) {
+                $pageOk = true;
+                $page   = $ownPage;
+                $pageId = (int) $ownPage->ID;
+            }
+        }
+        $items[] = self::item('page', __('A page shows your code', 'walletup'), $pageOk,
             $pageOk
                 ? sprintf(/* translators: %s: page title */ __('"%s" is live.', 'walletup'), get_the_title($page))
                 : ($page instanceof \WP_Post
@@ -164,20 +179,26 @@ final class SetupCheck
         $activatedAt = (int) get_option('wallet_up_activated_at', 0);
         $firstDay = $activatedAt > 0 && (time() - $activatedAt) < DAY_IN_SECONDS;
         // A brand-new install has not had time to be seen; the row turns red only after the first day.
-        $items[] = self::item('seen', __('Visitors have seen your code', 'walletup'), !($pageOk || $enabled !== []) ? null : ($seen ? true : ($firstDay ? null : false)),
-            $seen
-                ? sprintf(/* translators: 1: views, 2: taps, 3: confirmations */ __('%1$d views, %2$d taps and %3$d confirmed payments so far.', 'walletup'), (int) $all['impressions'], (int) $all['clicks'], (int) $all['confirmations'])
-                : ($firstDay
-                    ? __('Nobody has opened a page with your code yet; checked again after your first day. Send the link in your next invoice or message.', 'walletup')
-                    : __('Nobody has opened a page with your code yet. Send the link in your next invoice or message.', 'walletup')),
-            $pageOk ? (string) get_permalink($pageId) : '');
+        $cacheOn = (defined('WP_CACHE') && WP_CACHE) || function_exists('rocket_clean_domain') || defined('LSCWP_V') || function_exists('w3tc_flush_all') || function_exists('wp_cache_clear_cache');
+        $items[] = self::item('seen', __('Visitors have seen your code', 'walletup'), $premium || !($pageOk || $enabled !== []) ? null : ($seen ? true : ($firstDay ? null : false)),
+            $premium
+                ? __('Pro keeps these numbers under Activity.', 'walletup')
+                : ($seen
+                    ? sprintf(/* translators: 1: views, 2: taps, 3: confirmations */ __('%1$d views, %2$d taps and %3$d confirmed payments so far (your own visits are not counted).', 'walletup'), (int) $all['impressions'], (int) $all['clicks'], (int) $all['confirmations'])
+                    : (($firstDay
+                        ? __('Nobody has opened a page with your code yet; checked again after your first day. Send the link in your next invoice or message.', 'walletup')
+                        : __('Nobody has opened a page with your code yet. Send the link in your next invoice or message.', 'walletup'))
+                        . ($cacheOn ? ' ' . __('A caching plugin is active: views are still counted, but if you changed your details today, visitors may see yesterday\'s page until the cache clears.', 'walletup') : ''))),
+            '');
 
         // 7. Admin screens load
         $failedAt = (int) get_option('wallet_up_admin_mount_failed_at', 0);
+        $failedOn = (string) get_option('wallet_up_admin_mount_failed_on', '');
         $recent   = $failedAt > 0 && (time() - $failedAt) < 7 * DAY_IN_SECONDS;
+        $screenName = $failedOn === 'onboarding' ? __('the setup screen', 'walletup') : __('the dashboard', 'walletup');
         $items[] = self::item('admin', __('Wallet Up screens load', 'walletup'), !$recent,
             $recent
-                ? sprintf(/* translators: %s: human time */ __('The visual admin did not load %s ago. Another plugin or a browser extension may be blocking its script; the simple forms on this screen work without it.', 'walletup'), human_time_diff($failedAt, time()))
+                ? sprintf(/* translators: 1: screen name, 2: human time */ __('The visual admin did not load on %1$s %2$s ago. Another plugin or a browser extension may be blocking its script; the simple forms on this screen work without it.', 'walletup'), $screenName, human_time_diff($failedAt, time()))
                 : __('The visual admin has loaded normally.', 'walletup'),
             $admin('wallet-up-onboarding') . '&fallback=1');
 
@@ -186,12 +207,14 @@ final class SetupCheck
         $next     = wp_next_scheduled('wallet_up_free_daily');
         $late     = $next !== false && $next < time() - 2 * DAY_IN_SECONDS;
         $cronOk   = !$late && ($next !== false || $cronOff);
-        $items[] = self::item('cron', __('Scheduled tasks run', 'walletup'), $cronOk,
-            $late
+        $items[] = self::item('cron', __('Scheduled tasks run', 'walletup'), $premium ? null : $cronOk,
+            $premium
+                ? __('Not used on the Pro plan.', 'walletup')
+                : ($late
                 ? __('A daily task is more than two days overdue, so the weekly summary email may not go out. Your host may have WP-Cron turned off without a replacement.', 'walletup')
                 : ($cronOff
                     ? __('WP-Cron is disabled in wp-config.php, so the daily task relies on a server cron job. Everything else works without it.', 'walletup')
-                    : __('The daily task is scheduled.', 'walletup')),
+                    : __('The daily task is scheduled.', 'walletup'))),
             '');
 
         // 9. WooCommerce checkout
@@ -199,7 +222,9 @@ final class SetupCheck
         $gw = (array) get_option('woocommerce_wallet_up_p2p_settings', []);
         $gwOn = ($gw['enabled'] ?? 'no') === 'yes';
         $gwMethod = (string) ($gw['method'] ?? '');
-        $gwReady = $gwOn && $gwMethod !== '' && in_array($gwMethod, $enabled, true) && trim((string) ($transfer[$gwMethod . '_holder'] ?? '')) !== '';
+        $usdOnlyElsewhere = $gwMethod !== '' && in_array($gwMethod, \WalletUpPro\Core\Config\PaymentMethodsConfig::USD_ONLY_METHOD_IDS, true)
+            && function_exists('get_woocommerce_currency') && strtoupper((string) get_woocommerce_currency()) !== 'USD';
+        $gwReady = $gwOn && $gwMethod !== '' && in_array($gwMethod, $enabled, true) && trim((string) ($transfer[$gwMethod . '_holder'] ?? '')) !== '' && !$usdOnlyElsewhere;
         $items[] = self::item('woo', __('WooCommerce checkout', 'walletup'), !$wooActive ? null : (!$gwOn ? null : $gwReady),
             !$wooActive
                 ? __('WooCommerce is not active, so nothing to check.', 'walletup')
@@ -207,14 +232,30 @@ final class SetupCheck
                     ? __('Wallet Up is not at your checkout. Turn it on under WooCommerce → Settings → Payments if you want one method there.', 'walletup')
                     : ($gwReady
                         ? sprintf(/* translators: %s: method name */ __('%s shows at checkout.', 'walletup'), self::methodName($gwMethod))
-                        : __('Wallet Up is on at checkout, but the chosen method is off or has no username saved, so customers will not see it.', 'walletup'))),
+                        : ($usdOnlyElsewhere
+                            ? sprintf(/* translators: 1: method name, 2: store currency */ __('%1$s is chosen for checkout, but it pays out in US dollars only and your store sells in %2$s, so customers will not see it. Choose PayPal.me there instead.', 'walletup'), self::methodName($gwMethod), strtoupper((string) get_woocommerce_currency()))
+                            : __('Wallet Up is on at checkout, but the chosen method is off or has no username saved, so customers will not see it.', 'walletup')))),
             $wooActive ? admin_url('admin.php?page=wc-settings&tab=checkout&section=wallet_up_p2p') : '');
 
         $passed = count(array_filter($items, static fn($i) => $i['ok'] === true));
         $failed = count(array_filter($items, static fn($i) => $i['ok'] === false));
         $criticalIds = ['php', 'qr', 'admin'];
         $critical = (bool) array_filter($items, static fn($i) => $i['ok'] === false && in_array($i['id'], $criticalIds, true));
-        return ['items' => $items, 'passed' => $passed, 'failed' => $failed, 'total' => count($items), 'critical' => $critical];
+        $memo = ['items' => $items, 'passed' => $passed, 'failed' => $failed, 'total' => count($items), 'critical' => $critical];
+        return $memo;
+    }
+
+    /** The newest published post or page that carries a Wallet Up block or shortcode, if any. */
+    private static function anyPublishedPostWithCode(): ?\WP_Post
+    {
+        global $wpdb;
+        $sql = "SELECT ID FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type IN ('page','post')
+                AND (post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s OR post_content LIKE %s)
+                ORDER BY post_modified DESC LIMIT 1";
+        $like = static fn(string $s) => '%' . $wpdb->esc_like($s) . '%';
+        $id = (int) $wpdb->get_var($wpdb->prepare($sql, $like('<!-- wp:walletup/'), $like('[wallet_up'), $like('[cashapp'), $like('[venmo'), $like('[paypal'), $like('[zelle'))); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- prepared above
+        $post = $id ? get_post($id) : null;
+        return $post instanceof \WP_Post ? $post : null;
     }
 
     private static function item(string $id, string $label, ?bool $ok, string $detail, string $url): array

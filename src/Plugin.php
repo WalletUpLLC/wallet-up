@@ -292,7 +292,9 @@ class Plugin extends BaseSingleton
             $this->initializeServices();
             $this->runMigrations();
 
-            if (!self::isLightRequest()) {
+            // Admin, AJAX and (for a provisioned merchant) the front-end admin-bar link; a plain
+            // logged-in page view otherwise skips it, because reading fs_accounts drags in the SDK.
+            if (is_admin() || (!self::isLightRequest() && get_option('walletup_pay_merchant_id'))) {
                 \WalletUpPro\Core\Payments\MerchantProvisioning::getInstance()->init();
             }
 
@@ -373,10 +375,9 @@ class Plugin extends BaseSingleton
         $this->container->set('asset_manager', $this->assetManager);
         $this->container->set('display_handler', $this->displayHandler);
 
-        if (!self::isLightRequest()) {
-            $theme_manager = \WalletUpPro\Core\Admin\Themes\AdminThemeManager::getInstance();
-            $this->container->set('theme_manager', $theme_manager);
-        }
+        // Kept on every request: when the admin theme is on it also filters front-end menus and the admin bar.
+        $theme_manager = \WalletUpPro\Core\Admin\Themes\AdminThemeManager::getInstance();
+        $this->container->set('theme_manager', $theme_manager);
 
         if (wallet_up_fs()->can_use_premium_code__premium_only()) {
             $urlHandler = \WalletUpPro\Core\URL\URLHandler::getInstance();
@@ -532,7 +533,9 @@ class Plugin extends BaseSingleton
      */
     public static function isLightRequest(): bool
     {
-        return function_exists('WalletUpPro\\wallet_up_is_light_request') && \WalletUpPro\wallet_up_is_light_request();
+        // Logged-in users keep the admin bar links and the rest of the full plugin on the front-end.
+        return function_exists('WalletUpPro\\wallet_up_is_light_request') && \WalletUpPro\wallet_up_is_light_request()
+            && !(function_exists('is_user_logged_in') && is_user_logged_in());
     }
 
     private function getTableName(): string

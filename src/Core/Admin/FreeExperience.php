@@ -64,9 +64,16 @@ final class FreeExperience
             'counts'       => class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') ? \WalletUpPro\Core\Retention\FreeCounter::dashboardData() : null,
             'isPremium'    => function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active(),
             'adminEmail'   => (string) get_option('admin_email', ''),
+            'adminUrl'     => admin_url(),
+            'countries'    => SiteLocale::pickList(),
             'checks'       => class_exists('\\WalletUpPro\\Core\\Retention\\SetupCheck') ? \WalletUpPro\Core\Retention\SetupCheck::checks() : null,
             'i18n'         => [
                 'geoLine'      => __('Your site looks like it is in %s.', 'walletup'),
+                'geoUnknown'   => __('Cash App, Venmo and Zelle pay out in the United States only; PayPal.me works almost everywhere.', 'walletup'),
+                'geoChoose'    => __('Not in the US? Choose your country', 'walletup'),
+                'geoSaved'     => __('Saved. Methods that work in %s are suggested first.', 'walletup'),
+                'shareLabel'   => __('Also share this email with WalletUp (through Freemius, our licensing service) so we can tell you about updates. Off by default; nothing else is shared.', 'walletup'),
+                'notifyHelp'   => __('Sent by your own site; turn them off any time under Settings → Notifications.', 'walletup'),
                 'geoUsOnly'    => __('%s work in the United States only.', 'walletup'),
                 'geoWorks'     => __('PayPal.me works where you are.', 'walletup'),
                 'geoPro'       => __('Pro adds Interac, PayID, BPAY and mobile money for other countries.', 'walletup'),
@@ -139,7 +146,7 @@ final class FreeExperience
             unset($images[$method]);
         } else {
             $uploads = wp_get_upload_dir();
-            if (strpos($url, (string) $uploads['baseurl']) !== 0 || !preg_match('/\.(png|jpe?g)$/i', $url)) {
+            if (strpos($url, (string) $uploads['baseurl']) !== 0 || !preg_match('/^[^?#]+\.(png|jpe?g)$/i', $url) || strpos($url, '..') !== false || attachment_url_to_postid($url) <= 0) {
                 wp_send_json_error(['message' => __('The image must be one uploaded to this site.', 'walletup')], 400);
             }
             $images[$method] = $url;
@@ -158,12 +165,12 @@ final class FreeExperience
             wp_send_json_error(['message' => __('Please enter a valid email address.', 'walletup')], 400);
         }
         update_option(self::OPTION_NOTIFY, $email, false);
-        update_option('wallet_up_notify_optin_at', time(), false);
 
-        // Best effort: register the install with Freemius so the account can also reach the owner.
-        // Failure here never fails the request; the email above is what the plugin itself uses.
+        // 6.7.0: the Freemius registration is a separate, default-off choice ("share" ticked), so the
+        // notifications button never sends anything off-site on its own.
+        $share = isset($_POST['share']) && (string) wp_unslash($_POST['share']) === '1';
         $freemius = 'skipped';
-        if (function_exists('WalletUpPro\\wallet_up_fs')) {
+        if ($share && function_exists('WalletUpPro\\wallet_up_fs')) {
             try {
                 $fs = \WalletUpPro\wallet_up_fs();
                 if (is_object($fs) && method_exists($fs, 'is_registered') && !$fs->is_registered() && method_exists($fs, 'opt_in')) {

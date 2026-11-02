@@ -340,7 +340,9 @@ class PaymentRegistry
             $m = self::getInstance()->getMethod($methodId);
             if ($m && method_exists($m, 'qrPayload')) {
                 $own = trim((string) $m->qrPayload($amount, $reference));
-                if ($own !== '') {
+                // A method with no native link (Zelle) owns the answer even when it is "no QR":
+                // falling through would draw a QR of the bare email or phone number.
+                if ($own !== '' || (method_exists($m, 'hasNativeLink') && !$m->hasNativeLink())) {
                     return $own;
                 }
             }

@@ -334,7 +334,7 @@ class PaymentMethodsConfig
 
     /** Where each free method can receive money. null means worldwide. Country codes are ISO 3166-1 alpha-2. */
     private const METHOD_COUNTRIES = [
-        'cashapp' => ['US', 'GB'],
+        'cashapp' => ['US'],
         'venmo'   => ['US'],
         'zelle'   => ['US'],
         'paypal'  => null,

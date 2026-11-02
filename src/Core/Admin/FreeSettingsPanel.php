@@ -20,6 +20,7 @@ final class FreeSettingsPanel
     private const AJAX_BRAND  = 'wallet_up_save_branding';
     private const AJAX_RERUN  = 'wallet_up_rerun_setup';
     private const AJAX_LOCALE = 'wallet_up_save_locale';
+    private const AJAX_NOTIFY = 'wallet_up_save_notify';
 
     public static function init(): void
     {
@@ -27,6 +28,7 @@ final class FreeSettingsPanel
         add_action('wp_ajax_' . self::AJAX_BRAND, [__CLASS__, 'saveBranding']);
         add_action('wp_ajax_' . self::AJAX_RERUN, [__CLASS__, 'rerunSetup']);
         add_action('wp_ajax_' . self::AJAX_LOCALE, [__CLASS__, 'saveLocale']);
+        add_action('wp_ajax_' . self::AJAX_NOTIFY, [__CLASS__, 'saveNotify']);
     }
 
     private static function isPremium(): bool
@@ -36,7 +38,7 @@ final class FreeSettingsPanel
 
     public static function enqueue(string $hook_suffix): void
     {
-        if ($hook_suffix !== 'toplevel_page_wallet-up' || !current_user_can('manage_options')) {
+        if (strpos($hook_suffix, 'wallet-up') === false || !current_user_can('manage_options')) {
             return;
         }
         $rel  = 'assets/js/admin/free-settings.js';
@@ -57,6 +59,8 @@ final class FreeSettingsPanel
             'geo'          => class_exists('\\WalletUpPro\\Core\\Geo\\SiteLocale') ? \WalletUpPro\Core\Geo\SiteLocale::hint() : [],
             'countryOverride' => (string) get_option('wallet_up_site_country', ''),
             'currency'     => \WalletUpPro\Core\Config\PaymentMethodsConfig::siteCurrency(),
+            'notifyEmail'  => (string) get_option('wallet_up_notify_email', ''),
+            'adminEmail'   => (string) get_option('admin_email', ''),
             'currencies'   => ['USD','EUR','GBP','CAD','AUD','INR','MXN','BRL','JPY','NGN','ZAR','PKR','BDT','IDR','PHP','KES','NZD','CHF','SEK','NOK','DKK','PLN','TRY','VND','THB','SGD','HKD'],
             'i18n'         => [
                 'where'           => __('Where you are', 'walletup'),
@@ -77,6 +81,13 @@ final class FreeSettingsPanel
                 'rerunConfirm'    => __('Open the setup assistant again? Your saved payment details stay as they are.', 'walletup'),
                 'error'           => __('Could not save. Please try again.', 'walletup'),
                 'pro'             => __('PRO', 'walletup'),
+                'notify'          => __('Notifications', 'walletup'),
+                'notifyHelp'      => __('Your own site emails you the first time someone taps your link or copies your details, each time a visitor confirms a payment (at most ten a day), and one summary after your first week. Nothing is sent anywhere else.', 'walletup'),
+                'notifyEmailLabel'=> __('Send to', 'walletup'),
+                'notifyOn'        => __('Turn on', 'walletup'),
+                'notifyOff'       => __('Turn off', 'walletup'),
+                'notifyStateOn'   => __('On. We email %s.', 'walletup'),
+                'notifyStateOff'  => __('Off.', 'walletup'),
             ],
         ]);
     }
@@ -117,6 +128,25 @@ final class FreeSettingsPanel
             'geo'      => class_exists('\\WalletUpPro\\Core\\Geo\\SiteLocale') ? \WalletUpPro\Core\Geo\SiteLocale::hint() : [],
             'currency' => \WalletUpPro\Core\Config\PaymentMethodsConfig::siteCurrency(),
         ]);
+    }
+
+    /** Notifications on (with an address) or off. The address is only ever used by this site's wp_mail. */
+    public static function saveNotify(): void
+    {
+        if (!check_ajax_referer('wallet_up_admin_nonce', 'nonce', false) || !current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Permission denied', 'walletup')], 403);
+        }
+        $on    = isset($_POST['on']) && (string) wp_unslash($_POST['on']) === '1';
+        $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : '';
+        if (!$on) {
+            delete_option('wallet_up_notify_email');
+            wp_send_json_success(['email' => '']);
+        }
+        if (!is_email($email)) {
+            wp_send_json_error(['message' => __('Please enter a valid email address.', 'walletup')], 400);
+        }
+        update_option('wallet_up_notify_email', $email, false);
+        wp_send_json_success(['email' => $email]);
     }
 
     public static function rerunSetup(): void

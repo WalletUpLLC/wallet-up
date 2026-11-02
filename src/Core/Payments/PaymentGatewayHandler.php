@@ -1033,6 +1033,12 @@ class PaymentGatewayHandler
         ];
     }
 
+    /** Page-bound token for the visitor confirm form; survives page caching, unlike a nonce. */
+    public static function confirmToken(int $postId, int $orderId = 0): string
+    {
+        return substr(wp_hash('walletup_confirm|' . $postId . '|' . $orderId, 'nonce'), 0, 20);
+    }
+
     public static function handleConfirmPaymentSent(): void
     {
         try {
@@ -1045,7 +1051,11 @@ class PaymentGatewayHandler
             }
             set_transient($rateKey, $attempts + 1, 60);
 
-            if (!check_ajax_referer('walletup_confirm_payment', 'nonce', false)) {
+            // 6.7.0: a cached page serves a nonce that expires after a day; the long-lived page token
+            // (tied to the post and order, never to a user) keeps the form working on cached sites.
+            $token   = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : '';
+            $tokenOk = $token !== '' && hash_equals(self::confirmToken((int) ($_POST['post_id'] ?? 0), (int) ($_POST['wc_order_id'] ?? 0)), $token);
+            if (!$tokenOk && !check_ajax_referer('walletup_confirm_payment', 'nonce', false)) {
                 wp_send_json_error(['message' => __('Security check failed. Please refresh and try again.', 'walletup')]);
                 return;
             }
@@ -1062,9 +1072,20 @@ class PaymentGatewayHandler
                 wp_send_json_error(['message' => __('Payment method is required.', 'walletup')]);
                 return;
             }
+            // 6.7.0: the method id is a known id, never free text (it reaches the merchant's inbox).
+            if (!in_array($paymentMethod, \WalletUpPro\Core\Config\PaymentMethodsConfig::getAllMethodIds(), true)) {
+                wp_send_json_error(['message' => __('Unknown payment method.', 'walletup')], 400);
+                return;
+            }
 
             if ($wcOrderId > 0 && function_exists('wc_get_order')) {
                 $order = wc_get_order($wcOrderId);
+                // 6.7.0: only the customer who holds the order key may confirm against an order.
+                $orderKey = sanitize_text_field(wp_unslash($_POST['order_key'] ?? ''));
+                if (!$order || $orderKey === '' || !hash_equals((string) $order->get_order_key(), $orderKey)) {
+                    wp_send_json_error(['message' => __('This order could not be matched. Please use the link from your order email.', 'walletup')], 403);
+                    return;
+                }
                 if ($order) {
                     $customerName = trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name());
                     $customerEmail = $order->get_billing_email();

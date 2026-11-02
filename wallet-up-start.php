@@ -405,13 +405,15 @@ if ( !function_exists( __NAMESPACE__ . '\\wallet_up_is_light_request' ) ) {
             return $light;
         }
         $uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- compared as a plain string only
-        if ( '' !== $uri && ( false !== strpos( $uri, '/wp-json/' ) || false !== strpos( $uri, 'rest_route=' ) ) ) {
+        $rest_prefix = function_exists( 'rest_get_url_prefix' ) ? '/' . trim( (string) rest_get_url_prefix(), '/' ) . '/' : '/wp-json/';
+        if ( '' !== $uri && ( false !== strpos( $uri, '/wp-json/' ) || false !== strpos( $uri, $rest_prefix ) || false !== strpos( $uri, 'rest_route=' ) ) ) {
             return $light;
         }
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- presence check only
-        if ( isset( $_REQUEST['fs_action'] ) || isset( $_GET['wallet_up_support_login'] ) || isset( $_GET['walletup_short_code'] ) ) {
+        if ( isset( $_REQUEST['rest_route'] ) || isset( $_GET['doing_wp_cron'] ) || isset( $_REQUEST['fs_action'] ) || isset( $_GET['wallet_up_support_login'] ) || isset( $_GET['walletup_short_code'] ) ) {
             return $light;
         }
+        // Evaluated when the plugin file loads, so only an mu-plugin or an earlier plugin can hook this.
         $light = (bool) apply_filters( 'wallet_up_light_request', true );
         return $light;
     }
@@ -499,6 +501,41 @@ if ( !function_exists( 'wallet_up_fs' ) ) {
 }
 wallet_up_fs()->set_basename( true, WALLET_UP_PRO_FILE );
 do_action( 'wallet_up_fs_loaded' );
+
+if ( ! function_exists( __NAMESPACE__ . '\\wallet_up_free_uninstall_cleanup' ) ) {
+    /**
+     * 6.7.0: removes the free plan's own state when the plugin is deleted. Runs through Freemius'
+     * uninstall hook (the SDK owns uninstall.php duties). Account details, enabled methods and the
+     * payment page are kept when Wallet Up Pro is installed, because Pro continues from them.
+     */
+    function wallet_up_free_uninstall_cleanup() {
+        $pro_present = file_exists( WP_PLUGIN_DIR . '/wallet-up-pro/wallet-up.php' ) || file_exists( WP_PLUGIN_DIR . '/wallet-up-pro/wallet-up-pro.php' );
+        $free_only = [
+            'wallet_up_free_counts', 'wallet_up_notify_email', 'wallet_up_geo_hint', 'wallet_up_site_country',
+            'wallet_up_admin_mount_failed_at', 'wallet_up_admin_mount_failed_on', 'wallet_up_hide_branding',
+            'wallet_up_dismiss_permalink_notice', 'wallet_up_scan_rewrite_v1', 'woocommerce_wallet_up_p2p_settings',
+            'wallet_up_onboarding_step', 'wallet_up_onboarding_data', 'wallet_up_onboarding_completed',
+        ];
+        $shared = [ 'wallet_up_payment_page_id', 'wallet_up_custom_qr_images', 'wallet_up_activated_at' ];
+        foreach ( $free_only as $name ) {
+            delete_option( $name );
+        }
+        if ( ! $pro_present ) {
+            foreach ( $shared as $name ) {
+                delete_option( $name );
+            }
+        }
+        wp_clear_scheduled_hook( 'wallet_up_free_daily' );
+        wp_clear_scheduled_hook( 'walletup_clean_expired_payments' );
+        delete_metadata( 'user', 0, 'wallet_up_permalink_notice_dismissed', '', true );
+        delete_metadata( 'user', 0, 'wallet_up_onboarding_banner_dismissed_at', '', true );
+        global $wpdb;
+        $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_wup\\_evt\\_%' OR option_name LIKE '\\_transient\\_timeout\\_wup\\_evt\\_%' OR option_name LIKE '\\_transient\\_wup\\_confmail\\_%' OR option_name LIKE '\\_transient\\_timeout\\_wup\\_confmail\\_%' OR option_name LIKE '\\_transient\\_wallet\\_up\\_fallback\\_qr\\_%' OR option_name LIKE '\\_transient\\_timeout\\_wallet\\_up\\_fallback\\_qr\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    }
+}
+if ( method_exists( wallet_up_fs(), 'add_action' ) ) {
+    wallet_up_fs()->add_action( 'after_uninstall', __NAMESPACE__ . '\\wallet_up_free_uninstall_cleanup' );
+}
 
 wallet_up_fs()->add_filter( 'is_submenu_visible', function ( $is_visible, $menu_id ) {
     if ( $menu_id === 'affiliation' && ! wallet_up_fs()->can_use_premium_code() ) {

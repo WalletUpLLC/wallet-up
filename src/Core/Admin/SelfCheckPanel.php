@@ -55,7 +55,7 @@ final class SelfCheckPanel
                 /* translators: 1: number failing, 2: first failing check */
                 esc_html(_n('Setup check: %1$d thing needs attention (%2$s)', 'Setup check: %1$d things need attention (%2$s)', $r['failed'], 'walletup')),
                 $r['failed'],
-                $first
+                esc_html($first)
             )
         );
         return $meta;

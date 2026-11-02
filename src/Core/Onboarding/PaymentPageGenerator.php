@@ -138,6 +138,14 @@ class PaymentPageGenerator
         $content  = ($onlyMethodId === '' && self::availabilityOn())
             ? self::headingBlock($title) . "\n\n" . self::liveSectionMarkup()
             : self::buildPageContent($artifact, $title, $onlyMethodId);
+        // 6.7.0: "Create page" clicked twice, or setup re-run, refreshes the page it made before
+        // instead of publishing a second public page.
+        $existing = (int) get_option('wallet_up_payment_page_id', 0);
+        $prior    = $existing ? get_post($existing) : null;
+        if ($prior instanceof \WP_Post && $prior->post_type === 'page' && $prior->post_status !== 'trash' && get_post_meta($existing, self::GENERATED_META, true)) {
+            wp_update_post(['ID' => $existing, 'post_title' => $title, 'post_content' => $content, 'post_status' => 'publish']);
+            return ['pageId' => $existing, 'title' => $title];
+        }
         $pageId   = self::createDraftPage($title, $content);
 
         if (!$pageId) {

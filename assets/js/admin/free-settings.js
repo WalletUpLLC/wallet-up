@@ -103,15 +103,35 @@
   }
   function fmt(s, v) { return String(s || '').replace('%s', v); }
 
+  /* 6.7.0: the off switch for the plugin's own emails. */
+  function notifyCard() {
+    var c = card(t.notify || 'Notifications');
+    c._body.appendChild(el('p', 'text-sm text-gray-600', t.notifyHelp || ''));
+    var state = el('p', 'text-sm text-gray-900 font-medium mt-2');
+    var row = el('div', 'mt-3 flex flex-wrap gap-2 items-center');
+    var email = el('input', 'border border-gray-300 rounded-lg px-3 py-2 text-sm'); email.type = 'email'; email.value = cfg.notifyEmail || cfg.adminEmail || ''; email.setAttribute('aria-label', t.notifyEmailLabel || 'Send to');
+    var on = el('button', 'bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg px-4 py-2 text-sm', t.notifyOn || 'Turn on'); on.type = 'button';
+    var off = el('button', 'text-sm text-gray-600 underline', t.notifyOff || 'Turn off'); off.type = 'button';
+    var status = el('span', 'text-xs text-gray-500');
+    function render() { var has = !!cfg.notifyEmail; state.textContent = has ? fmt(t.notifyStateOn, cfg.notifyEmail) : (t.notifyStateOff || 'Off.'); off.style.display = has ? '' : 'none'; }
+    function save(onFlag) { status.textContent = '…'; post('wallet_up_save_notify', { on: onFlag ? '1' : '0', email: email.value }).then(function (j) { if (j && j.success) { cfg.notifyEmail = j.data.email; status.textContent = t.saved || 'Saved.'; render(); } else { status.textContent = (j && j.data && j.data.message) || t.error; } }).catch(function () { status.textContent = t.error; }); }
+    on.addEventListener('click', function () { save(true); }); off.addEventListener('click', function () { save(false); });
+    row.appendChild(email); row.appendChild(on); row.appendChild(off); row.appendChild(status);
+    c._body.appendChild(state); c._body.appendChild(row); render();
+    return c;
+  }
+
+  var SETTINGS_RX = /^(Settings|Ajustes|Configuración|Paramètres|Réglages)$/;
   function mount() {
     var root = document.getElementById('wallet-up-admin-root');
     if (!root || document.getElementById(ID)) return;
-    var h1 = Array.prototype.find.call(root.querySelectorAll('h1'), function (h) { return h.textContent.trim() === 'Settings'; });
+    var h1 = Array.prototype.find.call(root.querySelectorAll('h1'), function (h) { return SETTINGS_RX.test(h.textContent.trim()); });
     if (!h1) return;
     var container = h1.closest('.space-y-6');
     if (!container) return;
     var wrap = el('div', 'space-y-6'); wrap.id = ID;
     wrap.appendChild(localeCard());
+    if (!cfg.isPremium) { wrap.appendChild(notifyCard()); }
     wrap.appendChild(brandingCard());
     wrap.appendChild(setupCard());
     container.appendChild(wrap);

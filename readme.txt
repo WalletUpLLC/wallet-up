@@ -48,7 +48,7 @@ Show your Zelle email or phone with the amount and a copy button on any page. Up
 
 Connect Stripe and take Visa, Mastercard and Amex at WooCommerce checkout in the free version, on both the classic and block-based checkout. Stripe pays out to your bank, and a 2% platform fee applies to card transactions only.
 
-Wallet Up Pro adds the peer-to-peer methods as checkout options as well, so customers pick Cash App, Venmo, PayPal or another method at checkout, scan the QR code, and confirm:
+On the free plan, one of your methods (Cash App, Venmo, PayPal.me or Zelle) can also appear at checkout as a manual payment option: the order waits on hold, the customer pays in their app from the order-received page and confirms there. Wallet Up Pro adds the rest:
 
 * **Grouped mode** - all methods under one "Wallet Up" gateway
 * **Individual mode** - each method as its own checkout option
@@ -66,7 +66,7 @@ Wallet Up adds four blocks to the WordPress editor. Open any page or post, click
 
 * **Payment Button** - a single button that opens the payment app.
 * **Payment QR Code** - a scannable QR for the page or for print.
-* **Tip Jar** - preset amounts ($3 / $5 / $10) plus a custom amount field.
+* **Tip Jar** - preset amounts (3 / 5 / 10 in your currency) plus a custom amount field.
 * **Pay Link** - a plain text link, ideal for navigation menus or footers.
 
 = Or use shortcodes =
@@ -76,13 +76,14 @@ Prefer the classic editor? Every block is also available as a shortcode:
 `[wallet_up method="cashapp" amount="25"]`
 `[wallet_up method="venmo" amount="50"]`
 `[wallet_up method="paypal" amount="100"]`
+`[wallet_up method="zelle" amount="20"]`
 
 = Who Is Wallet Up For? =
 
 * **Freelancers** - add a payment QR code to your portfolio or invoicing page
 * **Small businesses** - accept mobile payments without processing fees
-* **Nonprofits** - collect donations via Cash App, Venmo, or PayPal
-* **WooCommerce stores** - take cards at checkout with Stripe, and add Cash App or Venmo at checkout with Wallet Up Pro
+* **Nonprofits** - collect donations via Cash App, Venmo, PayPal.me or Zelle
+* **WooCommerce stores** - show one of your methods at checkout for free, take cards with Stripe, and add the rest with Wallet Up Pro
 * **Service providers** - let clients pay via QR code after a consultation
 * **Event organizers** - collect registration fees or ticket payments
 * **Content creators** - accept tips and support from your audience
@@ -91,7 +92,7 @@ Prefer the classic editor? Every block is also available as a shortcode:
 
 Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 
-* **24 payment methods** - add Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin, and 8 African mobile money providers
+* **20 more payment methods** - add Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin, and 8 African mobile money providers
 * **Advanced QR Code Studio** - custom logos, colors, styles (rounded, dot, circular), SVG export
 * **URL Shortener** - branded short links with real-time click analytics
 * **Donation System** - customizable donation pages with campaigns, donor management, and tax receipts
@@ -115,7 +116,7 @@ Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 * The GD or Imagick PHP extension, for drawing QR images (pay links and buttons work without it; most hosts have GD)
 * Any database WordPress itself supports
 
-The default WordPress memory limit is enough. A visitor page view with a Wallet Up code on it uses under 10 MB of PHP memory; the plugin loads none of its admin or licensing code on visitor pages. WooCommerce is optional and only needed for the checkout option. No account with us, no API key and no outgoing connection is needed for the free methods.
+The default WordPress memory limit is enough. A visitor page view with a Wallet Up code on it uses under 10 MB of PHP memory; the plugin loads none of its admin or licensing code on visitor pages. WooCommerce is optional and only needed for the checkout option. No account with us and no API key is needed for the free methods, and visitor pages make no outgoing connection. The admin contacts our licensing service only if you opt in or open the pricing page.
 
 = Automatic Installation =
 
@@ -123,8 +124,8 @@ The default WordPress memory limit is enough. A visitor page view with a Wallet 
 2. Search for **"Wallet Up"**
 3. Click **"Install Now"** then **"Activate"**
 4. Go to **Wallet Up** in your admin menu
-5. Enter your Cash App, Venmo, or PayPal username
-6. Use the shortcode `[wallet_up method="cashapp" amount="25"]` on any page
+5. The setup assistant opens: pick your business type, enter your Cash App, Venmo, PayPal.me or Zelle username, and it publishes a payment page for you
+6. Or use the shortcode `[wallet_up method="cashapp" amount="25"]` on any page
 
 = WooCommerce Setup =
 
@@ -132,13 +133,6 @@ The default WordPress memory limit is enough. A visitor page view with a Wallet 
 2. In setup, tick "Show [method] at my WooCommerce checkout", or enable **Wallet Up** under WooCommerce > Settings > Payments and pick the method
 3. Optionally connect Stripe under **Wallet Up > Sell with cards** to take cards too
 4. Add the remaining methods, grouped display and discounts with Wallet Up Pro
-
-= Requirements =
-
-* WordPress 5.8+
-* PHP 8.1+
-* MySQL 5.7+
-* SSL certificate recommended
 
 == Frequently Asked Questions ==
 
@@ -170,7 +164,7 @@ Yes (Pro). You can set a percentage or fixed-amount discount per payment method.
 
 = How do customers pay? =
 
-Customers scan a QR code with their phone camera or click a payment link. The payment app (Cash App, Venmo, PayPal) opens with the amount pre-filled. After paying, they confirm on your site.
+Customers scan a QR code with their phone camera or click a payment link. Cash App, Venmo and PayPal open with the amount pre-filled. Zelle has no pay link, so visitors see your Zelle email or phone and the amount with a copy button, or scan the QR code from your bank app if you uploaded one. After paying, they can confirm on your site.
 
 = Is it secure? =
 
@@ -213,6 +207,16 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved: The uninstall survey's context tag now carries the real page-view count and whether the admin ever failed to load.
 * Improved: The download is a third smaller: two unused copies of a web font set, two unused translation bundles and duplicate demo images are gone.
 * Fixed: The readme no longer asks for a 256 MB memory limit; the plugin never needed it.
+* Fixed: The classic `[cashapp]`, `[venmo]`, `[paypal]` and `[zelle]` shortcodes now respect the off switch like `[wallet_up]` and the blocks do.
+* Fixed: Zelle without an uploaded bank QR no longer draws a QR of the bare email or phone number.
+* Fixed: Your own visits to your payment page are no longer counted as visitor views.
+* Fixed: Taps and the "I've sent it" form keep working on sites with full-page caching (the security token is now bound to the page, not to a 24-hour nonce).
+* Fixed: "Create page" and the simple form refresh the page they made before instead of publishing a second one; re-running setup keeps your WooCommerce checkout choice.
+* Fixed: Cash App is listed for the United States only.
+* Improved: Notifications have an off switch under Settings and a link in every email; confirmation emails are capped at ten a day; sharing your email with our licensing service is a separate, default-off choice.
+* Improved: The Welcome step offers a country chooser when the site's country cannot be told from its settings, and the free-plan additions work on Spanish and French admin screens.
+* Fixed: The old eight-second "Admin interface failed to load" alert with Cloudflare advice is gone; the plain-HTML fallbacks replace it.
+* Improved: A visitor's order confirmation must carry the order key, and the payment method is validated, so nobody can annotate another customer's order or send text into your inbox.
 
 = 6.6.0 - November 4, 2026 =
 * New: One of your payment methods can appear at your WooCommerce checkout on the free plan. Pick it in setup or under WooCommerce → Settings → Payments → Wallet Up; the order waits on hold and the customer pays from the order-received page and confirms there. Pro adds the other methods, grouped display, per-method discounts and automatic verification.
@@ -488,7 +492,7 @@ Wallet Up respects user privacy:
 
 = External services =
 
-The peer-to-peer methods, QR codes and short links work entirely on your own server and contact nothing.
+The peer-to-peer methods, QR codes and short links work entirely on your own server; visitor pages contact nothing outside your site.
 
 **Card payments** are the exception, and only if you choose to connect Stripe. In that case the plugin contacts two services:
 

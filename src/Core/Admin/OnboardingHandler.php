@@ -304,6 +304,14 @@ class OnboardingHandler
         if (!in_array($method, self::FREE_METHOD_IDS, true)) {
             $method = 'cashapp';
         }
+        $pattern = \WalletUpPro\Core\Config\PaymentMethodsConfig::getValidationPattern($method);
+        if ($holder === '' || ($pattern !== null && $pattern !== '' && !preg_match($pattern, $holder))) {
+            wp_die(
+                esc_html(sprintf(/* translators: %s: method name */ __('That does not look like a valid %s username. Go back and check it against the examples under the field.', 'walletup'), \WalletUpPro\Core\Config\PaymentMethodsConfig::getMethodName($method))),
+                '',
+                ['response' => 400, 'back_link' => true]
+            );
+        }
 
         $accounts = (array) get_option('wallet_up_transfer_call', []);
         $accounts['holder_owner'] = $name;
@@ -420,7 +428,15 @@ class OnboardingHandler
                 'gatewayEnabled' => false,
                 'methodsAtCheckout' => [],
             ];
-            if (class_exists('WooCommerce')) {
+            if (class_exists('WooCommerce') && !self::isPremium()) {
+                // 6.7.0: the free plan's checkout state lives in the one-method gateway, so re-running
+                // setup shows the box ticked instead of silently switching the gateway off.
+                $p2p = (array) get_option('woocommerce_wallet_up_p2p_settings', []);
+                $wc['gatewayEnabled'] = ($p2p['enabled'] ?? 'no') === 'yes';
+                if ($wc['gatewayEnabled'] && !empty($p2p['method'])) {
+                    $wc['methodsAtCheckout'][sanitize_key((string) $p2p['method'])] = true;
+                }
+            } elseif (class_exists('WooCommerce')) {
                 $gwSettings = (array) get_option('woocommerce_wallet_up_settings', []);
                 $wc['gatewayEnabled'] = !empty($gwSettings['enabled']) && $gwSettings['enabled'] === 'yes';
                 foreach ($gwSettings as $k => $v) {
@@ -573,7 +589,11 @@ class OnboardingHandler
                     foreach ($data['methodsAtCheckout'] as $methodId => $on) {
                         $methodId = sanitize_key((string) $methodId);
                         $wants = !empty($on) && $on !== 'false' && $on !== '0';
-                        if ($wants && in_array($methodId, self::FREE_METHOD_IDS, true) && \WalletUpPro\Core\Payments\MethodStatusResolver::isConfigured($methodId)) {
+                        $usdOnlyElsewhere = in_array($methodId, \WalletUpPro\Core\Config\PaymentMethodsConfig::USD_ONLY_METHOD_IDS, true)
+                            && function_exists('get_woocommerce_currency') && strtoupper((string) get_woocommerce_currency()) !== 'USD';
+                        if ($wants && $usdOnlyElsewhere) {
+                            $notEnabled[] = $methodId; // the gateway would hide it: these apps pay out in US dollars only
+                        } elseif ($wants && in_array($methodId, self::FREE_METHOD_IDS, true) && \WalletUpPro\Core\Payments\MethodStatusResolver::isConfigured($methodId)) {
                             if ($chosen === '') {
                                 $chosen = $methodId;
                             } else {

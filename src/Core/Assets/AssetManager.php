@@ -725,65 +725,15 @@ class AssetManager
         ];
     }
 
+    /**
+     * 6.7.0: no longer injects anything. The eight-second "Admin interface failed to load" alert
+     * (Cloudflare and file-permission advice, Pro-branded) is replaced by the server-rendered
+     * fallbacks in AdminManager and OnboardingHandler, which MountHealth shows after 2.5 seconds.
+     * Kept as a no-op so existing callers need no change.
+     */
     private function addAssetLoadFallback(string $scriptHandle, string $jsUrl): void
     {
-        add_action('admin_footer', function () use ($scriptHandle, $jsUrl) {
-            if (strpos($GLOBALS['hook_suffix'] ?? '', 'wallet-up') === false) {
-                return;
-            }
-            $nonce = wp_create_nonce('walletup_asset_fallback');
-            ?>
-            <script data-cfasync="false" data-walletup-fallback="<?php echo esc_attr($nonce); ?>">
-            (function() {
-                var rootEl = document.getElementById('walletup-admin-root') || document.getElementById('wallet-up-admin-root');
-                if (!rootEl) return;
-
-                setTimeout(function() {
-                    if (rootEl.children.length > 0) return; // React loaded fine
-
-                    var container = document.createElement('div');
-                    container.setAttribute('role', 'alert');
-                    container.style.cssText = 'max-width:600px;margin:40px auto;padding:24px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;font-family:-apple-system,sans-serif;color:#664d03;';
-
-                    var h3 = document.createElement('h3');
-                    h3.style.cssText = 'margin:0 0 12px';
-                    h3.textContent = 'WalletUp Pro: Admin interface failed to load';
-                    container.appendChild(h3);
-
-                    var p1 = document.createElement('p');
-                    p1.style.cssText = 'margin:0 0 8px';
-                    p1.textContent = 'The main JavaScript bundle could not be loaded. This is usually caused by:';
-                    container.appendChild(p1);
-
-                    var ul = document.createElement('ul');
-                    ul.style.cssText = 'margin:0 0 12px;padding-left:20px';
-                    var causes = [
-                        ['Cloudflare cache', 'Purge cache in your Cloudflare dashboard'],
-                        ['Cloudflare Rocket Loader', 'Disable it or add an exception for admin pages'],
-                        ['File permissions', 'Ensure plugin files are readable by the web server (chown to correct user)'],
-                        ['Browser extension', 'Disable ad blockers or privacy extensions on this page']
-                    ];
-                    causes.forEach(function(c) {
-                        var li = document.createElement('li');
-                        var b = document.createElement('strong');
-                        b.textContent = c[0];
-                        li.appendChild(b);
-                        li.appendChild(document.createTextNode(' \u2014 ' + c[1]));
-                        ul.appendChild(li);
-                    });
-                    container.appendChild(ul);
-
-                    var p2 = document.createElement('p');
-                    p2.style.cssText = 'margin:0;font-size:13px;color:#856404';
-                    p2.textContent = 'If the issue persists after clearing cache and fixing permissions, contact support.';
-                    container.appendChild(p2);
-
-                    rootEl.appendChild(container);
-                }, 8000);
-            })();
-            </script>
-            <?php
-        }, 99);
+        unset($scriptHandle, $jsUrl);
     }
 
     public function registerScript(string $handle, string $src, array $deps, bool $inFooter, string $context): void

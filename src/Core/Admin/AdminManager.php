@@ -394,6 +394,7 @@ class AdminManager
         }
         $out .= '<h1>' . esc_html__('Wallet Up', 'walletup') . '</h1>';
         $out .= '<div class="wup-fallback-note" style="border-left:4px solid #dba617;background:#fff;padding:8px 12px;margin:8px 0;max-width:720px;"><p>' . esc_html__('The visual dashboard has not loaded. Everything you need is below; the dashboard will come back once its script can run.', 'walletup') . '</p></div>';
+        $premium = function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active();
 
         if (class_exists(\WalletUpPro\Core\Onboarding\PaymentPageGenerator::class)) {
             try {
@@ -435,14 +436,16 @@ class AdminManager
                     $out .= '<p>' . esc_html__('Payment page:', 'walletup') . ' <a href="' . esc_url((string) get_permalink($pageId)) . '" target="_blank" rel="noopener">' . esc_html((string) get_permalink($pageId)) . '</a></p>';
                 }
                 $out .= '<p>' . esc_html__('Shortcode for any page:', 'walletup') . ' <code>' . esc_html((string) ($a['shortcode'] ?? '')) . '</code></p></div></div></div>';
-            } else {
+            } elseif (!$premium) {
                 $out .= '<p><a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=wallet-up-onboarding&fallback=1')) . '">' . esc_html__('Finish setup with the simple form', 'walletup') . '</a></p>';
             }
         }
         if (class_exists(SelfCheckPanel::class)) {
             $out .= '<h2>' . esc_html__('Setup check', 'walletup') . '</h2>' . SelfCheckPanel::table();
         }
-        $out .= '<p><a href="' . esc_url(admin_url('admin.php?page=wallet-up-onboarding&fallback=1')) . '">' . esc_html__('Change your details with the simple setup form', 'walletup') . '</a></p>';
+        if (!$premium) {
+            $out .= '<p><a href="' . esc_url(admin_url('admin.php?page=wallet-up-onboarding&fallback=1')) . '">' . esc_html__('Change your details with the simple setup form', 'walletup') . '</a></p>';
+        }
         return $out;
     }
 

@@ -88,9 +88,13 @@ class OnboardingBanner
             <p style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0;">
                 <strong><?php echo $heading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?></strong>
                 <span style="color:#50575e;"><?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?></span>
-                <a href="<?php echo $url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" class="button button-primary" style="margin-left:auto;"<?php echo $neverViewed !== null ? ' data-wup-copy="' . esc_attr($neverViewed) . '" target="_blank" rel="noopener"' : ''; ?>>
+                <?php if ($neverViewed !== null) : // 6.7.0: copies only; opening the page would count the owner as a visitor ?>
+                <button type="button" class="button button-primary" style="margin-left:auto;" data-wup-copy="<?php echo esc_attr($neverViewed); ?>"><?php echo $cta; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?></button>
+                <?php else : ?>
+                <a href="<?php echo $url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" class="button button-primary" style="margin-left:auto;">
                     <?php echo $cta; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?>
                 </a>
+                <?php endif; ?>
             </p>
             <script>
             (function(){

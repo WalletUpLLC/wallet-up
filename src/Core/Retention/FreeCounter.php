@@ -57,6 +57,12 @@ final class FreeCounter
             $o = [];
         }
         $o += ['days' => [], 'recent' => [], 'first_click_at' => 0, 'first_click_email_at' => 0, 'digest_sent_at' => 0];
+        if (!is_array($o['days'])) {
+            $o['days'] = [];
+        }
+        if (!is_array($o['recent'])) {
+            $o['recent'] = [];
+        }
         return $o;
     }
 
@@ -122,6 +128,11 @@ final class FreeCounter
 
     public static function onImpression(string $method, int $postId, string $mode): void
     {
+        // 6.7.0: the owner previewing their own page is not a visitor; counting them turned every
+        // "did anyone see it" signal green on the first click of "Create page".
+        if (is_user_logged_in() && current_user_can('edit_posts')) {
+            return;
+        }
         if (self::premium()) {
             return;
         }
@@ -131,16 +142,29 @@ final class FreeCounter
     /** The sendBeacon from assets/js/wup-events.js on a tap of a code, button or link. */
     public static function handleEvent(): void
     {
-        if (!check_ajax_referer('wallet_up_admin_nonce', 'nonce', false)) {
-            wp_send_json_error(['message' => 'bad nonce'], 403);
+        // 6.7.0: no nonce. This is a tap counter with per-IP dedupe and no state a visitor could
+        // abuse; a nonce baked into a cached page expired after a day and silently froze "taps" at 0.
+        if (is_user_logged_in() && current_user_can('edit_posts')) {
+            wp_send_json_success(['ignored' => 'owner']);
         }
         $type   = isset($_POST['type']) ? sanitize_key(wp_unslash($_POST['type'])) : '';
         $method = isset($_POST['method']) ? sanitize_key(wp_unslash($_POST['method'])) : '';
-        if ($type !== 'click' || $method === '' || (!in_array($method, PaymentMethodsConfig::getAllMethodIds(), true) && $method !== 'unknown')) {
+        if ($type !== 'click' || $method === '' || !in_array($method, PaymentMethodsConfig::getAllMethodIds(), true)) {
             wp_send_json_error(['message' => 'ignored'], 400);
         }
+        $postId = (int) ($_POST['post_id'] ?? 0);
+        if ($postId && get_post_status($postId) === false) {
+            $postId = 0; // only real posts take part in the dedupe key
+        }
+        $_POST['post_id'] = $postId;
         $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
-        $key = 'wup_evt_' . md5($ip . $method . (int) ($_POST['post_id'] ?? 0));
+        $perIp = 'wup_evt_ip_' . md5($ip);
+        $n = (int) get_transient($perIp);
+        if ($n >= 30) {
+            wp_send_json_success(['deduped' => true]); // one address cannot inflate the counter
+        }
+        set_transient($perIp, $n + 1, HOUR_IN_SECONDS);
+        $key = 'wup_evt_' . md5($ip . $method . $postId);
         if (get_transient($key)) {
             wp_send_json_success(['deduped' => true]);
         }
@@ -195,14 +219,49 @@ final class FreeCounter
         return $t !== '' ? $t : __('your site', 'walletup');
     }
 
-    private static function send(string $subject, string $body): bool
+    private static function send(string $subject, string $body, string $replyTo = ''): bool
     {
         $to = self::notifyEmail();
         if ($to === '') {
             return false;
         }
         $body .= "\n\n" . sprintf(/* translators: %s: dashboard URL */ __('Wallet Up dashboard: %s', 'walletup'), admin_url('admin.php?page=wallet-up'));
-        return (bool) wp_mail($to, $subject, $body);
+        $body .= "\n" . sprintf(/* translators: %s: Wallet Up admin URL */ __('Turn these emails off under Wallet Up → Settings → Notifications: %s', 'walletup'), admin_url('admin.php?page=wallet-up'));
+        $headers = [];
+        if ($replyTo !== '' && is_email($replyTo)) {
+            $headers[] = 'Reply-To: ' . $replyTo;
+        }
+        return (bool) wp_mail($to, $subject, $body, $headers);
+    }
+
+    /**
+     * At most ten confirmation emails a day, then one more saying the rest are on the dashboard;
+     * identical confirmations (same IP, method and amount) within ten minutes send nothing.
+     */
+    private static function confirmationEmailAllowed(array $p): bool
+    {
+        $ip  = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+        $dup = 'wup_confmail_' . md5($ip . '|' . (string) ($p['method'] ?? '') . '|' . (string) ($p['amount'] ?? ''));
+        if (get_transient($dup)) {
+            return false;
+        }
+        set_transient($dup, 1, 10 * MINUTE_IN_SECONDS);
+        $o   = self::load();
+        $day = gmdate('Y-m-d');
+        if (($o['mail_day'] ?? '') !== $day) {
+            $o['mail_day'] = $day;
+            $o['mail_count'] = 0;
+        }
+        $o['mail_count'] = (int) ($o['mail_count'] ?? 0) + 1;
+        self::save($o);
+        if ($o['mail_count'] > 11) {
+            return false;
+        }
+        if ($o['mail_count'] === 11) {
+            self::send(__('More payment confirmations today', 'walletup'), __('You have had more than ten payment confirmations today. The rest are listed on your Wallet Up dashboard; emails resume tomorrow.', 'walletup'));
+            return false;
+        }
+        return true;
     }
 
     private static function firstTapEmail(string $method, int $postId): void
@@ -216,19 +275,22 @@ final class FreeCounter
             sprintf(/* translators: %s: method name */ __('Someone just tapped your %s link', 'walletup'), $name),
             sprintf(
                 /* translators: 1: page title, 2: method name */
-                __("A visitor on \"%1\$s\" tapped your %2\$s link a moment ago. Payments go straight to your %2\$s account, so check the app for the money. Nothing else to do.\n\nIf you want visitors to confirm on your site after paying, the \"I've sent it\" form is already under your code. You'll get an email each time it is used.", 'walletup'),
+                __("A visitor on \"%1\$s\" opened your %2\$s payment details a moment ago. A tap means they opened the app or copied your details; if they paid, the money is already in your %2\$s account, so check the app.\n\nIf you want visitors to confirm on your site after paying, the \"I've sent it\" form is already under your code. You'll get an email each time it is used.", 'walletup'),
                 self::pageLabel($postId),
                 $name
             )
         );
-        if ($sent || self::notifyEmail() === '') {
-            $o['first_click_email_at'] = time();
+        if ($sent) {
+            $o['first_click_email_at'] = time(); // an owner who opts in later still gets the first-tap mail
             self::save($o);
         }
     }
 
     private static function confirmationEmail(array $p): void
     {
+        if (!self::confirmationEmailAllowed($p)) {
+            return;
+        }
         $name   = sanitize_text_field((string) ($p['name'] ?? ''));
         $email  = sanitize_email((string) ($p['email'] ?? ''));
         $amount = (float) ($p['amount'] ?? 0);
@@ -239,7 +301,7 @@ final class FreeCounter
         $order  = (int) ($p['order_id'] ?? 0);
         $body   = sprintf(
             /* translators: 1: payer, 2: payer email, 3: currency symbol, 4: amount, 5: method name, 6: reference */
-            __("%1\$s (%2\$s) confirmed a payment of %3\$s%4\$s via %5\$s. Reference: %6\$s. Check %5\$s to match it. Reply to this email to reach them.", 'walletup'),
+            __("%1\$s (%2\$s) confirmed a payment of %3\$s%4\$s via %5\$s. Reference: %6\$s. Check %5\$s to match it.", 'walletup'),
             $who,
             $email !== '' ? $email : '-',
             $cur,
@@ -250,9 +312,13 @@ final class FreeCounter
         if ($order > 0 && function_exists('wc_get_order')) {
             $body .= "\n\n" . sprintf(/* translators: 1: order number, 2: edit link */ __('WooCommerce order #%1$s is on hold until you confirm it: %2$s', 'walletup'), $order, admin_url('post.php?post=' . $order . '&action=edit'));
         }
+        if ($email !== '') {
+            $body .= "\n" . __('Reply to this email to reach them.', 'walletup');
+        }
         self::send(
             sprintf(/* translators: 1: payer, 2: currency symbol, 3: amount, 4: method */ __('%1$s says they sent you %2$s%3$s via %4$s', 'walletup'), $who, $cur, number_format($amount, 2), $method),
-            $body
+            $body,
+            $email
         );
     }
 
@@ -274,17 +340,24 @@ final class FreeCounter
             $subject = sprintf(/* translators: 1: views, 2: taps */ __('Your first week with Wallet Up: %1$d views, %2$d taps', 'walletup'), $t['impressions'], $t['clicks']);
             $body = sprintf(
                 /* translators: 1: views, 2: taps, 3: confirmations */
-                __("Your payment code was seen %1\$d times, tapped %2\$d times and confirmed %3\$d times this week.\n\nTip: add the Tip Jar block to your footer so every page can take a payment.", 'walletup'),
+                __("Your payment code was seen %1\$d times, tapped %2\$d times and confirmed %3\$d times this week.\n\nTip: add the Payment Button block to your contact page so people who are already asking you a question can pay you there.", 'walletup'),
                 $t['impressions'],
                 $t['clicks'],
                 $t['confirmations']
             );
-        } else {
+        } elseif ($pageId && get_post_status($pageId) === 'publish') {
             $subject = __('Nobody has seen your payment code yet', 'walletup');
             $body = sprintf(
                 /* translators: %s: page URL */
                 __("Your code is live at %s but no visitor has opened that page this week. Three ways people get paid with Wallet Up: send the link in your next invoice email, add the Payment Button block to your contact page, or print the QR (Download QR in your dashboard) for the counter.", 'walletup'),
                 $url
+            );
+        } else {
+            $subject = __('Your payment code is not on a page yet', 'walletup');
+            $body = sprintf(
+                /* translators: %s: dashboard URL */
+                __("A week in, your code is ready but no page shows it. Open your dashboard (%s) and click \"Create a page\", or add the Payment Button block to any page you already have. Then send that link in your next invoice or message.", 'walletup'),
+                admin_url('admin.php?page=wallet-up')
             );
         }
         if (self::send($subject, $body)) {

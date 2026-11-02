@@ -267,7 +267,7 @@ class DisplayHandler
                 'post_id' => $post_id,
             ];
 
-            $vsrc = $customImageUrl !== '' ? $customImageUrl : $this->generateQRSource($url, $qr_source_args);
+            $vsrc = $customImageUrl !== '' ? esc_url($customImageUrl) : $this->generateQRSource($url, $qr_source_args);
 
             if ($customImageUrl === '' && empty($vsrc)) {
                 throw new Exception(esc_html('Failed to generate QR code source'));
@@ -672,7 +672,7 @@ class DisplayHandler
 
         $confirmLabel = esc_js(__('Confirm Payment Sent', 'walletup'));
         $js = sprintf(
-            '(function(){var f="%1$s";var isWc=%8$s;var tgl=document.getElementById(f+"-toggle");var frm=document.getElementById(f);if(tgl&&frm){tgl.addEventListener("click",function(){frm.style.display=frm.style.display==="none"?"block":"none"})}var btn=document.getElementById(f+"-btn");if(!btn)return;btn.addEventListener("click",function(){var b=this,m=document.getElementById(f+"-msg");var nEl=document.getElementById(f+"-name");var eEl=document.getElementById(f+"-email");var n=nEl?nEl.value:"";var e=eEl?eEl.value:"";var r=document.getElementById(f+"-ref")?document.getElementById(f+"-ref").value:"";if(!isWc&&nEl&&eEl&&!n&&!e){m.style.display="block";m.style.color="#dc2626";m.textContent="Please enter your name or email.";return}b.disabled=true;b.textContent="Sending...";var fd=new FormData();fd.append("action","walletup_confirm_payment_sent");fd.append("nonce","%2$s");fd.append("payment_method","%3$s");fd.append("amount","%4$s");fd.append("customer_name",n);fd.append("customer_email",e);fd.append("transaction_reference",r);fd.append("post_id","%5$s");fd.append("wc_order_id","%9$s");fetch("%6$s",{method:"POST",body:fd}).then(function(r){return r.json()}).then(function(d){m.style.display="block";if(d.success){m.style.color="#059669";m.textContent=d.data.message||"Confirmation received!";b.textContent="Sent!";tgl.style.display="none"}else{m.style.color="#dc2626";m.textContent=d.data&&d.data.message?d.data.message:"Failed.";b.disabled=false;b.textContent="%7$s"}}).catch(function(){m.style.display="block";m.style.color="#dc2626";m.textContent="Network error.";b.disabled=false;b.textContent="%7$s"})})})();',
+            '(function(){var f="%1$s";var isWc=%8$s;var tgl=document.getElementById(f+"-toggle");var frm=document.getElementById(f);if(tgl&&frm){tgl.addEventListener("click",function(){frm.style.display=frm.style.display==="none"?"block":"none"})}var btn=document.getElementById(f+"-btn");if(!btn)return;btn.addEventListener("click",function(){var b=this,m=document.getElementById(f+"-msg");var nEl=document.getElementById(f+"-name");var eEl=document.getElementById(f+"-email");var n=nEl?nEl.value:"";var e=eEl?eEl.value:"";var r=document.getElementById(f+"-ref")?document.getElementById(f+"-ref").value:"";if(!isWc&&nEl&&eEl&&!n&&!e){m.style.display="block";m.style.color="#dc2626";m.textContent="Please enter your name or email.";return}b.disabled=true;b.textContent="Sending...";var fd=new FormData();fd.append("action","walletup_confirm_payment_sent");fd.append("nonce","%2$s");fd.append("token","%10$s");fd.append("order_key","%11$s");fd.append("payment_method","%3$s");fd.append("amount","%4$s");fd.append("customer_name",n);fd.append("customer_email",e);fd.append("transaction_reference",r);fd.append("post_id","%5$s");fd.append("wc_order_id","%9$s");fetch("%6$s",{method:"POST",body:fd}).then(function(r){return r.json()}).then(function(d){m.style.display="block";if(d.success){m.style.color="#059669";m.textContent=d.data.message||"Confirmation received!";b.textContent="Sent!";tgl.style.display="none"}else{m.style.color="#dc2626";m.textContent=d.data&&d.data.message?d.data.message:"Failed.";b.disabled=false;b.textContent="%7$s"}}).catch(function(){m.style.display="block";m.style.color="#dc2626";m.textContent="Network error.";b.disabled=false;b.textContent="%7$s"})})})();',
             esc_js($formId),
             esc_js($nonce),
             esc_js($method),
@@ -681,7 +681,9 @@ class DisplayHandler
             esc_url($ajaxUrl),
             $confirmLabel,
             $isWcOrder ? 'true' : 'false',
-            esc_js($wcOrderId)
+            esc_js($wcOrderId),
+            esc_js(\WalletUpPro\Core\Payments\PaymentGatewayHandler::confirmToken($postId, $wcOrderId)),
+            esc_js($wcOrderId > 0 && function_exists('wc_get_order') && ($o = wc_get_order($wcOrderId)) ? (string) $o->get_order_key() : '')
         );
 
         return ['html' => $html, 'js' => $js];

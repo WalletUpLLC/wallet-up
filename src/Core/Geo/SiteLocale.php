@@ -91,6 +91,17 @@ final class SiteLocale
         return ['country' => '', 'source' => 'unknown'];
     }
 
+    /** Countries offered in the "choose your country" control: code => name, US first. */
+    public static function pickList(): array
+    {
+        $codes = ['US', 'CA', 'GB', 'AU', 'NZ', 'IE', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'PT', 'SE', 'NO', 'DK', 'PL', 'CH', 'AT', 'MX', 'BR', 'AR', 'CO', 'IN', 'PK', 'BD', 'PH', 'ID', 'MY', 'SG', 'JP', 'KR', 'AE', 'SA', 'IL', 'TR', 'NG', 'GH', 'KE', 'ZA', 'EG', 'MA'];
+        $out = [];
+        foreach ($codes as $cc) {
+            $out[$cc] = self::countryName($cc);
+        }
+        return $out;
+    }
+
     public static function countryName(string $code): string
     {
         return self::COUNTRY_NAMES[strtoupper($code)] ?? strtoupper($code);

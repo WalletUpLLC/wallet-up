@@ -43,10 +43,17 @@ class FreeP2pGateway extends \WC_Payment_Gateway
         $this->description = trim((string) $this->get_option('description')) !== '' ? (string) $this->get_option('description') : sprintf(/* translators: %s: payment method name */ __('After you place the order you will see a %s code and link. Pay there, then confirm on the same page.', 'walletup'), $name);
         $this->icon        = $method !== '' ? DisplayHandler::methodLogoUrl($method) : '';
 
-        add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
-        add_action('woocommerce_thankyou_' . $this->id, [$this, 'renderThankYou'], 5);
-        add_action('woocommerce_email_before_order_table', [$this, 'emailInstructions'], 10, 3);
+        // WooCommerce and WooCommerce Blocks each construct the gateway; the hooks go on once.
+        if (!self::$hooked) {
+            self::$hooked = true;
+            add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
+            add_action('woocommerce_thankyou_' . $this->id, [$this, 'renderThankYou'], 5);
+            add_action('woocommerce_email_before_order_table', [$this, 'emailInstructions'], 10, 3);
+        }
     }
+
+    /** @var bool */
+    private static $hooked = false;
 
     public function init_form_fields(): void
     {

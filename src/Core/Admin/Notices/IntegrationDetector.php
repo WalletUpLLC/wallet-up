@@ -221,7 +221,7 @@ class IntegrationDetector
                 'pageMatch' => function ($page, $screen) {
                     return $page !== '' && strpos($page, 'wpforms') === 0;
                 },
-                'freeBody' => __('The free plan does not add Wallet Up payment fields to WPForms. You can place a Cash App, Venmo or PayPal QR code or link next to any form with a block or shortcode; form fields are part of Pro.', 'walletup'),
+                'freeBody' => __('The free plan does not add Wallet Up payment fields to WPForms. You can place a Cash App, Venmo, PayPal.me or Zelle code or link next to any form with a block or shortcode; form fields are part of Pro.', 'walletup'),
                 'freeCta'  => __('See Pro', 'walletup'),
                 'freeUrl'  => $upgrade('wpforms'),
                 'proBody'  => __('Add a Wallet Up payment field to WPForms in one click.', 'walletup'),

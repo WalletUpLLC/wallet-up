@@ -144,3 +144,66 @@ Same harness, same local WordPress 7.1 / PHP 8.3 / SQLite site. Each release has
 - The three React bundle edits from 6.5.0 (Zelle in the free list, geo-aware preset, Woo step sent on free, counters "of 4") are string-level and must be ported to the JSX source before the next `vite build`.
 - `ScanRoutes`, `SelfCheckPanel`, `MountHealth`, `Zelle`, `SiteLocale`, `FreeExperience`, `FreeCounter`, `FreeP2pGateway`, `FreeP2pBlocksSupport` were added to the classmap by hand; run `composer dump-autoload -o` at release.
 - The Freemius installs export that motivated 6.5.0–6.7.0 contains customer site URLs and is not in the repository.
+
+
+# Adversarial audit of the whole branch (after 6.7.0)
+
+Three independent reviewers (security and correctness, wiring sweep, product and copy) read the complete diff against `origin/main` without the author's conclusions. Their full reports are in `revamp/agent-reports/audit-security.md`, `audit-wiring.md` and `audit-product.md`. Every finding was checked against the code; the table lists what was changed and what was left, with the reason. The fixes were then re-proven with all three drivers (`proof/6.7.1-fresh`, `6.7.1-regression-650`, `6.7.1-regression-660`).
+
+| Finding | Severity | Action |
+|---|---|---|
+| A visitor could confirm against any WooCommerce order by id, with free-text in the method name, and the merchant got an email | high | Order key required and compared with `hash_equals`; method id validated against the known list (`PaymentGatewayHandler`, `DisplayHandler` form) |
+| Legacy `[cashapp]`/`[venmo]`/`[paypal]`/`[zelle]` rendered while the method was off | must-fix | `PaymentMethod::processShortcode` returns the same setup notice as `[wallet_up]` and the blocks |
+| Zelle without a bank QR still drew a QR of the bare email or phone | medium | `PaymentRegistry::qrPayloadFor` lets a method without a native link own the "no QR" answer |
+| "Turn on notifications" silently registered the install with Freemius | medium (consent) | Separate, default-off checkbox; the button alone stores the address locally only |
+| No way to turn notifications off; emails promised a reply-to that was not set | must-fix | Notifications card under Settings (on/off), "turn off" link in every email, `Reply-To` set when the payer gave an address |
+| Owner's own page views counted as visitor views | must-fix | `FreeCounter::onImpression` skips users who can edit posts; banner copy button only copies |
+| Tap beacon and confirm form broke on cached pages after 24 h (nonce) | should-fix | Tap counter needs no nonce (bounded per IP and per real post); confirm form carries a page-bound token beside the nonce |
+| Confirmation emails had no ceiling | should-fix | Ten a day, then one "more today" email; identical confirmations within ten minutes send nothing |
+| Mount watchdog recorded a failure at 2.5 s and never cleared it on a late mount | should-fix | Fallback still shows at 2.5 s; a failure is recorded only after 10 s or on a bundle script error, and cleared by any later mount |
+| "Create page" published a new page on every click; re-running setup switched the free checkout gateway off | should-fix | `publishPage` refreshes the generated page; wizard state reads the free gateway option |
+| A US-only method could be chosen for a non-USD store and the check said it shows | should-fix | Wizard and setup check apply the same currency rule as the gateway |
+| Cash App listed for the United Kingdom | factual | US only |
+| Welcome step had no "not in the US" path; default en_US installs were treated as US | should-fix | Neutral line with a country chooser whenever the detection is locale-only or unknown; preset data updated after the choice |
+| Free-plan additions anchored on English headings only | must-fix (partial) | Anchors match the English, Spanish and French strings the compiled app ships; a stable hook in the React source is still the right fix |
+| Step 3 said checkout placement is Pro, three lines above the free checkbox | copy | `integrationProHint` rewritten (en, es, fr) |
+| Light request classifier missed custom REST prefixes, body `rest_route` and alternate cron; dropped the admin theme's front-end filters and admin-bar items for logged-in users | medium | REST prefix from `rest_get_url_prefix()`, `rest_route` and `doing_wp_cron` excluded; logged-in users take the full path; `AdminThemeManager` back on every request |
+| Setup-check "Fix" links pointed at `page=wallet-up-payments`, which the free build does not register | defect | Links go to the single free admin page |
+| Free gateway constructed by WooCommerce and by WooCommerce Blocks, so email instructions printed twice | defect | Hooks registered once per request |
+| `FreeCounter` option could throw on a corrupted value; first-tap stamp set without an email; `method=unknown` accepted | low | Guards added; stamp only when sent; unknown rejected |
+| Plugin header said WordPress 5.8 while the readme said 6.1; two Requirements blocks; changelog.txt missing 6.7.0; copy omitting Zelle; "24 methods" vs "20"; "no outgoing connection" overstated | copy/wiring | All corrected |
+| No uninstall cleanup for the new options | low | `after_uninstall` (Freemius) removes the free plan's own state; shared data is kept when Pro is installed |
+| Uninstall-survey tag unreadable in the modal; byte-based truncation could split a multibyte character | should-fix | Words in the modal, compact tag on the wire, `mb_strcut` |
+| `SelfCheckPanel` label unescaped in the Plugins row; hard-coded `/wp-admin/` in a link | nit | Escaped; `adminUrl` passed |
+| No-JS setup form did not validate the handle | nit | Same pattern check as the wizard, with a back link |
+| `SetupCheck::checks()` ran three times per screen | perf | Memoised per request |
+| Found while re-proving: a legacy eight-second script in `AssetManager` appended a Pro-branded "Admin interface failed to load" alert (Cloudflare and file-permission advice) into the React root, which the new watchdog took for a successful mount, hiding the real fallback and clearing the recorded failure | must-fix | Injector removed; the 6.7.0 fallbacks replace it |
+
+## Re-proof after the fixes
+
+| Check | Result | Folder |
+|---|---|---|
+| Visitor page view (logged out): plugin files / KB / Freemius | 31 / 467 / no (owner logged in on the front end: 34 / 529 / no) | 6.7.1-fresh |
+| Setup screen with the bundle blocked: fallback form shown, failure recorded on the script error | yes / yes | 6.7.1-fresh |
+| Dashboard with the bundle blocked after the simple form: QR, link, "Setup saved", checks | yes | 6.7.1-fresh |
+| Inline notice visible above the app when a failure is recorded; cleared by the next good mount | yes / yes | 6.7.1-fresh |
+| Owner's own page views not counted; a visitor's view and tap counted | before 3, after owner 3; visitor +1 view, +1 tap | 6.7.1-fresh |
+| `[cashapp]` while Cash App is off | visitor gets `<!-- wallet-up: cashapp is switched off -->`, no link | 6.7.1-fresh |
+| Zelle with no uploaded bank QR | pay-to card with the handle, 0 generated QR images | 6.7.1-fresh |
+| Tap beacon without a nonce / with a bad method id | 200 counted / 400 rejected | 6.7.1-fresh |
+| "Create page" twice | same page id both times | 6.7.1-fresh |
+| Settings cards | Where you are, Notifications, Branding, Setup assistant | 6.7.1-fresh |
+| Survey modal text | "installed 54 seconds ago · 3 methods saved · 4 page views · admin loaded · PHP 8.3 · the United States" | 6.7.1-fresh |
+| Welcome line on a default en_US site | neutral line with a country chooser | 6.7.1-regression-650 |
+| Zelle upload stored; Zelle pay-to card without an image | yes / yes | 6.7.1-regression-650 |
+| Confirm with a wrong order key / with free-text method | 403 / 400 | 6.7.1-regression-660 |
+| Wizard state after setup with WooCommerce | gatewayEnabled true, methodsAtCheckout {paypal} | 6.7.1-regression-660 |
+| On-hold order email instruction line (hook fired directly on order 17) | printed once | script in `harness/` notes |
+| Checkout, order on hold, thank-you confirm, counts, three emails, This week card, review prompt | unchanged from 6.6.0 | 6.7.1-regression-660 |
+| PHP fatals / console errors | 0 / one 404 for a WordPress core asset in the sandbox, none from the plugin | all |
+
+Left as is, with the reason:
+- The reviewers' `enumeration by order id` on the "already received" message needs the order key now, so it is closed by the key check.
+- `PaymentPageGenerator::registerLiveSection()` is unused but public; Pro code may call it, so it stays.
+- The reviewer's note that `PaymentGatewayHandler::init()` runs on light requests was wrong: that call is inside the premium-only block.
+- Screenshots 2 and 5 on WordPress.org still show Pro screens; the readme labels them as Pro. Replacing the images is a release task outside this repository.

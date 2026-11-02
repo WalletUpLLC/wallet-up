@@ -147,6 +147,11 @@ abstract class PaymentMethod
             $this->errorHandler->log('Processing shortcode for ' . $this->methodId);
 
             $processedAtts = $this->processAttributes($atts);
+            // 6.7.0: the legacy [cashapp]/[venmo]/[paypal]/[zelle] tags must respect the off switch
+            // like [wallet_up] and the blocks do; visitors get a comment, admins an inline Turn-on.
+            if (!\WalletUpPro\Core\PaymentRegistry::getInstance()->isMethodEnabled($this->methodId)) {
+                return \WalletUpPro\Core\PaymentRegistry::setupNotice($this->methodId, 'off');
+            }
             $holder = $this->getHolder();
 
             if (empty($holder)) {
