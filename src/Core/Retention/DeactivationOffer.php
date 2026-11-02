@@ -78,11 +78,7 @@ final class DeactivationOffer
                 $methods++;
             }
         }
-        $counts = (array) get_option('wallet_up_free_counts', []);
-        $views = 0;
-        foreach ($counts as $day) {
-            $views += (int) (is_array($day) ? ($day['impressions'] ?? 0) : 0);
-        }
+        $views = class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') ? (int) (FreeCounter::allTime()['impressions'] ?? 0) : 0;
         $mount = get_option('wallet_up_admin_mount_failed_at') ? 'no' : 'yes';
         $hint = (array) get_option(\WalletUpPro\Core\Geo\SiteLocale::OPTION_HINT, []);
         $cc = (string) ($hint['country'] ?? '');

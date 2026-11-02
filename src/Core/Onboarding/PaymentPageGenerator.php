@@ -108,20 +108,9 @@ class PaymentPageGenerator
             // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in assertAllowed()
             $onlyMethodId = isset($_POST['methodId']) ? sanitize_key(wp_unslash($_POST['methodId'])) : '';
 
-            $artifact = self::buildArtifact();
-            $title    = self::pageTitleFor($artifact, $onlyMethodId);
-            $content  = ($onlyMethodId === '' && self::availabilityOn())
-                ? self::headingBlock($title) . "\n\n" . self::liveSectionMarkup()
-                : self::buildPageContent($artifact, $title, $onlyMethodId);
-            $pageId   = self::createDraftPage($title, $content);
-
-            if (!$pageId) {
-                throw new \Exception(esc_html__('Could not create page', 'walletup'));
-            }
-            // 6.6.0: the page goes live at once and the assistant lands on it, so the
-            // first thing a new user owns is a URL they can send, not a draft to finish.
-            wp_update_post(['ID' => $pageId, 'post_status' => 'publish']);
-            update_option('wallet_up_payment_page_id', (int) $pageId, false);
+            $published = self::publishPage($onlyMethodId);
+            $pageId    = $published['pageId'];
+            $title     = $published['title'];
             wp_send_json_success([
                 'pageId'     => $pageId,
                 'editUrl'    => esc_url_raw(get_permalink($pageId)),
@@ -134,6 +123,31 @@ class PaymentPageGenerator
         } catch (\Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Builds and publishes the payment page and remembers its id. Shared by the wizard's
+     * "Create page" (AJAX) and the no-JavaScript setup form (6.7.0).
+     *
+     * @return array{pageId:int,title:string}
+     */
+    public static function publishPage(string $onlyMethodId = ''): array
+    {
+        $artifact = self::buildArtifact();
+        $title    = self::pageTitleFor($artifact, $onlyMethodId);
+        $content  = ($onlyMethodId === '' && self::availabilityOn())
+            ? self::headingBlock($title) . "\n\n" . self::liveSectionMarkup()
+            : self::buildPageContent($artifact, $title, $onlyMethodId);
+        $pageId   = self::createDraftPage($title, $content);
+
+        if (!$pageId) {
+            throw new \Exception(esc_html__('Could not create page', 'walletup'));
+        }
+        // 6.6.0: the page goes live at once and the assistant lands on it, so the
+        // first thing a new user owns is a URL they can send, not a draft to finish.
+        wp_update_post(['ID' => $pageId, 'post_status' => 'publish']);
+        update_option('wallet_up_payment_page_id', (int) $pageId, false);
+        return ['pageId' => (int) $pageId, 'title' => $title];
     }
 
     private static function headingBlock(string $title): string

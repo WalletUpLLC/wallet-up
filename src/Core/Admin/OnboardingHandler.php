@@ -191,60 +191,58 @@ class OnboardingHandler
             return;
         }
         $step = get_option(self::OPTION_STEP, 'welcome');
-        $fallbackUrl = esc_url(add_query_arg('fallback', '1', admin_url('admin.php?page=wallet-up-onboarding')));
         ?>
         <div class="wrap">
+            <hr class="wp-header-end" style="display:none;">
             <div id="wallet-up-admin-root"
                  data-admin-version="v2"
                  data-initial-page="onboarding"
                  data-onboarding-step="<?php echo esc_attr($step); ?>"></div>
 
-            <div id="wallet-up-onboarding-fallback-link" style="display:none;margin-top:24px;">
-                <div class="notice notice-warning inline">
-                    <p>
-                        <?php esc_html_e('The visual setup wizard didn\'t load.', 'walletup'); ?>
-                        <a href="<?php echo $fallbackUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>">
-                            <?php esc_html_e('Use the simple setup form instead.', 'walletup'); ?>
-                        </a>
-                    </p>
-                </div>
+            <?php // 6.7.0: the simple form is on the page already; it appears if the wizard has not mounted after 2.5 s. ?>
+            <div id="wallet-up-onboarding-fallback" style="display:none;max-width:640px;">
+                <h1><?php esc_html_e('Wallet Up setup', 'walletup'); ?></h1>
+                <div class="wup-fallback-note" style="border-left:4px solid #dba617;background:#fff;padding:8px 12px;margin:8px 0;"><p><?php esc_html_e('The visual setup wizard has not loaded. You can finish setup with this form instead; it does the same thing.', 'walletup'); ?></p></div>
+                <?php self::fallbackForm(); ?>
             </div>
 
             <noscript>
-                <div class="notice notice-warning inline">
-                    <p>
-                        <?php esc_html_e('JavaScript is required for the visual setup wizard.', 'walletup'); ?>
-                        <a href="<?php echo $fallbackUrl; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>"><?php esc_html_e('Use the simple setup form', 'walletup'); ?></a>
-                    </p>
+                <div style="max-width:640px;">
+                    <h1><?php esc_html_e('Wallet Up setup', 'walletup'); ?></h1>
+                    <div class="wup-fallback-note" style="border-left:4px solid #dba617;background:#fff;padding:8px 12px;margin:8px 0;"><p><?php esc_html_e('JavaScript is off, so here is the simple setup form.', 'walletup'); ?></p></div>
+                    <?php self::fallbackForm(); ?>
                 </div>
             </noscript>
 
-            <script>
-            (function(){
-                var root = document.getElementById('wallet-up-admin-root');
-                var link = document.getElementById('wallet-up-onboarding-fallback-link');
-                if (!root || !link) { return; }
-                var mounted = function(){ return !!root.firstElementChild; };
-                if (window.MutationObserver) {
-                    var obs = new MutationObserver(function(){
-                        if (mounted()) { link.style.display = 'none'; obs.disconnect(); }
-                    });
-                    obs.observe(root, { childList: true });
-                }
-                setTimeout(function(){
-                    if (!mounted()) { link.style.display = 'block'; }
-                }, 8000);
-            })();
-            </script>
+            <?php echo MountHealth::watchScript('wallet-up-admin-root', 'wallet-up-onboarding-fallback', 'onboarding'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static script with JSON-encoded config ?>
         </div>
         <?php
     }
 
     private static function renderFallback(): void
     {
+        ?>
+        <div class="wrap" style="max-width:640px;">
+            <h1><?php esc_html_e('Wallet Up — Simple Setup', 'walletup'); ?></h1>
+            <p><?php esc_html_e('Fill in the basics and you\'re ready to accept payments.', 'walletup'); ?></p>
+            <?php self::fallbackForm(); ?>
+            <?php if (class_exists(SelfCheckPanel::class)) : ?>
+                <h2 style="margin-top:32px;"><?php esc_html_e('Setup check', 'walletup'); ?></h2>
+                <?php echo SelfCheckPanel::table(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside ?>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /** The plain-HTML setup form: name, email, one method and its username. No JavaScript involved. */
+    public static function fallbackForm(): void
+    {
         $accounts = (array) get_option('wallet_up_transfer_call', []);
         $name = (string) ($accounts['holder_owner'] ?? '');
         $email = (string) ($accounts['holder_email'] ?? '');
+        if ($email === '') {
+            $email = (string) get_option('admin_email', '');
+        }
         $methods = [
             'cashapp' => 'Cash App',
             'paypal'  => 'PayPal.me',
@@ -252,9 +250,6 @@ class OnboardingHandler
             'zelle'   => 'Zelle',
         ];
         ?>
-        <div class="wrap" style="max-width:640px;">
-            <h1><?php esc_html_e('Wallet Up — Simple Setup', 'walletup'); ?></h1>
-            <p><?php esc_html_e('Fill in the basics and you\'re ready to accept payments.', 'walletup'); ?></p>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <?php wp_nonce_field('wallet_up_fallback_setup', 'wallet_up_fallback_nonce'); ?>
                 <input type="hidden" name="action" value="wallet_up_fallback_setup">
@@ -289,7 +284,6 @@ class OnboardingHandler
                     <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup', 'walletup'); ?></button>
                 </p>
             </form>
-        </div>
         <?php
     }
 
@@ -323,6 +317,16 @@ class OnboardingHandler
 
         update_option(self::OPTION_COMPLETED, 1, false);
         self::clearPending();
+
+        // 6.7.0: the simple form ends the same way the wizard does, with a live page to send.
+        $existing = (int) get_option('wallet_up_payment_page_id', 0);
+        if ($holder !== '' && (!$existing || get_post_status($existing) !== 'publish')) {
+            try {
+                \WalletUpPro\Core\Onboarding\PaymentPageGenerator::publishPage($method);
+            } catch (\Throwable $e) {
+                // The dashboard fallback still shows the link and QR; the page is optional.
+            }
+        }
 
         wp_safe_redirect(admin_url('admin.php?page=wallet-up&fallback_setup=done'));
         exit;

@@ -1,0 +1,85 @@
+{
+  "label": "650-geo",
+  "geo": true,
+  "checks": {
+    "set_timezone": "Europe/Berlin",
+    "landing": "http://127.0.0.1:8080/wp-admin/admin.php?page=wallet-up-onboarding",
+    "geo_line_shown": true,
+    "geo_line_text": "Your site looks like it is in Germany. Cash App and Venmo and Zelle work in the United States only. PayPal.me works where you are. Pro adds Interac, PayID, BPAY and mobile money for other countries. I'm in the US",
+    "geo_hint_option": {
+      "country": "DE",
+      "countryName": "Germany",
+      "source": "timezone",
+      "isUS": false,
+      "works": [
+        "paypal"
+      ],
+      "doesNotWork": [
+        "cashapp",
+        "venmo",
+        "zelle"
+      ],
+      "worldwide": [
+        "paypal"
+      ],
+      "currency": "EUR"
+    },
+    "currency_option": {
+      "currency": "EUR",
+      "default_amount": 10,
+      "enable_logging": true
+    },
+    "zelle_button_enabled": true,
+    "preselected": [
+      "PayPal"
+    ],
+    "zelle_hint_shown": true,
+    "step4": "You're ready to accept payments.",
+    "notify_block_shown": true,
+    "notify_email_option": "admin@example.com",
+    "notify_text": "Want to know when someone pays you? Turn on notifications and we email you the first time your code is scanned or your link is tapped, and each time a visitor confirms a payment. Notifications are on. We will email admin@example.com.",
+    "accounts": {
+      "holder_owner": "Test Shop",
+      "holder_email": "admin@example.com",
+      "paypal_holder": "TestShop",
+      "zelle_holder": "pay@testshop.com"
+    },
+    "enabled": {
+      "paypal": true,
+      "zelle": true
+    },
+    "zelle_upload_control": true,
+    "zelle_row_locked_inputs": 2,
+    "custom_qr_option": {
+      "zelle": "http://127.0.0.1:8080/wp-content/uploads/2026/11/zelle-qr-20261102-202317.png"
+    },
+    "zelle_upload_status": "Zelle has no pay link. Visitors see your Zelle email or phone and the amount, with a copy button. If your bank app can show a Zelle QR code, upload it under Wallet Up → Payments and visitors can scan ",
+    "settings_cards": [
+      "Where you are",
+      "Branding",
+      "Setup assistant"
+    ],
+    "page": "http://127.0.0.1:8080/?page_id=7",
+    "admin_sees_turn_on": true,
+    "admin_sees_venmo_notice": true,
+    "zelle_card": true,
+    "amounts": [
+      "$20.00",
+      "€25.00"
+    ],
+    "paypal_link": "https://www.paypal.com/paypalme/TestShop/25EUR",
+    "visitor_comments": [
+      "<!-- wallet-up: cashapp is switched off -->",
+      "<!-- wallet-up: venmo is not configured -->"
+    ],
+    "visitor_sees_notice_box": false,
+    "visitor_sees_zelle": true,
+    "after_turn_on_cashapp_renders": true,
+    "after_turn_on_url": "http://127.0.0.1:8080/?page_id=7",
+    "timeline_note": "Sent with your answer so we can tell how far setup got: [6.5.0 0m m3 pv0 am-yes php8.3 DE]",
+    "fs_submit_request": true,
+    "stored_reason_info": "just testing [6.5.0 0m m3 pv0 am-yes php8.3 DE]",
+    "stored_reason_has_timeline": true
+  },
+  "console_errors": []
+}

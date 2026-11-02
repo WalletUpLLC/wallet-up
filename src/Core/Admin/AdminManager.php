@@ -379,6 +379,73 @@ class AdminManager
         ];
     }
 
+    /** Plain-HTML dashboard: the saved link and code, the setup checks, and the simple form. */
+    private function fallbackMarkup(): string
+    {
+        $out = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only flag set by our own redirect
+        if (isset($_GET['fallback_setup']) && $_GET['fallback_setup'] === 'done') {
+            $pageId = (int) get_option('wallet_up_payment_page_id', 0);
+            $out .= '<div class="wup-fallback-note" style="border-left:4px solid #00a32a;background:#fff;padding:8px 12px;margin:8px 0;"><p>' . esc_html__('Setup saved.', 'walletup')
+                . ($pageId && get_post_status($pageId) === 'publish'
+                    ? ' <a href="' . esc_url((string) get_permalink($pageId)) . '" target="_blank" rel="noopener">' . esc_html__('Open your payment page', 'walletup') . '</a>'
+                    : '')
+                . '</p></div>';
+        }
+        $out .= '<h1>' . esc_html__('Wallet Up', 'walletup') . '</h1>';
+        $out .= '<div class="wup-fallback-note" style="border-left:4px solid #dba617;background:#fff;padding:8px 12px;margin:8px 0;max-width:720px;"><p>' . esc_html__('The visual dashboard has not loaded. Everything you need is below; the dashboard will come back once its script can run.', 'walletup') . '</p></div>';
+
+        if (class_exists(\WalletUpPro\Core\Onboarding\PaymentPageGenerator::class)) {
+            try {
+                $a = \WalletUpPro\Core\Onboarding\PaymentPageGenerator::buildArtifact(false);
+            } catch (\Throwable $e) {
+                $a = [];
+            }
+            if (!empty($a['configured'])) {
+                $url = (string) ($a['url'] ?? '');
+                $qr  = '';
+                if ($url !== '') {
+                    $key = 'wallet_up_fallback_qr_' . md5($url);
+                    $qr  = (string) get_transient($key);
+                    if ($qr === '') {
+                        try {
+                            $qr = \WalletUpPro\Core\Onboarding\PaymentPageGenerator::generateQrDataUri($url);
+                        } catch (\Throwable $e) {
+                            $qr = '';
+                        }
+                        if ($qr !== '') {
+                            set_transient($key, $qr, 12 * HOUR_IN_SECONDS);
+                        }
+                    }
+                }
+                $pageId = (int) get_option('wallet_up_payment_page_id', 0);
+                $out .= '<div class="card" style="max-width:720px;padding:16px;">';
+                $out .= '<h2 style="margin-top:0;">' . sprintf(/* translators: %s: method name */ esc_html__('Your %s code and link', 'walletup'), esc_html((string) ($a['methodLabel'] ?? ''))) . '</h2>';
+                $out .= '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">';
+                if ($qr !== '' && strpos($qr, 'data:image/') === 0) {
+                    $out .= '<img src="' . esc_attr($qr) . '" alt="" width="160" height="160" style="border:1px solid #dcdcde;border-radius:6px;">';
+                }
+                $out .= '<div><p><strong>' . esc_html((string) ($a['holder'] ?? '')) . '</strong></p>';
+                if ($url !== '') {
+                    $out .= '<p><a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . esc_html($url) . '</a></p>';
+                } else {
+                    $out .= '<p>' . esc_html__('This method has no pay link; visitors see your handle and the amount.', 'walletup') . '</p>';
+                }
+                if ($pageId && get_post_status($pageId) === 'publish') {
+                    $out .= '<p>' . esc_html__('Payment page:', 'walletup') . ' <a href="' . esc_url((string) get_permalink($pageId)) . '" target="_blank" rel="noopener">' . esc_html((string) get_permalink($pageId)) . '</a></p>';
+                }
+                $out .= '<p>' . esc_html__('Shortcode for any page:', 'walletup') . ' <code>' . esc_html((string) ($a['shortcode'] ?? '')) . '</code></p></div></div></div>';
+            } else {
+                $out .= '<p><a class="button button-primary" href="' . esc_url(admin_url('admin.php?page=wallet-up-onboarding&fallback=1')) . '">' . esc_html__('Finish setup with the simple form', 'walletup') . '</a></p>';
+            }
+        }
+        if (class_exists(SelfCheckPanel::class)) {
+            $out .= '<h2>' . esc_html__('Setup check', 'walletup') . '</h2>' . SelfCheckPanel::table();
+        }
+        $out .= '<p><a href="' . esc_url(admin_url('admin.php?page=wallet-up-onboarding&fallback=1')) . '">' . esc_html__('Change your details with the simple setup form', 'walletup') . '</a></p>';
+        return $out;
+    }
+
     public function renderAdminPage(): void
     {
 
@@ -389,6 +456,8 @@ class AdminManager
         }
 
         echo '<div class="wrap">';
+        // Notices land here (WordPress moves them after .wp-header-end), above the app, never inside the hidden fallback.
+        echo '<hr class="wp-header-end" style="display:none;">';
         echo '<!-- WalletUpPro Admin Mount Point -->';
         $v2Attrs = '';
         if (get_option('wallet_up_admin_v2', 'yes') === 'yes') {
@@ -408,12 +477,14 @@ class AdminManager
         }
         echo wp_kses_post('<div id="wallet-up-admin-root"' . $v2Attrs . '></div>');
 
-        echo '<noscript>';
-        printf(
-            '<div class="notice notice-error"><p>%s</p></div>',
-            esc_html__('Oops! For a better experience, JavaScript is required for the Wallet Up admin interface. Please enable Javascript.', 'walletup')
-        );
-        echo '</noscript>';
+        // 6.7.0: what the owner needs most is on the page in plain HTML, shown if the app has not
+        // mounted after 2.5 seconds or when JavaScript is off: their link, their code, the checks.
+        $fallback = $this->fallbackMarkup();
+        echo '<div id="wallet-up-dashboard-fallback" style="display:none;">' . $fallback . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in fallbackMarkup()
+        echo '<noscript>' . $fallback . '</noscript>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in fallbackMarkup()
+        if (class_exists(MountHealth::class)) {
+            echo MountHealth::watchScript('wallet-up-admin-root', 'wallet-up-dashboard-fallback', 'dashboard'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static script with JSON-encoded config
+        }
 
         echo '<div style="display:none;">';
         echo '<form method="post" action="options.php" id="wallet-up-settings-form">';

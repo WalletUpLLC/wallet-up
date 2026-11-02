@@ -196,10 +196,8 @@ class Plugin extends BaseSingleton
             }
 
             // resolve on every site/subsite regardless of license. Scan analytics
-            \WalletUpPro\Services\QRCodeService::registerCacheBypass();
-            add_action('init', ['\\WalletUpPro\\Services\\QRCodeService', 'registerScanRewriteRule'], 0);
-            add_action('init', ['\\WalletUpPro\\Services\\QRCodeService', 'handleScanRedirect'], 1);
-            add_action('parse_request', ['\\WalletUpPro\\Services\\QRCodeService', 'handleScanRedirect'], 0);
+            // 6.7.0: the routes live in ScanRoutes; the QR engine loads only on a scan request.
+            \WalletUpPro\Services\ScanRoutes::register();
 
             if (get_option('wallet_up_scan_rewrite_v1') !== 'yes') {
                 add_action('wp_loaded', static function () {
@@ -208,9 +206,10 @@ class Plugin extends BaseSingleton
                 });
             }
 
-            if (class_exists(\WalletUpPro\Core\Onboarding\PaymentPageGenerator::class)) {
-                \WalletUpPro\Core\Onboarding\PaymentPageGenerator::registerLiveSection();
-            }
+            // 6.7.0: the shortcode is registered by name, so the generator loads only on a page that uses it.
+            add_shortcode('walletup_payment_section', static function () {
+                return \WalletUpPro\Core\Onboarding\PaymentPageGenerator::renderLiveSection();
+            });
 
             if (wallet_up_fs()->can_use_premium_code__premium_only()) {
                 \WalletUpPro\Core\Tenancy\Tenant::register();
@@ -220,11 +219,11 @@ class Plugin extends BaseSingleton
                     \WalletUpPro\Core\Admin\PageSearch::register();
                 }
             }
-            \WalletUpPro\Core\Retention\DeactivationOffer::register();
-            \WalletUpPro\Core\Admin\ActivityCache::register();
-            if (class_exists(\WalletUpPro\Core\Support\SetupHelp::class)) {
+            if (!self::isLightRequest()) {
+                \WalletUpPro\Core\Retention\DeactivationOffer::register();
                 \WalletUpPro\Core\Support\SetupHelp::register();
             }
+            \WalletUpPro\Core\Admin\ActivityCache::register();
             $this->registry = PaymentRegistry::getInstance();
 
             add_action('updated_option', function ($option) {
@@ -251,7 +250,9 @@ class Plugin extends BaseSingleton
                 }
             }
 
-            new \WalletUpPro\API\QRCodeEndpoint();
+            if (!self::isLightRequest()) {
+                new \WalletUpPro\API\QRCodeEndpoint();
+            }
 
             if (wallet_up_fs()->can_use_premium_code__premium_only()) {
                 new \WalletUpPro\Core\Shortcodes\QRCodeShortcode();
@@ -291,7 +292,7 @@ class Plugin extends BaseSingleton
             $this->initializeServices();
             $this->runMigrations();
 
-            if (class_exists(\WalletUpPro\Core\Payments\MerchantProvisioning::class)) {
+            if (!self::isLightRequest()) {
                 \WalletUpPro\Core\Payments\MerchantProvisioning::getInstance()->init();
             }
 
@@ -372,8 +373,10 @@ class Plugin extends BaseSingleton
         $this->container->set('asset_manager', $this->assetManager);
         $this->container->set('display_handler', $this->displayHandler);
 
-        $theme_manager = \WalletUpPro\Core\Admin\Themes\AdminThemeManager::getInstance();
-        $this->container->set('theme_manager', $theme_manager);
+        if (!self::isLightRequest()) {
+            $theme_manager = \WalletUpPro\Core\Admin\Themes\AdminThemeManager::getInstance();
+            $this->container->set('theme_manager', $theme_manager);
+        }
 
         if (wallet_up_fs()->can_use_premium_code__premium_only()) {
             $urlHandler = \WalletUpPro\Core\URL\URLHandler::getInstance();
@@ -423,12 +426,14 @@ class Plugin extends BaseSingleton
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\FreeExperience::class)) {
             \WalletUpPro\Core\Admin\FreeExperience::init();
         }
-        if (class_exists(\WalletUpPro\Core\Retention\FreeCounter::class)) {
-            \WalletUpPro\Core\Retention\FreeCounter::init();
+        if (is_admin()) {
+            \WalletUpPro\Core\Admin\SelfCheckPanel::init();
+            \WalletUpPro\Core\Admin\MountHealth::init();
         }
+        \WalletUpPro\Core\Retention\FreeCounter::init();
         // 6.6.0: the visitor's "I've sent it" form must work on the free plan too; the Pro
         // block below registers the same callback, and add_action de-duplicates it.
-        if (class_exists(\WalletUpPro\Core\Payments\PaymentGatewayHandler::class)) {
+        if (wp_doing_ajax()) {
             add_action('wp_ajax_walletup_confirm_payment_sent', [\WalletUpPro\Core\Payments\PaymentGatewayHandler::class, 'handleConfirmPaymentSent']);
             add_action('wp_ajax_nopriv_walletup_confirm_payment_sent', [\WalletUpPro\Core\Payments\PaymentGatewayHandler::class, 'handleConfirmPaymentSent']);
         }
@@ -455,9 +460,7 @@ class Plugin extends BaseSingleton
             }
         }
 
-        if (class_exists(\WalletUpPro\Core\Blocks\BlockRegistrar::class)) {
-            \WalletUpPro\Core\Blocks\BlockRegistrar::init();
-        }
+        \WalletUpPro\Core\Blocks\BlockRegistrar::init();
 
         if (wallet_up_fs()->can_use_premium_code__premium_only()) {
             \WalletUpPro\Core\Emails\EmailTemplateHandler::init();
@@ -522,6 +525,16 @@ class Plugin extends BaseSingleton
      * 
      * @return string The table name prefixed with WordPress database prefix.
      */
+    /**
+     * 6.7.0: true on a plain visitor page view of the free build (see wallet_up_is_light_request
+     * in wallet-up-start.php). Services that only answer admin, AJAX, REST or cron calls are
+     * skipped on such requests. The Pro build never takes the light path.
+     */
+    public static function isLightRequest(): bool
+    {
+        return function_exists('WalletUpPro\\wallet_up_is_light_request') && \WalletUpPro\wallet_up_is_light_request();
+    }
+
     private function getTableName(): string
     {
         global $wpdb;

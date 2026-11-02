@@ -138,7 +138,7 @@ if ( get_transient( 'wallet_up_free_deactivated' ) ) {
     } );
 }
 // which has the Plugin Name header — WooCommerce FeaturesUtil requires this
-define( 'WALLET_UP_PRO_VERSION', '6.6.0' );
+define( 'WALLET_UP_PRO_VERSION', '6.7.0' );
 define( 'WALLET_UP_PRO_PRODUCT_NAME', 'Wallet Up Pro' );
 define( 'WALLET_UP_IS_PRO_BUILD', false );
 define( 'WALLET_UP_PRO_FILE', dirname( __FILE__ ) . '/wallet-up.php' );
@@ -374,6 +374,84 @@ add_action( 'plugins_loaded', function () {
     }
 }, 0 );
 
+if ( !function_exists( __NAMESPACE__ . '\\wallet_up_is_light_request' ) ) {
+    /**
+     * 6.7.0: a plain visitor page view on the free build. Nothing on such a request needs the
+     * licensing SDK, the admin notices or the AJAX/REST handlers, so the plugin skips them and
+     * the request loads about a third of the PHP it used to. Anything that could need them
+     * (wp-admin, admin-ajax, cron, REST, XML-RPC, WP-CLI, the login screen, a Freemius action
+     * in the URL, the support-login link) is served the full plugin exactly as before.
+     */
+    function wallet_up_is_light_request() : bool {
+        static $light = null;
+        if ( null !== $light ) {
+            return $light;
+        }
+        $light = false;
+        if ( defined( 'WALLET_UP_IS_PRO_BUILD' ) && WALLET_UP_IS_PRO_BUILD ) {
+            return $light;
+        }
+        if ( defined( 'WALLET_UP_FULL_BOOT' ) && WALLET_UP_FULL_BOOT ) {
+            return $light;
+        }
+        if ( is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+            return $light;
+        }
+        if ( ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) || ( defined( 'WP_INSTALLING' ) && WP_INSTALLING ) ) {
+            return $light;
+        }
+        $pagenow = isset( $GLOBALS['pagenow'] ) ? (string) $GLOBALS['pagenow'] : '';
+        if ( in_array( $pagenow, [ 'wp-login.php', 'wp-cron.php', 'wp-activate.php', 'wp-signup.php', 'xmlrpc.php' ], true ) ) {
+            return $light;
+        }
+        $uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- compared as a plain string only
+        if ( '' !== $uri && ( false !== strpos( $uri, '/wp-json/' ) || false !== strpos( $uri, 'rest_route=' ) ) ) {
+            return $light;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- presence check only
+        if ( isset( $_REQUEST['fs_action'] ) || isset( $_GET['wallet_up_support_login'] ) || isset( $_GET['walletup_short_code'] ) ) {
+            return $light;
+        }
+        $light = (bool) apply_filters( 'wallet_up_light_request', true );
+        return $light;
+    }
+}
+
+if ( ! class_exists( __NAMESPACE__ . '\\FreemiusFrontendStub', false ) ) {
+    /**
+     * Stands in for the Freemius SDK on light requests (see wallet_up_is_light_request). The free
+     * build can never use premium code, so every question the plugin asks the SDK on a visitor
+     * page view has a fixed answer: no, nothing, nobody. Admin, AJAX, cron and REST requests get
+     * the real SDK, so opt-in, licensing, updates and the uninstall survey are untouched.
+     */
+    final class FreemiusFrontendStub {
+        public function is_wallet_up_stub() : bool {
+            return true;
+        }
+
+        public function get_menu_slug() : string {
+            return 'wallet-up';
+        }
+
+        public function apply_filters( $tag, $value = null ) {
+            return $value;
+        }
+
+        public function __call( $name, $arguments ) {
+            if ( 'checkout_url' === $name || str_ends_with( $name, '_url' ) || str_ends_with( $name, '_slug' ) ) {
+                return '';
+            }
+            if ( str_starts_with( $name, 'add_' ) || str_starts_with( $name, 'set_' ) || str_starts_with( $name, 'remove_' ) || str_starts_with( $name, 'do_' ) || str_starts_with( $name, '_' ) ) {
+                return null;
+            }
+            if ( str_starts_with( $name, 'get_' ) ) {
+                return str_contains( $name, 'days' ) || str_contains( $name, 'count' ) ? 0 : null;
+            }
+            return false;
+        }
+    }
+}
+
 if ( !function_exists( 'wallet_up_fs' ) ) {
     /**
      * Helper function for Freemius SDK access
@@ -381,6 +459,9 @@ if ( !function_exists( 'wallet_up_fs' ) ) {
      */
     function wallet_up_fs() {
         global $wallet_up_fs;
+        if ( !isset( $wallet_up_fs ) && wallet_up_is_light_request() ) {
+            $wallet_up_fs = new FreemiusFrontendStub();
+        }
         if ( !isset( $wallet_up_fs ) ) {
             $freemius_path = ( file_exists( WALLET_UP_PRO_PATH . 'vendor-pro/freemius/start.php' ) ? WALLET_UP_PRO_PATH . 'vendor-pro/freemius/start.php' : WALLET_UP_PRO_PATH . 'vendor/freemius/start.php' );
             if ( file_exists( $freemius_path ) ) {
@@ -499,12 +580,15 @@ if ( PHPVersionChecker::is_compatible() ) {
         }
     }, 5 );
     add_action( 'plugins_loaded', function () {
-        if ( class_exists( 'WalletUpPro\\API\\ClassManagerREST' ) ) {
+        if ( ! wallet_up_is_light_request() && class_exists( 'WalletUpPro\\API\\ClassManagerREST' ) ) {
             ClassManagerREST::init();
         }
     } );
 
     add_action( 'plugins_loaded', function () {
+        if ( wallet_up_is_light_request() ) {
+            return; // 6.7.0: notices, the Pro modal and support access are admin, AJAX and cron work only.
+        }
         if ( class_exists( 'WalletUpPro\\Core\\Admin\\Notices\\ReviewPrompt' ) ) {
             \WalletUpPro\Core\Admin\Notices\ReviewPrompt::init();
         }
@@ -541,7 +625,7 @@ if ( PHPVersionChecker::is_compatible() ) {
     } else {
     }
     add_action( 'plugins_loaded', function () {
-        if ( class_exists( '\\WalletUpPro\\Compatibility\\walletUpCompatibilityHandler' ) ) {
+        if ( ! wallet_up_is_light_request() && class_exists( '\\WalletUpPro\\Compatibility\\walletUpCompatibilityHandler' ) ) {
             walletUpCompatibilityHandler::getInstance();
         }
         if ( class_exists( '\\WalletUpPro\\Core\\URL\\URLTrackingHandler' ) ) {
@@ -698,6 +782,9 @@ if ( PHPVersionChecker::is_compatible() ) {
     }
 
     add_action( 'plugins_loaded', function () {
+        if ( wallet_up_is_light_request() ) {
+            return; // 6.7.0: these only answer AJAX and REST calls.
+        }
         if ( class_exists( '\\WalletUpPro\\Services\\PaymentProcessor' ) ) {
             \WalletUpPro\Services\PaymentProcessor::getInstance();
         }

@@ -1,4 +1,5 @@
-/* Wallet Up 6.5.0: free-plan additions rendered beside the React admin app.
+/* Wallet Up 6.5.0+: free-plan additions rendered beside the React admin app.
+ * - 6.7.0: Setup check card on Dashboard and Payments.
  * - Welcome step: one line saying which payment apps work in the site's country.
  * - Step 3 and Payments: Zelle explainer and bank-QR upload.
  * - Step 4: "tell me when someone pays" opt-in, offered after the first QR exists. */
@@ -123,8 +124,46 @@
     var first = container.children[1] || null; container.insertBefore(card, first ? first.nextSibling : null);
   }
 
+  /* ---- 6.7.0: Setup check card on Dashboard and Payments ---- */
+  function checkRows(items) {
+    var ul = el('ul', 'space-y-2');
+    items.forEach(function (i) {
+      var li = el('li', 'flex items-start gap-2 text-sm');
+      var mark = el('span', 'font-bold w-4 shrink-0', i.ok === true ? '\u2713' : (i.ok === false ? '\u2717' : '\u2013'));
+      mark.style.color = i.ok === true ? '#1e8449' : (i.ok === false ? '#b32d2e' : '#8c8f94');
+      var body = el('div', ''); body.appendChild(el('div', 'font-medium text-gray-900', i.label));
+      var d = el('div', 'text-xs text-gray-500'); d.textContent = i.detail;
+      if (i.ok === false && i.url) { var a = el('a', 'ml-1 text-purple-600 hover:underline', t.checkFix || 'Fix'); a.href = i.url; d.appendChild(a); }
+      body.appendChild(d); li.appendChild(mark); li.appendChild(body); ul.appendChild(li);
+    });
+    return ul;
+  }
+  function mountChecks() {
+    if (!cfg.checks || document.getElementById('wup-self-check')) return;
+    var h = findText('h1', /^(Dashboard|Payments|Payment Methods)$/); if (!h) return;
+    var container = h.closest('.space-y-6') || h.parentElement; if (!container) return;
+    var r = cfg.checks;
+    var card = el('div', 'rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden'); card.id = 'wup-self-check';
+    var head = el('div', 'w-full flex items-center justify-between p-4');
+    var title = el('span', 'font-semibold text-gray-900 text-base', t.checkTitle || 'Setup check');
+    var summary = el('span', 'text-sm ' + (r.failed ? 'text-red-700 font-medium' : 'text-gray-500'), (t.checkPassed || '%1$d of %2$d passed').replace('%1$d', r.passed).replace('%2$d', r.total));
+    head.appendChild(title); head.appendChild(summary); card.appendChild(head);
+    var body = el('div', 'px-4 pb-4 border-t border-gray-100 pt-4'); body.style.display = r.failed ? 'block' : 'none';
+    body.appendChild(checkRows(r.items)); card.appendChild(body);
+    var foot = el('div', 'px-4 pb-4 flex gap-4 text-xs');
+    var toggle = el('button', 'text-purple-600 hover:underline', r.failed ? (t.checkHide || 'Hide details') : (t.checkShow || 'Show details')); toggle.type = 'button';
+    toggle.addEventListener('click', function () { var open = body.style.display !== 'none'; body.style.display = open ? 'none' : 'block'; toggle.textContent = open ? (t.checkShow || 'Show details') : (t.checkHide || 'Hide details'); });
+    var rerun = el('button', 'text-gray-500 hover:underline', t.checkRerun || 'Run again'); rerun.type = 'button';
+    rerun.addEventListener('click', function () { rerun.disabled = true; post('wallet_up_self_check', {}).then(function (j) { if (j && j.success) { cfg.checks = j.data; card.remove(); mountChecks(); var c2 = document.getElementById('wup-self-check'); if (c2) { var b2 = c2.querySelector('.border-t'); if (b2) b2.style.display = 'block'; } } rerun.disabled = false; }).catch(function () { rerun.disabled = false; }); });
+    foot.appendChild(toggle); foot.appendChild(rerun); card.appendChild(foot);
+    var week = document.getElementById('wup-this-week');
+    if (week && week.parentElement === container) { week.insertAdjacentElement('afterend', card); }
+    else { var first = container.children[1] || null; container.insertBefore(card, first ? first.nextSibling : null); }
+    if (window.location.hash === '#wup-self-check') { body.style.display = 'block'; card.scrollIntoView(); }
+  }
+
   var pending = null;
-  function tick() { pending = null; try { mountGeo(); mountZelleHint(); mountZelleUpload(); mountNotify(); mountWeek(); } catch (e) { /* never break the admin */ } }
+  function tick() { pending = null; try { mountGeo(); mountZelleHint(); mountZelleUpload(); mountNotify(); mountWeek(); mountChecks(); } catch (e) { /* never break the admin */ } }
   function schedule() { if (pending) return; pending = setTimeout(tick, 150); }
   document.addEventListener('DOMContentLoaded', function () { schedule(); var r = root(); if (r && window.MutationObserver) new MutationObserver(schedule).observe(r, { childList: true, subtree: true }); });
 })();

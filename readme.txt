@@ -1,10 +1,10 @@
 === Wallet Up - Cash App, Venmo, PayPal & Zelle QR Code Payments ===
 Contributors: walletup, freemius
 Tags: cash app, venmo, paypal, zelle, qr code
-Requires at least: 5.8
+Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 6.6.0
+Stable tag: 6.7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate Link: https://walletup.app/donate
@@ -108,21 +108,14 @@ Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 
 == Installation ==
 
-= Minimum Requirements =
+= Requirements =
 
-* WordPress 5.8 or greater
-* PHP version 8.1 or greater
-* MySQL version 5.6 or MariaDB version 10.5 or greater
-* PHP Memory limit of 256 MB or greater
-* WordPress Memory limit of 256 MB or greater
+* WordPress 6.1 or newer
+* PHP 8.1 or newer
+* The GD or Imagick PHP extension, for drawing QR images (pay links and buttons work without it; most hosts have GD)
+* Any database WordPress itself supports
 
-= Recommended Requirements =
-
-* WordPress 7.0 or greater
-* PHP version 8.3 or greater
-* MySQL version 8.0 or MariaDB version 10.6 or greater
-* PHP Memory limit of 512 MB (768 MB for best performance) or greater
-* WordPress Memory limit of 512 MB (768 MB for best performance) or greater
+The default WordPress memory limit is enough. A visitor page view with a Wallet Up code on it uses under 10 MB of PHP memory; the plugin loads none of its admin or licensing code on visitor pages. WooCommerce is optional and only needed for the checkout option. No account with us, no API key and no outgoing connection is needed for the free methods.
 
 = Automatic Installation =
 
@@ -213,6 +206,14 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 10. WPForms Integration - payment fields in forms (Pro)
 
 == Changelog ==
+= 6.7.0 - November 5, 2026 =
+* New: A setup check with nine plain yes/no answers (PHP, QR engine, method on, details saved, page published, visitors seen, admin loads, scheduled tasks, WooCommerce checkout) on the dashboard and Payments screens, on the Plugins row, and as an inline notice when the problem is the server. Each failing row links to its fix.
+* New: If the visual admin cannot load (a blocked script, a browser extension, JavaScript off), the dashboard shows your link, code and setup check in plain HTML after 2.5 seconds instead of staying empty, and the setup screen shows the simple form right there. The simple form now also publishes your payment page.
+* Improved: Visitor page views load about a fifth of the PHP they used to. The licensing SDK, admin notices, AJAX and REST handlers and the QR engine are no longer loaded on a plain page view; they load on admin, AJAX, cron, REST and scan requests as before.
+* Improved: The uninstall survey's context tag now carries the real page-view count and whether the admin ever failed to load.
+* Improved: The download is a third smaller: two unused copies of a web font set, two unused translation bundles and duplicate demo images are gone.
+* Fixed: The readme no longer asks for a 256 MB memory limit; the plugin never needed it.
+
 = 6.6.0 - November 4, 2026 =
 * New: One of your payment methods can appear at your WooCommerce checkout on the free plan. Pick it in setup or under WooCommerce → Settings → Payments → Wallet Up; the order waits on hold and the customer pays from the order-received page and confirms there. Pro adds the other methods, grouped display, per-method discounts and automatic verification.
 * New: The dashboard answers "did anyone pay me?" with a This week card: views, taps and confirmed payments, with the latest confirmations.

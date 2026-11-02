@@ -39,7 +39,9 @@ final class FreeExperience
 
     public static function enqueue(string $hook_suffix): void
     {
-        if (!in_array($hook_suffix, ['toplevel_page_wallet-up', 'wallet-up_page_wallet-up-onboarding'], true) || !current_user_can('manage_options')) {
+        // 6.7.0: every Wallet Up screen, so the setup check card and the Zelle upload work on
+        // the Payments page when it is opened by its own URL, not only inside the app.
+        if (strpos($hook_suffix, 'wallet-up') === false || !current_user_can('manage_options')) {
             return;
         }
         $rel  = 'assets/js/admin/free-ui.js';
@@ -62,6 +64,7 @@ final class FreeExperience
             'counts'       => class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') ? \WalletUpPro\Core\Retention\FreeCounter::dashboardData() : null,
             'isPremium'    => function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active(),
             'adminEmail'   => (string) get_option('admin_email', ''),
+            'checks'       => class_exists('\\WalletUpPro\\Core\\Retention\\SetupCheck') ? \WalletUpPro\Core\Retention\SetupCheck::checks() : null,
             'i18n'         => [
                 'geoLine'      => __('Your site looks like it is in %s.', 'walletup'),
                 'geoUsOnly'    => __('%s work in the United States only.', 'walletup'),
@@ -91,6 +94,12 @@ final class FreeExperience
                 'tip3'         => __('Download the QR from the card above and print it for the counter.', 'walletup'),
                 'viewOrder'    => __('View order', 'walletup'),
                 'notifyOff'    => __('Email me when someone taps or confirms a payment', 'walletup'),
+                'checkTitle'   => __('Setup check', 'walletup'),
+                'checkPassed'  => __('%1$d of %2$d passed', 'walletup'),
+                'checkFix'     => __('Fix', 'walletup'),
+                'checkRerun'   => __('Run again', 'walletup'),
+                'checkShow'    => __('Show details', 'walletup'),
+                'checkHide'    => __('Hide details', 'walletup'),
             ],
         ]);
     }

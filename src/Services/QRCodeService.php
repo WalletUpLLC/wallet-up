@@ -266,44 +266,12 @@ class QRCodeService extends BaseSingleton
 
     public static function registerScanRewriteRule(): void
     {
-        add_rewrite_rule(
-            '^wallet-up/scan/([^/]+)/([A-Za-z0-9_\-]+)/?$',
-            'index.php?wup_scan=$matches[1]&r=$matches[2]',
-            'top'
-        );
-        add_rewrite_rule(
-            '^wallet-up/scan/([^/]+)/([A-Za-z0-9_\-]+)/([0-9]+)/?$',
-            'index.php?wup_scan=$matches[1]&r=$matches[2]&p=$matches[3]',
-            'top'
-        );
-        add_filter('query_vars', static function ($vars) {
-            $vars[] = 'wup_scan';
-            $vars[] = 'r';
-            $vars[] = 'p';
-            return $vars;
-        });
+        ScanRoutes::registerScanRewriteRule();
     }
 
     public static function registerCacheBypass(): void
     {
-        add_filter('rocket_cache_reject_uri', static function ($urls) {
-            $urls[] = '/wallet-up/scan/(.*)';
-            $urls[] = '/?wup_scan=(.*)';
-            return $urls;
-        });
-        add_filter('litespeed_excludes_uri', static function ($urls) {
-            $urls = (array) $urls;
-            $urls[] = '/wallet-up/scan/';
-            $urls[] = '?wup_scan=';
-            return $urls;
-        });
-        add_action('init', static function () {
-            $on_scan_url = isset($_GET['wup_scan'])
-                || (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/wallet-up/scan/') !== false);
-            if ($on_scan_url && !defined('DONOTCACHEPAGE')) {
-                define('DONOTCACHEPAGE', true);
-            }
-        }, 0);
+        ScanRoutes::registerCacheBypass();
     }
 
     public function generateQR(string $data, array $settings = []): string
