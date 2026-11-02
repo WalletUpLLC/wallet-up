@@ -27,9 +27,23 @@ class AssetManager
 
     private static $ADMIN_DEPS = null;
 
+    private static function isPremiumActive(): bool
+    {
+        return function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active();
+    }
+
+    /**
+     * The admin app ships its own React runtime and does not read window.wp.*,
+     * so the free build registers no WordPress script dependencies. The Pro
+     * build keeps them for the screens (QR Studio, media picker) that use them.
+     */
     private static function getAdminDeps(): array
     {
         if (self::$ADMIN_DEPS === null) {
+            if (!self::isPremiumActive()) {
+                self::$ADMIN_DEPS = ['scripts' => [], 'styles' => []];
+                return self::$ADMIN_DEPS;
+            }
             self::$ADMIN_DEPS = [
                 'scripts' => [
                     'wp-element',
@@ -126,7 +140,9 @@ class AssetManager
                 [],
                 $this->version
             );
-            if (!wp_script_is('stripe-js', 'enqueued')) {
+            // Only visitors of a site that actually takes cards through Stripe need
+            // Stripe.js; a page with a Cash App or Venmo QR code does not.
+            if (self::stripeCardsLive() && !wp_script_is('stripe-js', 'enqueued')) {
                 wp_enqueue_script('stripe-js', 'https://js.stripe.com/v3/', [], null, true);
             }
         }
@@ -237,7 +253,9 @@ class AssetManager
             return;
         }
 
-        if (function_exists('wp_enqueue_media')) {
+        // The media picker is only used by Pro screens (QR Studio logos); it pulls in
+        // the block-editor bundles, so the free build no longer loads it.
+        if (self::isPremiumActive() && function_exists('wp_enqueue_media')) {
             wp_enqueue_media();
         }
 

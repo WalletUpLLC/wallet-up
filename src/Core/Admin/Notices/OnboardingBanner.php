@@ -27,6 +27,14 @@ class OnboardingBanner
         if (isset($_GET['page']) && $_GET['page'] === 'wallet-up-onboarding') {
             return;
         }
+        // 6.4.1: this reminder appears on the WordPress Dashboard, the Plugins screen
+        // and Wallet Up's own screens only, not on every admin page.
+        global $pagenow;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page check
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        if (!in_array($pagenow, ['index.php', 'plugins.php'], true) && strpos($page, 'wallet-up') !== 0) {
+            return;
+        }
 
         $finding = self::setupFinding();
         $needsAttention = $finding !== null && ($finding['state'] ?? '') !== 'ready';

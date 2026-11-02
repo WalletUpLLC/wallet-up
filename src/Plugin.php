@@ -417,6 +417,10 @@ class Plugin extends BaseSingleton
             \WalletUpPro\Core\Admin\CheckoutHandoff::init();
         }
 
+        if (is_admin() && class_exists(\WalletUpPro\Core\Admin\FreeSettingsPanel::class)) {
+            \WalletUpPro\Core\Admin\FreeSettingsPanel::init();
+        }
+
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\OnboardingHandler::class)) {
             \WalletUpPro\Core\Admin\OnboardingHandler::init();
             $quiet = class_exists(\WalletUpPro\Core\Retention\DeactivationOffer::class)

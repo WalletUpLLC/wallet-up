@@ -191,6 +191,7 @@ return array(
     'WalletUpPro\\Core\\Admin\\AdminManager' => $baseDir . '/src/Core/Admin/AdminManager.php',
     'WalletUpPro\\Core\\Admin\\CheckoutHandoff' => $baseDir . '/src/Core/Admin/CheckoutHandoff.php',
     'WalletUpPro\\Core\\Admin\\ElevationTracker' => $baseDir . '/src/Core/Admin/ElevationTracker.php',
+    'WalletUpPro\\Core\\Admin\\FreeSettingsPanel' => $baseDir . '/src/Core/Admin/FreeSettingsPanel.php',
     'WalletUpPro\\Core\\Admin\\Integrations\\OnboardingPromoter' => $baseDir . '/src/Core/Admin/Integrations/OnboardingPromoter.php',
     'WalletUpPro\\Core\\Admin\\Integrations\\OneClickAttach' => $baseDir . '/src/Core/Admin/Integrations/OneClickAttach.php',
     'WalletUpPro\\Core\\Admin\\MenuVisibility' => $baseDir . '/src/Core/Admin/MenuVisibility.php',

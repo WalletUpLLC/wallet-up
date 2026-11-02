@@ -759,6 +759,10 @@ class DisplayHandler
 
     public static function poweredByMarkup(string $url = 'https://walletup.app'): string
     {
+        $premium = function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active();
+        if ($premium && get_option('wallet_up_hide_branding', 'no') === 'yes') {
+            return '';
+        }
         return sprintf(
             '<div style="text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.06);">'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="font-size:10px;color:#9CA3AF;'

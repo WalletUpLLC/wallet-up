@@ -264,6 +264,7 @@ class ComposerStaticInit90897c406d9503a0d0e794d37b1681dd
         'WalletUpPro\\Core\\Admin\\AdminManager' => __DIR__ . '/../..' . '/src/Core/Admin/AdminManager.php',
         'WalletUpPro\\Core\\Admin\\CheckoutHandoff' => __DIR__ . '/../..' . '/src/Core/Admin/CheckoutHandoff.php',
         'WalletUpPro\\Core\\Admin\\ElevationTracker' => __DIR__ . '/../..' . '/src/Core/Admin/ElevationTracker.php',
+        'WalletUpPro\\Core\\Admin\\FreeSettingsPanel' => __DIR__ . '/../..' . '/src/Core/Admin/FreeSettingsPanel.php',
         'WalletUpPro\\Core\\Admin\\Integrations\\OnboardingPromoter' => __DIR__ . '/../..' . '/src/Core/Admin/Integrations/OnboardingPromoter.php',
         'WalletUpPro\\Core\\Admin\\Integrations\\OneClickAttach' => __DIR__ . '/../..' . '/src/Core/Admin/Integrations/OneClickAttach.php',
         'WalletUpPro\\Core\\Admin\\MenuVisibility' => __DIR__ . '/../..' . '/src/Core/Admin/MenuVisibility.php',

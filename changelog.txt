@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 6.4.1 - November 2, 2026 =
+* Improved: The dashboard shows one upgrade banner. The sidebar upgrade card is gone and Explore Pro moved to the end of the menu; Pro features keep their badge.
+* Improved: Pro-only screens (Donations, QR Studio, Activity) explain the feature instead of showing sample figures behind a blur.
+* New: Settings has a Branding card with the "Powered by WalletUp" switch (switchable on Pro) and a Setup card that reruns the setup assistant.
+* Improved: The "Finish setting up" reminder appears on the WordPress Dashboard, the Plugins screen and Wallet Up screens only.
+* Improved: Stripe.js loads for your visitors only when card payments are live on your site. A page with a Cash App, Venmo or PayPal code no longer loads it.
+* Improved: Wallet Up admin screens no longer load the WordPress media library and its dependencies on the free plan, which removes about 600 KB and two dozen requests from each Wallet Up screen. The remaining weight is WordPress's own command palette, which every admin page loads.
+
 = 6.4.0 - November 2, 2026 =
 * Improved: Activating the plugin opens the Wallet Up setup directly. The optional opt-in to share usage data and receive updates moved to the Plugins screen and the Account page.
 * Fixed: Sites using plain permalinks no longer see an error-styled "Permalinks Required" banner on every admin page. Wallet Up works with plain permalinks; a dismissible suggestion now appears only on Wallet Up screens when a feature that benefits from pretty URLs is in use.
