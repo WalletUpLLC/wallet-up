@@ -138,7 +138,7 @@ if ( get_transient( 'wallet_up_free_deactivated' ) ) {
     } );
 }
 // which has the Plugin Name header — WooCommerce FeaturesUtil requires this
-define( 'WALLET_UP_PRO_VERSION', '6.3.11' );
+define( 'WALLET_UP_PRO_VERSION', '6.4.0' );
 define( 'WALLET_UP_PRO_PRODUCT_NAME', 'Wallet Up Pro' );
 define( 'WALLET_UP_IS_PRO_BUILD', false );
 define( 'WALLET_UP_PRO_FILE', dirname( __FILE__ ) . '/wallet-up.php' );
@@ -404,6 +404,9 @@ if ( !function_exists( 'wallet_up_fs' ) ) {
                     ),
                     'is_live'        => true,
                     'is_premium'     => false,
+                    // 6.4.0: never put the opt-in between Activate and the product.
+                    // The user can still opt in from the Plugins screen or Account page.
+                    'anonymous_mode' => true,
                     'has_affiliation' => 'selected',
                 ) );
             } else {

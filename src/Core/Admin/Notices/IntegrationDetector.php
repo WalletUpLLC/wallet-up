@@ -221,7 +221,7 @@ class IntegrationDetector
                 'pageMatch' => function ($page, $screen) {
                     return $page !== '' && strpos($page, 'wpforms') === 0;
                 },
-                'freeBody' => __('We integrate with WPForms. Add a Wallet Up payment field to any form with Pro.', 'walletup'),
+                'freeBody' => __('The free plan does not add Wallet Up payment fields to WPForms. You can place a Cash App, Venmo or PayPal QR code or link next to any form with a block or shortcode; form fields are part of Pro.', 'walletup'),
                 'freeCta'  => __('See Pro', 'walletup'),
                 'freeUrl'  => $upgrade('wpforms'),
                 'proBody'  => __('Add a Wallet Up payment field to WPForms in one click.', 'walletup'),
@@ -261,7 +261,7 @@ class IntegrationDetector
                 'onEmptyBody'   => __('Wallet Up is on, but no payment methods are set to show at your WooCommerce checkout yet.', 'walletup'),
                 'onEmptyCta'    => __('Set up methods', 'walletup'),
                 'onEmptyUrl'    => admin_url('admin.php?page=wallet-up-seller'),
-                'freeBody' => __('We integrate with WooCommerce checkout. Make Wallet Up a payment option in your store with Pro.', 'walletup'),
+                'freeBody' => __('The free plan does not add Cash App, Venmo or PayPal to the WooCommerce checkout. You can place them on any page with a block or shortcode; checkout options are part of Pro.', 'walletup'),
                 'freeCta'  => __('See Pro', 'walletup'),
                 'freeUrl'  => $upgrade('woocommerce'),
                 'proBody'  => __('Enable Wallet Up at your WooCommerce checkout — one click.', 'walletup'),

@@ -1,19 +1,27 @@
-=== Wallet Up - Cash App, Venmo, PayPal, Zelle & QR Code Payments ===
+=== Wallet Up - Cash App, Venmo & PayPal QR Code Payments ===
 Contributors: walletup, freemius
-Tags: payment gateway, cash app, venmo, qr code, woocommerce
+Tags: cash app, venmo, paypal, qr code, payments
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 8.1
+Stable tag: 6.4.0
 Stable tag: 6.3.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate Link: https://walletup.app/donate
 
-Accept Stripe cards, PayPal, Venmo, Cash App, Zelle, Bitcoin, M-Pesa and 18 more - with QR codes, short links and WooCommerce checkout.
+Free: put a Cash App, Venmo or PayPal QR code or payment link on any page in about a minute. Pro adds Zelle, 20 more methods and WooCommerce checkout.
 
 == Description ==
 
-**Wallet Up** is the easiest way to accept peer-to-peer payments on WordPress. Add Cash App, Venmo, PayPal, Zelle, and Meta Pay to any page or post with a simple shortcode or block. Connect Stripe to also take cards at WooCommerce checkout.
+**Wallet Up** puts a Cash App, Venmo or PayPal QR code and payment link on any page or post with a block or shortcode. Enter your username, and your customers scan or tap to pay you directly. No merchant account, no API keys, no fee from us.
+
+= What is free and what is Pro =
+
+* **Free:** Cash App, Venmo and PayPal.me QR codes, payment buttons, pay links and a tip jar on any page or post. Optional card payments at WooCommerce checkout through a Stripe account you connect (a platform fee applies to card payments only, see "What does it cost?").
+* **Pro:** Zelle, Meta Pay and 20 more methods, Cash App, Venmo and PayPal as WooCommerce checkout options, WPForms payment fields, donation pages, QR Studio, short links and analytics.
+
+If you are installing this to put Cash App or Venmo on your WooCommerce checkout, that is a Pro feature. The free plugin places them on pages, not at checkout.
 
 Customers scan a QR code or click a payment link - no merchant account, no monthly fees, no WalletUp fee. Payments go directly to your own Cash App, Venmo, PayPal or Zelle account.
 
@@ -193,10 +201,10 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 == Screenshots ==
 
 1. Admin Dashboard - configure payment methods in seconds
-2. WooCommerce Checkout - Cash App, Venmo, PayPal as payment options
+2. WooCommerce Checkout - Cash App, Venmo, PayPal as payment options (Pro)
 3. QR Code Payment Display - customers scan to pay
 4. Payment Method Configuration - enter your username, done
-5. WooCommerce Order Confirmation - itemized order with automatic per-method discount
+5. WooCommerce Order Confirmation - itemized order with automatic per-method discount (Pro)
 6. Shortcode Builder - generate embed codes for any page
 7. Advanced QR Code Studio - custom logos, colors, and styles (Pro)
 8. Analytics Dashboard - track scans, clicks, and conversions (Pro)
@@ -204,6 +212,12 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 10. WPForms Integration - payment fields in forms (Pro)
 
 == Changelog ==
+= 6.4.0 - November 2, 2026 =
+* Improved: Activating the plugin opens the Wallet Up setup directly. The optional opt-in to share usage data and receive updates moved to the Plugins screen and the Account page.
+* Fixed: Sites using plain permalinks no longer see an error-styled "Permalinks Required" banner on every admin page. Wallet Up works with plain permalinks; a dismissible suggestion now appears only on Wallet Up screens when a feature that benefits from pretty URLs is in use.
+* Improved: The setup assistant says plainly what the free plan does and does not do with WooCommerce and WPForms, before you enter any details.
+* Improved: Each business type pre-selects one payment method in setup, so one username is enough to finish.
+* Improved: The WordPress.org listing, tags and live preview describe the free plugin; WooCommerce checkout placement is labelled as Pro.
 = 6.3.11 - November 2, 2026 =
 * Improved (Pro): The order confirmation page and every store payment display use the QR code appearance you set in Seller.
 * Improved (Pro): Impressions count each visitor who sees a payment option once per page and half hour, and leave out your own visits and admin previews.

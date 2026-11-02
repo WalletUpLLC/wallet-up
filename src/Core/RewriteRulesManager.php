@@ -34,6 +34,7 @@ class RewriteRulesManager
         register_activation_hook(WALLET_UP_FILE, [$this, 'scheduleRewriteFlush']);
         
         add_action('admin_notices', [$this, 'maybeShowPermalinkNotice']);
+        add_action('admin_init', [$this, 'maybeDismissPermalinkNotice']);
     }
     
     public function registerAllRewriteRules(): void
@@ -285,36 +286,66 @@ class RewriteRulesManager
         return !empty(get_option('permalink_structure'));
     }
     
-    public function maybeShowPermalinkNotice(): void
+    /**
+     * Persist the dismissal of the permalink suggestion for the current user.
+     */
+    public function maybeDismissPermalinkNotice(): void
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin page check only; no data processing.
-        if (isset($_GET['page']) && strpos(sanitize_text_field(wp_unslash($_GET['page'])), 'walletup') !== false) {
+        if (empty($_GET['wallet_up_dismiss_permalink_notice'])) {
             return;
         }
-        
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'wallet_up_dismiss_permalink_notice')) {
+            return;
+        }
+        update_user_meta(get_current_user_id(), 'wallet_up_permalink_notice_dismissed', 1);
+        wp_safe_redirect(remove_query_arg(['wallet_up_dismiss_permalink_notice', '_wpnonce']));
+        exit;
+    }
+
+    /**
+     * Plain permalinks are fully supported through the query-string fallbacks
+     * registered in registerFallbackHandlers(), so this is a suggestion, not an
+     * error. It is shown only on Wallet Up's own screens, only when a feature
+     * that produces pretty URLs (short links, pay pages, donation pages) is
+     * available, which means a Pro licence, and it stays dismissed once dismissed.
+     */
+    public function maybeShowPermalinkNotice(): void
+    {
         if (!is_admin() || !current_user_can('manage_options')) {
             return;
         }
-        
+        if ($this->hasPrettyPermalinks()) {
+            return;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin page check only; no data processing.
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        if (strpos($page, 'wallet-up') !== 0 || $page === 'wallet-up-onboarding') {
+            return;
+        }
+        if (!function_exists('WalletUpPro\\wallet_up_premium_active') || !\WalletUpPro\wallet_up_premium_active()) {
+            return;
+        }
         if (get_user_meta(get_current_user_id(), 'wallet_up_permalink_notice_dismissed', true)) {
             return;
         }
-        
-        if (!$this->hasPrettyPermalinks()) {
-            ?>
-            <div class="notice notice-error is-dismissible">
-                <p><strong>WalletUp Pro: Permalinks Required</strong></p>
-                <p>Pretty permalinks must be enabled for WalletUp Pro features to work properly.</p>
-                <p>
-                    <a href="<?php echo esc_url(admin_url('options-permalink.php')); ?>" class="button button-primary">
-                        Go to Permalink Settings
-                    </a>
-                </p>
-            </div>
-            <?php
-        }
+        $dismissUrl = wp_nonce_url(add_query_arg('wallet_up_dismiss_permalink_notice', '1'), 'wallet_up_dismiss_permalink_notice');
+        ?>
+        <div class="notice notice-info">
+            <p>
+                <strong><?php esc_html_e('Wallet Up works with your current permalink setting.', 'walletup'); ?></strong>
+                <?php esc_html_e('Switching WordPress to pretty permalinks gives you shorter payment, donation and short-link URLs, such as /pay/invoice123 instead of a query string.', 'walletup'); ?>
+            </p>
+            <p>
+                <a href="<?php echo esc_url(admin_url('options-permalink.php')); ?>" class="button button-secondary"><?php esc_html_e('Open Permalink Settings', 'walletup'); ?></a>
+                <a href="<?php echo esc_url($dismissUrl); ?>" class="button button-link" style="margin-left:6px;"><?php esc_html_e('Dismiss', 'walletup'); ?></a>
+            </p>
+        </div>
+        <?php
     }
-    
+
     public function getPermalinkStatus(): array
     {
         $hasPrettyPermalinks = $this->hasPrettyPermalinks();

@@ -4,7 +4,7 @@
  * Description: Accept Cash App, Venmo, and PayPal payments on your WordPress site with QR codes and payment links.
  * Plugin URI: https://walletup.app/
  * Author: WalletUp.app
- * Version: 6.3.11
+ * Version: 6.4.0
  * Requires at least: 5.8
  * Tested up to: 7.1
  * Requires PHP: 8.1
