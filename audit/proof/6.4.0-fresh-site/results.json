@@ -1,0 +1,75 @@
+{
+  "label": "640-fresh",
+  "withWoo": false,
+  "checks": {
+    "activate_ms": 3882,
+    "landing_url": "http://127.0.0.1:8080/wp-admin/admin.php?page=wallet-up-onboarding",
+    "landing_headings": "Welcome to Wallet Up",
+    "freemius_optin_shown": false,
+    "landed_on_setup": true,
+    "notices_wp_dashboard": [
+      "Finish setting up Wallet Up No payment method is switched on yet, so nothing would have appeared on your site. Switching one on takes about a minute. Fix setup Dismiss this notice.",
+      "This widget requires JavaScript.An error occurred. Please try again."
+    ],
+    "notices_plugins": [
+      "Finish setting up Wallet Up No payment method is switched on yet, so nothing would have appeared on your site. Switching one on takes about a minute. Fix setup Dismiss this notice."
+    ],
+    "notices_posts": [
+      "Finish setting up Wallet Up No payment method is switched on yet, so nothing would have appeared on your site. Switching one on takes about a minute. Fix setup Dismiss this notice."
+    ],
+    "plugins_row_actions": "Settings | Upgrade | Opt In | Deactivate",
+    "step3_heading": "Connect Wallet Up to your site",
+    "step3_preselected_methods": [
+      "Add payment to a form or store\n· Change",
+      "PayPal"
+    ],
+    "step3_required_username_fields": 1,
+    "step3_woo_copy": [
+      "WPForms",
+      "WooCommerce",
+      "Neither WPForms nor WooCommerce is installed. You can still use Wallet Up blocks on any page."
+    ],
+    "step3_continue_enabled_after_one_username": true,
+    "step4_heading": "You're ready to accept payments.",
+    "wizard_total_ms": 20473,
+    "nav_order": [
+      "Dashboard",
+      "Explore Pro",
+      "Payments",
+      "Sell with cards",
+      "Shortcodes",
+      "Donations PRO",
+      "QR Studio PRO",
+      "Activity PRO",
+      "More by WalletUp",
+      "Settings"
+    ],
+    "upsell_surfaces": {
+      "explore_pro_nav": true,
+      "sidebar_unlock_card": true,
+      "bottom_banner": true,
+      "pro_badges": 5
+    },
+    "admin_page_weight": {
+      "requests": 99,
+      "kb": 5606,
+      "media_loaded": true,
+      "wp_components_css": false,
+      "block_editor_js": true
+    },
+    "locked_page_mock_numbers": true,
+    "locked_page_has_explainer": true,
+    "settings_sections": [
+      "About Wallet Up"
+    ],
+    "settings_has_powered_by_control": false,
+    "settings_has_rerun_setup": false,
+    "visitor_external_hosts": [
+      "js.stripe.com"
+    ],
+    "visitor_loads_stripe": true,
+    "visitor_powered_by": false
+  },
+  "notes": [],
+  "console_errors": []
+}

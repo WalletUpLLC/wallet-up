@@ -2,7 +2,7 @@
 
 **Question asked:** several users uninstall the free plugin within seconds of installing. What could we have done better?
 
-**Scope:** audit only, no code changes. Version audited is 6.3.9, the build on `main` and on WordPress.org since 23 October 2026. Findings come from three sources: reading the code and the WordPress.org listing, then running the actual plugin twice in a real browser and screenshotting every screen a new user meets.
+**Scope:** audit only, no code changes. (Releases 6.4.0 and 6.4.1 were later built from these findings; see `PROOF.md` for the measured before/after.) Version audited is 6.3.9, the build on `main` and on WordPress.org since 23 October 2026. Findings come from three sources: reading the code and the WordPress.org listing, then running the actual plugin twice in a real browser and screenshotting every screen a new user meets.
 
 **How it was run.** WordPress.org and the Playground host are not reachable from the audit sandbox, so the official "Live preview" could not be used. Instead a fresh WordPress 7.1 on PHP 8.3 was installed locally with the SQLite drop-in, the identical 6.3.9 tree from this repository was dropped into `wp-content/plugins/wallet-up`, and a headless Chromium drove it the way a person would: Plugins screen, Activate, follow whatever appears.
 

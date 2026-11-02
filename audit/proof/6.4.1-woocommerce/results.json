@@ -1,0 +1,77 @@
+{
+  "label": "641-woo",
+  "withWoo": true,
+  "checks": {
+    "activate_ms": 4802,
+    "landing_url": "http://127.0.0.1:8080/wp-admin/admin.php?page=wallet-up-onboarding",
+    "landing_headings": "Welcome to Wallet Up",
+    "freemius_optin_shown": false,
+    "landed_on_setup": true,
+    "notices_wp_dashboard": [
+      "Finish setting up Wallet Up No payment method is switched on yet, so nothing would have appeared on your site. Switching one on takes about a minute. Fix setup Dismiss this notice.",
+      "This widget requires JavaScript.An error occurred. Please try again."
+    ],
+    "notices_plugins": [
+      "Finish setting up Wallet Up No payment method is switched on yet, so nothing would have appeared on your site. Switching one on takes about a minute. Fix setup Dismiss this notice."
+    ],
+    "notices_posts": [],
+    "plugins_row_actions": "Settings | Upgrade | Opt In | Deactivate",
+    "step3_heading": "Connect Wallet Up to your site",
+    "step3_preselected_methods": [
+      "Add payment to a form or store\n· Change",
+      "PayPal"
+    ],
+    "step3_required_username_fields": 1,
+    "step3_woo_copy": [
+      "WPForms",
+      "WooCommerce",
+      "On the free plan, Wallet Up does not add payment options to the WooCommerce checkout or to WPForms. You can place a Cash App, Venmo or PayPal QR code or link on any page with a block or shortcode. Checkout and form placement are part of Pro.See Pro",
+      "Connect Stripe once to take cards at your WooCommerce checkout, paid to your own Stripe account.",
+      "Show PayPal at my WooCommerce checkoutPRO",
+      "Showing PayPal as a WooCommerce checkout option is part of Pro and is not included in the free plan. On the free plan you can still share your PayPal link or QR on any page with a Wallet Up block, and connect Stripe above if you want cards at checkout."
+    ],
+    "step3_continue_enabled_after_one_username": true,
+    "step4_heading": "You're ready to accept payments.",
+    "wizard_total_ms": 28874,
+    "nav_order": [
+      "Dashboard",
+      "Payments",
+      "Sell with cards",
+      "Shortcodes",
+      "Donations PRO",
+      "QR Studio PRO",
+      "Activity PRO",
+      "More by WalletUp",
+      "Settings",
+      "Explore Pro"
+    ],
+    "upsell_surfaces": {
+      "explore_pro_nav": true,
+      "sidebar_unlock_card": false,
+      "bottom_banner": true,
+      "pro_badges": 5
+    },
+    "admin_page_weight": {
+      "requests": 83,
+      "kb": 5411,
+      "media_loaded": false,
+      "wp_components_css": false,
+      "block_editor_js": true
+    },
+    "locked_page_mock_numbers": false,
+    "locked_page_has_explainer": true,
+    "settings_sections": [
+      "About Wallet Up",
+      "Branding",
+      "Setup assistant"
+    ],
+    "settings_has_powered_by_control": true,
+    "settings_has_rerun_setup": true,
+    "visitor_external_hosts": [],
+    "visitor_loads_stripe": false,
+    "visitor_powered_by": true,
+    "visitor_card_rendered": true
+  },
+  "notes": [],
+  "console_errors": []
+}
