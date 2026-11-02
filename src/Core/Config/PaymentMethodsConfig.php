@@ -42,7 +42,9 @@ class PaymentMethodsConfig
             'brand_color' => '#6C1CD3',
             'validation_pattern' => '/^([^\s@]+@[^\s@]+\.[^\s@]+|\+?[\d\s-]{10,})$/',
             'has_deep_linking' => true,
-            'has_bank_selector' => true
+            'has_bank_selector' => true,
+            'payee_label' => 'Zelle email or phone',
+            'countries' => ['US']
         ],
         'interac' => [
             'payee_label' => 'Email or mobile number',
@@ -322,9 +324,71 @@ class PaymentMethodsConfig
         return preg_replace('#[/?\#].*$#', '', $value);
     }
 
-    public const FREE_METHOD_IDS = ['cashapp', 'paypal', 'venmo'];
+    /** Methods included in the free plan. Zelle joined in 6.5.0: it is an uploaded bank QR plus instructions, no API behind it. */
+    public const FREE_METHOD_IDS = ['cashapp', 'paypal', 'venmo', 'zelle'];
 
     public const CUSTOM_QR_METHOD_IDS = ['zelle'];
+
+    /** Methods that only pay out in US dollars whatever the site currency. */
+    public const USD_ONLY_METHOD_IDS = ['cashapp', 'venmo', 'zelle'];
+
+    /** Where each free method can receive money. null means worldwide. Country codes are ISO 3166-1 alpha-2. */
+    private const METHOD_COUNTRIES = [
+        'cashapp' => ['US', 'GB'],
+        'venmo'   => ['US'],
+        'zelle'   => ['US'],
+        'paypal'  => null,
+        'interac' => ['CA'],
+        'payid'   => ['AU'],
+        'bpay'    => ['AU'],
+        'payto'   => ['AU'],
+    ];
+
+    public static function isProBuild(): bool
+    {
+        return defined('WALLET_UP_IS_PRO_BUILD') && WALLET_UP_IS_PRO_BUILD;
+    }
+
+    /** @return string[]|null Country codes the method works in, or null for worldwide. */
+    public static function methodCountries(string $methodId): ?array
+    {
+        if (array_key_exists($methodId, self::METHOD_COUNTRIES)) {
+            return self::METHOD_COUNTRIES[$methodId];
+        }
+        $cc = self::PAYMENT_METHODS[$methodId]['country_code'] ?? null;
+        return $cc ? [strtoupper((string) $cc)] : null;
+    }
+
+    public static function methodWorksIn(string $methodId, string $country): bool
+    {
+        $list = self::methodCountries($methodId);
+        return $list === null || $country === '' || in_array(strtoupper($country), $list, true);
+    }
+
+    /** Free methods that work in the given country; PayPal.me is always included because it is worldwide. */
+    public static function freeMethodsFor(string $country): array
+    {
+        return array_values(array_filter(self::FREE_METHOD_IDS, static fn($id) => self::methodWorksIn($id, $country)));
+    }
+
+    public static function siteCurrency(): string
+    {
+        $settings = get_option('wallet_up_settings', []);
+        $cur = is_array($settings) ? strtoupper(trim((string) ($settings['currency'] ?? ''))) : '';
+        return preg_match('/^[A-Z]{3}$/', $cur) ? $cur : 'USD';
+    }
+
+    public static function currencySymbol(string $currency): string
+    {
+        $map = ['USD' => '$', 'EUR' => '€', 'GBP' => '£', 'CAD' => 'CA$', 'AUD' => 'A$', 'INR' => '₹', 'MXN' => 'MX$', 'BRL' => 'R$', 'JPY' => '¥', 'CNY' => '¥', 'NGN' => '₦', 'ZAR' => 'R', 'PKR' => '₨', 'BDT' => '৳', 'IDR' => 'Rp', 'PHP' => '₱', 'KES' => 'KSh', 'NZD' => 'NZ$', 'CHF' => 'CHF ', 'SEK' => 'kr ', 'NOK' => 'kr ', 'DKK' => 'kr ', 'PLN' => 'zł ', 'TRY' => '₺', 'VND' => '₫', 'THB' => '฿', 'SGD' => 'S$', 'HKD' => 'HK$'];
+        return $map[strtoupper($currency)] ?? (strtoupper($currency) . ' ');
+    }
+
+    /** Currency the amount of a method is expressed in: USD for the US apps, the site currency otherwise. */
+    public static function methodCurrency(string $methodId): string
+    {
+        return in_array($methodId, self::USD_ONLY_METHOD_IDS, true) ? 'USD' : self::siteCurrency();
+    }
 
     public static function allowsCustomQr(string $methodId): bool
     {
@@ -338,7 +402,7 @@ class PaymentMethodsConfig
 
     public static function getAvailableMethodIds(): array
     {
-        if (class_exists('WalletUpPro\\Payments\\Bitcoin') || class_exists('WalletUpPro\\Payments\\Zelle')) {
+        if (self::isProBuild()) {
             return self::getAllMethodIds();
         }
 

@@ -15,7 +15,7 @@ class OnboardingHandler
     const TRANSIENT_REDIRECT = 'wallet_up_onboarding_redirect'; // back-compat read only
 
     const FREE_PROFILE_FIELDS = ['holder_owner', 'holder_email', 'holder_no'];
-    const FREE_ACCOUNT_FIELDS = ['cashapp_holder', 'paypal_holder', 'venmo_holder'];
+    const FREE_ACCOUNT_FIELDS = ['cashapp_holder', 'paypal_holder', 'venmo_holder', 'zelle_holder'];
     const FREE_METHOD_IDS = \WalletUpPro\Core\Config\PaymentMethodsConfig::FREE_METHOD_IDS;
 
     private static function isPremium(): bool
@@ -249,6 +249,7 @@ class OnboardingHandler
             'cashapp' => 'Cash App',
             'paypal'  => 'PayPal.me',
             'venmo'   => 'Venmo',
+            'zelle'   => 'Zelle',
         ];
         ?>
         <div class="wrap" style="max-width:640px;">
@@ -280,7 +281,7 @@ class OnboardingHandler
                         <th scope="row"><label for="wup_holder"><?php esc_html_e('Your username', 'walletup'); ?></label></th>
                         <td>
                             <input type="text" id="wup_holder" name="method_holder" value="" class="regular-text" required>
-                            <p class="description"><?php esc_html_e('Examples: $yourname (Cash App), you@example.com (PayPal), @yourname (Venmo).', 'walletup'); ?></p>
+                            <p class="description"><?php esc_html_e('Examples: $yourname (Cash App), yourname (PayPal.me), @yourname (Venmo), you@example.com or your phone (Zelle).', 'walletup'); ?></p>
                         </td>
                     </tr>
                 </table>

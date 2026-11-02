@@ -420,6 +420,9 @@ class Plugin extends BaseSingleton
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\FreeSettingsPanel::class)) {
             \WalletUpPro\Core\Admin\FreeSettingsPanel::init();
         }
+        if (is_admin() && class_exists(\WalletUpPro\Core\Admin\FreeExperience::class)) {
+            \WalletUpPro\Core\Admin\FreeExperience::init();
+        }
 
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\OnboardingHandler::class)) {
             \WalletUpPro\Core\Admin\OnboardingHandler::init();

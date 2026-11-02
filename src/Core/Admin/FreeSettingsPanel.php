@@ -19,12 +19,14 @@ final class FreeSettingsPanel
     private const OPTION      = 'wallet_up_hide_branding';
     private const AJAX_BRAND  = 'wallet_up_save_branding';
     private const AJAX_RERUN  = 'wallet_up_rerun_setup';
+    private const AJAX_LOCALE = 'wallet_up_save_locale';
 
     public static function init(): void
     {
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue']);
         add_action('wp_ajax_' . self::AJAX_BRAND, [__CLASS__, 'saveBranding']);
         add_action('wp_ajax_' . self::AJAX_RERUN, [__CLASS__, 'rerunSetup']);
+        add_action('wp_ajax_' . self::AJAX_LOCALE, [__CLASS__, 'saveLocale']);
     }
 
     private static function isPremium(): bool
@@ -52,7 +54,17 @@ final class FreeSettingsPanel
             'isPremium'    => self::isPremium(),
             'hideBranding' => get_option(self::OPTION, 'no') === 'yes',
             'upgradeUrl'   => function_exists('WalletUpPro\\wallet_up_upgrade_url') ? \WalletUpPro\wallet_up_upgrade_url() : 'https://walletup.app/pricing/',
+            'geo'          => class_exists('\\WalletUpPro\\Core\\Geo\\SiteLocale') ? \WalletUpPro\Core\Geo\SiteLocale::hint() : [],
+            'countryOverride' => (string) get_option('wallet_up_site_country', ''),
+            'currency'     => \WalletUpPro\Core\Config\PaymentMethodsConfig::siteCurrency(),
+            'currencies'   => ['USD','EUR','GBP','CAD','AUD','INR','MXN','BRL','JPY','NGN','ZAR','PKR','BDT','IDR','PHP','KES','NZD','CHF','SEK','NOK','DKK','PLN','TRY','VND','THB','SGD','HKD'],
             'i18n'         => [
+                'where'           => __('Where you are', 'walletup'),
+                'whereHelp'       => __('Cash App, Venmo and Zelle pay out in the United States only. PayPal.me works almost everywhere. Setting your country here changes which methods the setup assistant suggests; it never blocks anything.', 'walletup'),
+                'country'         => __('Country', 'walletup'),
+                'countryAuto'     => __('Detect from site settings', 'walletup'),
+                'currencyLabel'   => __('Currency shown with amounts (PayPal.me and card payments)', 'walletup'),
+                'detected'        => __('Detected: %s', 'walletup'),
                 'branding'        => __('Branding', 'walletup'),
                 'brandingLabel'   => __('Show "Powered by WalletUp" under payment cards', 'walletup'),
                 'brandingHelp'    => __('The small credit line under every QR code, button and pay link on your site.', 'walletup'),
@@ -80,6 +92,31 @@ final class FreeSettingsPanel
         $hide = isset($_POST['hide']) && sanitize_key(wp_unslash($_POST['hide'])) === '1';
         update_option(self::OPTION, $hide ? 'yes' : 'no', false);
         wp_send_json_success(['hideBranding' => $hide]);
+    }
+
+    public static function saveLocale(): void
+    {
+        if (!check_ajax_referer('wallet_up_admin_nonce', 'nonce', false) || !current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Permission denied', 'walletup')], 403);
+        }
+        $cc = isset($_POST['country']) ? strtoupper(sanitize_text_field(wp_unslash($_POST['country']))) : '';
+        if ($cc === '' || $cc === 'AUTO') {
+            delete_option('wallet_up_site_country');
+        } elseif (preg_match('/^[A-Z]{2}$/', $cc)) {
+            update_option('wallet_up_site_country', $cc, false);
+        }
+        $cur = isset($_POST['currency']) ? strtoupper(sanitize_text_field(wp_unslash($_POST['currency']))) : '';
+        if (preg_match('/^[A-Z]{3}$/', $cur)) {
+            $settings = get_option('wallet_up_settings', []);
+            $settings = is_array($settings) ? $settings : [];
+            $settings['currency'] = $cur;
+            $settings['currency_set_by_owner'] = 1;
+            update_option('wallet_up_settings', $settings);
+        }
+        wp_send_json_success([
+            'geo'      => class_exists('\\WalletUpPro\\Core\\Geo\\SiteLocale') ? \WalletUpPro\Core\Geo\SiteLocale::hint() : [],
+            'currency' => \WalletUpPro\Core\Config\PaymentMethodsConfig::siteCurrency(),
+        ]);
     }
 
     public static function rerunSetup(): void

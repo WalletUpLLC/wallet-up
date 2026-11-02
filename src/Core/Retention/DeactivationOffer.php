@@ -57,6 +57,52 @@ final class DeactivationOffer
         add_action('admin_post_' . self::AJAX_RESUME, [self::class, 'handleResume']);
         add_action('admin_notices', [self::class, 'pausedNotice']);
         self::hookFreemius();
+        // 6.5.0: every uninstall reason carries its own install age and state, so the next
+        // Freemius export can be analysed even for installs that never opted in.
+        add_action('wp_ajax_fs_submit_uninstall_reason_12319', [self::class, 'appendTimelineToReason'], 1);
+    }
+
+    /** Compact, human-readable state of this install, kept short because Freemius stores 128 characters. */
+    public static function timeline(): string
+    {
+        $activated = (int) get_option('wallet_up_activated_at', 0);
+        $age = 'new';
+        if ($activated > 0) {
+            $secs = max(0, time() - $activated);
+            $age = $secs < 3600 ? intdiv($secs, 60) . 'm' : ($secs < 86400 ? intdiv($secs, 3600) . 'h' : intdiv($secs, 86400) . 'd');
+        }
+        $accounts = (array) get_option('wallet_up_transfer_call', []);
+        $methods = 0;
+        foreach (\WalletUpPro\Core\Config\PaymentMethodsConfig::getAvailableMethodIds() as $id) {
+            if (trim((string) ($accounts[$id . '_holder'] ?? '')) !== '') {
+                $methods++;
+            }
+        }
+        $counts = (array) get_option('wallet_up_free_counts', []);
+        $views = 0;
+        foreach ($counts as $day) {
+            $views += (int) (is_array($day) ? ($day['impressions'] ?? 0) : 0);
+        }
+        $mount = get_option('wallet_up_admin_mount_failed_at') ? 'no' : 'yes';
+        $hint = (array) get_option(\WalletUpPro\Core\Geo\SiteLocale::OPTION_HINT, []);
+        $cc = (string) ($hint['country'] ?? '');
+        return sprintf('[%s %s m%d pv%d am-%s php%s %s]', WALLET_UP_PRO_VERSION, $age, $methods, $views, $mount, PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, $cc !== '' ? $cc : '??');
+    }
+
+    public static function appendTimelineToReason(): void
+    {
+        if (!current_user_can(self::CAP)) {
+            return;
+        }
+        $tag = self::timeline();
+        $info = isset($_REQUEST['reason_info']) ? trim((string) wp_unslash($_REQUEST['reason_info'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Freemius verifies its own nonce right after this.
+        $room = 128 - strlen($tag) - 1;
+        if ($room > 0 && strlen($info) > $room) {
+            $info = substr($info, 0, $room);
+        }
+        $merged = trim($info . ' ' . $tag);
+        $_REQUEST['reason_info'] = $merged;
+        $_POST['reason_info'] = $merged;
     }
 
     public static function isPaused(): bool
@@ -502,6 +548,8 @@ final class DeactivationOffer
             'checking'   => __('Checking', 'walletup'),
             'retry'      => __('Try again', 'walletup'),
             'gate'       => self::gateModalHtml(),
+            'timeline'   => self::timeline(),
+            'timelineNote' => __('Sent with your answer so we can tell how far setup got:', 'walletup'),
         ];
         wp_register_script(self::SCRIPT_HANDLE, '', [], WALLET_UP_PRO_VERSION, true);
         wp_enqueue_script(self::SCRIPT_HANDLE);
@@ -517,6 +565,9 @@ final class DeactivationOffer
 (function(){
 var c=window.walletUpRetention;
 if(!c){return;}
+function addTimelineNote(){var m=document.querySelector('.fs-modal-deactivation-feedback');if(!m||m.querySelector('.wup-timeline')){return;}var body=m.querySelector('.fs-modal-body')||m;var n=document.createElement('p');n.className='wup-timeline';n.style.cssText='margin:8px 0 0;font-size:11px;color:#6b7280;';n.textContent=c.timelineNote+' '+c.timeline;body.appendChild(n);}
+if(window.MutationObserver){new MutationObserver(addTimelineNote).observe(document.body,{childList:true,subtree:true});}
+document.addEventListener('DOMContentLoaded',addTimelineNote);
 var modal=null,bypass=false;
 function ensureModal(){
 if(modal){return modal;}

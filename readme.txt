@@ -1,24 +1,26 @@
-=== Wallet Up - Cash App, Venmo & PayPal QR Code Payments ===
+=== Wallet Up - Cash App, Venmo, PayPal & Zelle QR Code Payments ===
 Contributors: walletup, freemius
-Tags: cash app, venmo, paypal, qr code, payments
+Tags: cash app, venmo, paypal, zelle, qr code
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 6.4.1
+Stable tag: 6.5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate Link: https://walletup.app/donate
 
-Free: put a Cash App, Venmo or PayPal QR code or payment link on any page in about a minute. Pro adds Zelle, 20 more methods and WooCommerce checkout.
+Put a Cash App, Venmo, PayPal.me or Zelle "pay me" code and link on any page. US peer-to-peer apps; PayPal.me works worldwide. Free, no account, no fee from us.
 
 == Description ==
 
-**Wallet Up** puts a Cash App, Venmo or PayPal QR code and payment link on any page or post with a block or shortcode. Enter your username, and your customers scan or tap to pay you directly. No merchant account, no API keys, no fee from us.
+**Wallet Up** puts a scannable "pay me" code and a tap-to-pay link on any WordPress page or post. Enter your $cashtag, Venmo username, PayPal.me name or Zelle email, and your customers pay you directly in the app they already have. Nothing goes through us: no merchant account, no API keys, no fee.
+
+Cash App, Venmo and Zelle pay out in the United States. PayPal.me works in most countries, and the plugin tells you on its first screen which methods work where your site is. Requires PHP 8.1.
 
 = What is free and what is Pro =
 
-* **Free:** Cash App, Venmo and PayPal.me QR codes, payment buttons, pay links and a tip jar on any page or post. Optional card payments at WooCommerce checkout through a Stripe account you connect (a platform fee applies to card payments only, see "What does it cost?").
-* **Pro:** Zelle, Meta Pay and 20 more methods, Cash App, Venmo and PayPal as WooCommerce checkout options, WPForms payment fields, donation pages, QR Studio, short links and analytics.
+* **Free:** Cash App, Venmo, PayPal.me and Zelle codes, payment buttons, pay links and a tip jar on any page or post. Optional card payments at WooCommerce checkout through a Stripe account you connect (a platform fee applies to card payments only, see "What does it cost?").
+* **Pro:** Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, crypto and mobile money, Cash App, Venmo and PayPal as WooCommerce checkout options, WPForms payment fields, donation pages, QR Studio, short links and analytics.
 
 If you are installing this to put Cash App or Venmo on your WooCommerce checkout, that is a Pro feature. The free plugin places them on pages, not at checkout.
 
@@ -40,7 +42,7 @@ Use your personal PayPal.me link to accept payments via QR code. No PayPal Busin
 
 = Accept Zelle Payments on WordPress =
 
-Bank-specific QR codes that open directly in your customer's banking app - Chase, Bank of America, Wells Fargo, Citi, Capital One, and more.
+Show your Zelle email or phone with the amount and a copy button on any page. Upload the Zelle QR code from your own bank app and visitors can scan it in theirs.
 
 = WooCommerce Checkout =
 
@@ -89,7 +91,7 @@ Prefer the classic editor? Every block is also available as a shortcode:
 
 Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 
-* **24 payment methods** - add Zelle, Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin, and 8 African mobile money providers
+* **24 payment methods** - add Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin, and 8 African mobile money providers
 * **Advanced QR Code Studio** - custom logos, colors, styles (rounded, dot, circular), SVG export
 * **URL Shortener** - branded short links with real-time click analytics
 * **Donation System** - customizable donation pages with campaigns, donor management, and tax receipts
@@ -149,7 +151,7 @@ Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 
 = Which payment methods does Wallet Up support? =
 
-The free version supports **Cash App, Venmo and PayPal**, plus **card payments** through a Stripe account you connect. The Pro version adds Zelle, Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, WalletUp Pay, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin and 8 mobile money providers - 24 methods in total.
+The free version supports **Cash App, Venmo, PayPal and Zelle**, plus **card payments** through a Stripe account you connect. Zelle has no pay link, so the free plugin shows your Zelle email or phone with the amount and a copy button, and if your bank app can show a Zelle QR code you can upload it and visitors scan that. The Pro version adds Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, WalletUp Pay, Bitcoin, Ethereum, USDT, USDC, BNB, Dogecoin and 8 mobile money providers - 24 methods in total.
 
 = Do I need a merchant account or API keys? =
 
@@ -211,6 +213,15 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 10. WPForms Integration - payment fields in forms (Pro)
 
 == Changelog ==
+= 6.5.0 - November 3, 2026 =
+* New: Zelle is part of the free plan. Visitors see your Zelle email or phone with the amount and a copy button; upload the QR code from your bank app under Payments and they can scan it instead.
+* New: The setup assistant says on its first screen which payment apps work in your country, and suggests PayPal.me where Cash App and Venmo do not. Set your country and currency under Settings.
+* Improved: Amounts follow your site currency for PayPal.me and cards; Cash App, Venmo and Zelle stay in US dollars.
+* Improved: A page never shows an empty space where a payment should be. Administrators see why, with a one-click "Turn on" when a username is already saved; visitors see nothing but an HTML comment naming the method.
+* New: After your first code is ready, the assistant offers to email you when someone taps your link or confirms a payment.
+* Improved: Deactivation feedback now carries the install's age and setup state, so we can see where setup stops without any extra data collection.
+* Improved: The listing says which methods are US-only, that PayPal.me works worldwide, and that PHP 8.1 is required, before you install.
+
 = 6.4.1 - November 2, 2026 =
 * Improved: The dashboard shows one upgrade banner. The sidebar upgrade card is gone and Explore Pro moved to the end of the menu; Pro features keep their badge.
 * Improved: Pro-only screens (Donations, QR Studio, Activity) explain the feature instead of showing sample figures behind a blur.

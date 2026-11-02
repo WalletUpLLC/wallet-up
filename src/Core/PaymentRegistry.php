@@ -45,6 +45,8 @@ class PaymentRegistry
 
             $this->registerShortcodes();
 
+            add_action('admin_post_wallet_up_turn_on_method', [$this, 'handleTurnOnMethod']);
+
             $this->initialized = $this->checkInitializationStatus();
 
         } catch (\Exception $e) {
@@ -113,7 +115,9 @@ class PaymentRegistry
                 if (!class_exists($class)) {
                     continue;
                 }
-                if ($this->isMethodEnabled($id)) {
+                // 6.5.0: a method with a saved username is instantiated even when switched off, so the
+                // page can tell an administrator what is wrong instead of rendering nothing.
+                if ($this->isMethodEnabled($id) || $this->hasSavedHolder($id)) {
                     try {
                         $this->methods[$id] = new $class($this->db);
                     } catch (\Exception $e) {
@@ -137,7 +141,7 @@ class PaymentRegistry
     {
         add_shortcode('wallet_up', [$this, 'handleGenericShortcode']);
 
-        $isProVersion = class_exists('WalletUpPro\\Payments\\Bitcoin') || class_exists('WalletUpPro\\Payments\\Zelle');
+        $isProVersion = PaymentMethodsConfig::isProBuild();
         if (!$isProVersion) {
             $premiumMethods = array_diff(
                 PaymentMethodsConfig::getAllMethodIds(),
@@ -181,25 +185,101 @@ class PaymentRegistry
         );
     }
 
-    public static function setupNotice(string $methodId): string
+    /**
+     * A switched-off or unconfigured method never renders nothing silently (6.5.0).
+     * Visitors get an HTML comment naming the method; administrators get an inline
+     * explanation with a one-click "Turn on" when a username is already saved.
+     */
+    public static function setupNotice(string $methodId, string $state = ''): string
     {
-        if (!current_user_can('manage_options')) {
-            return '';
-        }
         $methodName = PaymentMethodsConfig::getMethodName($methodId) ?: $methodId;
+        if ($state === '') {
+            $state = self::savedHolderFor($methodId) !== '' ? 'off' : 'unconfigured';
+        }
+        if (!current_user_can('manage_options')) {
+            return sprintf('<!-- wallet-up: %s is %s -->', esc_html($methodId), $state === 'off' ? 'switched off' : 'not configured');
+        }
+        $style = 'padding:14px 16px;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:10px;color:#4c1d95;font-size:14px;line-height:1.5;';
+        $settingsUrl = esc_url(admin_url('admin.php?page=wallet-up'));
+        if ($state === 'off') {
+            $action = esc_url(admin_url('admin-post.php'));
+            $redirect = esc_url(self::currentUrl());
+            return sprintf(
+                '<div class="walletup-shortcode-notice" style="%1$s"><strong>%2$s</strong> %3$s '
+                . '<form method="post" action="%4$s" style="display:inline;margin-left:6px;">'
+                . '<input type="hidden" name="action" value="wallet_up_turn_on_method"><input type="hidden" name="method" value="%5$s">'
+                . '<input type="hidden" name="redirect_to" value="%6$s">%7$s'
+                . '<button type="submit" style="cursor:pointer;background:#674FBF;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:600;">%8$s</button></form>'
+                . ' <span style="color:#6b7280;font-size:12px;">%9$s</span></div>',
+                $style,
+                esc_html__('Wallet Up:', 'walletup'),
+                esc_html(sprintf(
+                    /* translators: %s = payment method name */
+                    __('%s has a username saved but is switched off, so visitors see nothing here.', 'walletup'),
+                    $methodName
+                )),
+                $action,
+                esc_attr($methodId),
+                $redirect,
+                wp_nonce_field('wallet_up_turn_on_method_' . $methodId, '_wpnonce', true, false),
+                esc_html(sprintf(
+                    /* translators: %s = payment method name */
+                    __('Turn on %s', 'walletup'),
+                    $methodName
+                )),
+                esc_html__('Only administrators see this box.', 'walletup')
+            );
+        }
         return sprintf(
-            '<div class="walletup-shortcode-notice" style="padding:14px 16px;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:10px;color:#4c1d95;font-size:14px;line-height:1.5;">' .
-            '<strong>%s</strong> %s <a href="%s" style="color:' . Brand::HEX . ';font-weight:600;text-decoration:underline;">%s</a>.' .
-            '</div>',
+            '<div class="walletup-shortcode-notice" style="%1$s"><strong>%2$s</strong> %3$s <a href="%4$s" style="color:' . Brand::HEX . ';font-weight:600;text-decoration:underline;">%5$s</a>. <span style="color:#6b7280;font-size:12px;">%6$s</span></div>',
+            $style,
             esc_html__('Wallet Up:', 'walletup'),
             esc_html(sprintf(
                 /* translators: %s = payment method name */
-                __('%s is turned off. Turn it on and add your details under', 'walletup'),
+                __('%s has no username saved yet, so visitors see nothing here. Add it under', 'walletup'),
                 $methodName
             )),
-            esc_url(admin_url('admin.php?page=wallet-up-payments')),
-            esc_html__('Wallet Up → Payments', 'walletup')
+            $settingsUrl,
+            esc_html__('Wallet Up → Payments', 'walletup'),
+            esc_html__('Only administrators see this box.', 'walletup')
         );
+    }
+
+    private static function currentUrl(): string
+    {
+        $uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '/'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passed through esc_url_raw below
+        return esc_url_raw(home_url($uri));
+    }
+
+    public static function savedHolderFor(string $methodId): string
+    {
+        $accounts = get_option('wallet_up_transfer_call', []);
+        return is_array($accounts) ? trim((string) ($accounts[$methodId . '_holder'] ?? '')) : '';
+    }
+
+    private function hasSavedHolder(string $methodId): bool
+    {
+        return self::savedHolderFor($methodId) !== '';
+    }
+
+    /** admin-post handler behind the inline "Turn on" button. */
+    public function handleTurnOnMethod(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Permission denied', 'walletup'), '', ['response' => 403]);
+        }
+        $methodId = isset($_POST['method']) ? sanitize_key(wp_unslash($_POST['method'])) : '';
+        if ($methodId === '' || !in_array($methodId, PaymentMethodsConfig::getAvailableMethodIds(), true)) {
+            wp_die(esc_html__('Unknown payment method', 'walletup'), '', ['response' => 400]);
+        }
+        check_admin_referer('wallet_up_turn_on_method_' . $methodId);
+        $enabled = (array) get_option('wallet_up_enabled_methods', []);
+        $enabled[$methodId] = true;
+        update_option('wallet_up_enabled_methods', $enabled);
+        delete_option("wallet_up_method_{$methodId}_enabled");
+        $redirect = isset($_POST['redirect_to']) ? esc_url_raw(wp_unslash($_POST['redirect_to'])) : '';
+        wp_safe_redirect($redirect !== '' ? $redirect : admin_url('admin.php?page=wallet-up'));
+        exit;
     }
 
     public function handleGenericShortcode($atts): string
@@ -220,8 +300,8 @@ class PaymentRegistry
             $method = $this->getMethod($atts['method']);
             if (!$method) {
                 $requested = $atts['method'];
-                if (in_array($requested, PaymentMethodsConfig::FREE_METHOD_IDS, true)) {
-                    return self::setupNotice($requested);
+                if (in_array($requested, PaymentMethodsConfig::getAvailableMethodIds(), true)) {
+                    return self::setupNotice($requested, isset($this->methods[$requested]) ? 'off' : 'unconfigured');
                 }
                 if (in_array($requested, PaymentMethodsConfig::getAllMethodIds(), true)) {
                     return self::upgradeNotice($requested);

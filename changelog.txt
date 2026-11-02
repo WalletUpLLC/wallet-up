@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 6.5.0 - November 3, 2026 =
+* New: Zelle is part of the free plan. Visitors see your Zelle email or phone with the amount and a copy button; upload the QR code from your bank app under Payments and they can scan it instead.
+* New: The setup assistant says on its first screen which payment apps work in your country, and suggests PayPal.me where Cash App and Venmo do not. Set your country and currency under Settings.
+* Improved: Amounts follow your site currency for PayPal.me and cards; Cash App, Venmo and Zelle stay in US dollars.
+* Improved: A page never shows an empty space where a payment should be. Administrators see why, with a one-click "Turn on" when a username is already saved; visitors see nothing but an HTML comment naming the method.
+* New: After your first code is ready, the assistant offers to email you when someone taps your link or confirms a payment.
+* Improved: Deactivation feedback now carries the install's age and setup state, so we can see where setup stops without any extra data collection.
+* Improved: The listing says which methods are US-only, that PayPal.me works worldwide, and that PHP 8.1 is required, before you install.
+
 = 6.4.1 - November 2, 2026 =
 * Improved: The dashboard shows one upgrade banner. The sidebar upgrade card is gone and Explore Pro moved to the end of the menu; Pro features keep their badge.
 * Improved: Pro-only screens (Donations, QR Studio, Activity) explain the feature instead of showing sample figures behind a blur.

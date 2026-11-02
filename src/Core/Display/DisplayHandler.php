@@ -859,6 +859,10 @@ class DisplayHandler
         if ($handle === '') {
             return '';
         }
+        // Without an uploaded bank QR there is no code to scan; the pay-to card already shows the handle.
+        if ($this->getCustomQRImage('zelle') === '') {
+            return '';
+        }
 
         if ((bool) get_option('wallet_up_zelle_hide_contact', false)) {
             return '<div class="walletup-zelle-help" style="max-width:280px;margin:10px auto 0;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;text-align:left;">'
@@ -942,7 +946,9 @@ class DisplayHandler
         if (empty($amount)) {
             return '';  // Return empty for fiat when no amount
         }
-        return sprintf('$%s', esc_html(number_format(floatval($amount), 2)));
+        $currency = \WalletUpPro\Core\Config\PaymentMethodsConfig::methodCurrency($method);
+        $symbol = \WalletUpPro\Core\Config\PaymentMethodsConfig::currencySymbol($currency);
+        return sprintf('%s%s', esc_html($symbol), esc_html(number_format(floatval($amount), 2)));
     }
 
     private function generateMessage($amount, $method, $settings, $display_mode = 'qr')

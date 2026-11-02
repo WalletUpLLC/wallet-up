@@ -138,7 +138,7 @@ if ( get_transient( 'wallet_up_free_deactivated' ) ) {
     } );
 }
 // which has the Plugin Name header — WooCommerce FeaturesUtil requires this
-define( 'WALLET_UP_PRO_VERSION', '6.4.1' );
+define( 'WALLET_UP_PRO_VERSION', '6.5.0' );
 define( 'WALLET_UP_PRO_PRODUCT_NAME', 'Wallet Up Pro' );
 define( 'WALLET_UP_IS_PRO_BUILD', false );
 define( 'WALLET_UP_PRO_FILE', dirname( __FILE__ ) . '/wallet-up.php' );
@@ -614,6 +614,9 @@ if ( PHPVersionChecker::is_compatible() ) {
 
             if ( ! get_option( 'wallet_up_activated_at' ) ) {
                 update_option( 'wallet_up_activated_at', time() );
+            }
+            if ( class_exists( '\\WalletUpPro\\Core\\Geo\\SiteLocale' ) ) {
+                \WalletUpPro\Core\Geo\SiteLocale::onActivation();
             }
 
             if ( class_exists( '\\WalletUpPro\\Core\\Admin\\OnboardingHandler' ) ) {

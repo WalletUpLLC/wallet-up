@@ -80,6 +80,29 @@
     return c;
   }
 
+  function localeCard() {
+    var c = card(t.where || 'Where you are');
+    c._body.appendChild(el('p', '', t.whereHelp || ''));
+    var g = cfg.geo || {};
+    var row = el('div', 'flex flex-wrap gap-4 items-end');
+    var cWrap = el('label', 'text-xs text-gray-700'); cWrap.appendChild(document.createTextNode((t.country || 'Country') + ' '));
+    var sel = el('select', 'border border-gray-300 rounded-lg px-2 py-1 text-sm ml-1');
+    var auto = el('option', '', (t.countryAuto || 'Detect') + (g.countryName ? ' (' + fmt(t.detected, g.countryName) + ')' : '')); auto.value = 'AUTO'; sel.appendChild(auto);
+    var list = ['US','GB','CA','AU','NZ','IN','PK','BD','DE','AT','FR','BE','NL','ES','IT','PT','IE','FI','LT','GR','CH','SE','NO','DK','PL','HU','CZ','RO','TR','MX','BR','AR','CO','CL','JP','CN','HK','KR','ID','PH','SG','MY','TH','VN','AE','SA','NG','KE','ZA','CI','ZM','EG'];
+    list.forEach(function (cc) { var o = el('option', '', cc); o.value = cc; if (cfg.countryOverride === cc) o.selected = true; sel.appendChild(o); });
+    cWrap.appendChild(sel); row.appendChild(cWrap);
+    var curWrap = el('label', 'text-xs text-gray-700'); curWrap.appendChild(document.createTextNode((t.currencyLabel || 'Currency') + ' '));
+    var cur = el('select', 'border border-gray-300 rounded-lg px-2 py-1 text-sm ml-1');
+    (cfg.currencies || ['USD']).forEach(function (k) { var o = el('option', '', k); o.value = k; if (cfg.currency === k) o.selected = true; cur.appendChild(o); });
+    curWrap.appendChild(cur); row.appendChild(curWrap);
+    var status = el('span', 'text-xs text-gray-500');
+    function save() { status.textContent = '…'; post('wallet_up_save_locale', { country: sel.value, currency: cur.value }).then(function (j) { status.textContent = j && j.success ? (t.saved || 'Saved.') : (t.error || 'Could not save.'); if (j && j.success) { cfg.geo = j.data.geo; cfg.currency = j.data.currency; } }).catch(function () { status.textContent = t.error; }); }
+    sel.addEventListener('change', save); cur.addEventListener('change', save);
+    row.appendChild(status); c._body.appendChild(row);
+    return c;
+  }
+  function fmt(s, v) { return String(s || '').replace('%s', v); }
+
   function mount() {
     var root = document.getElementById('wallet-up-admin-root');
     if (!root || document.getElementById(ID)) return;
@@ -88,6 +111,7 @@
     var container = h1.closest('.space-y-6');
     if (!container) return;
     var wrap = el('div', 'space-y-6'); wrap.id = ID;
+    wrap.appendChild(localeCard());
     wrap.appendChild(brandingCard());
     wrap.appendChild(setupCard());
     container.appendChild(wrap);

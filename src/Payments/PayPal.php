@@ -46,6 +46,10 @@ class PayPal extends PaymentMethod
         $url = self::PAYPAL_BASE_URL . urlencode($username);
         if (!empty($amount)) {
             $url .= '/' . urlencode($amount);
+            $currency = \WalletUpPro\Core\Config\PaymentMethodsConfig::methodCurrency('paypal');
+            if ($currency !== 'USD') {
+                $url .= $currency; // PayPal.me accepts paypal.me/name/25EUR
+            }
         }
 
         return $url;
