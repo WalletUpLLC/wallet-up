@@ -1198,6 +1198,17 @@ class PaymentGatewayHandler
                 }
             }
 
+            /** 6.6.0: lets the free counter record the confirmation and email the merchant. */
+            do_action('wallet_up_payment_confirmed', [
+                'method'    => $paymentMethod,
+                'amount'    => $amount,
+                'name'      => $customerName,
+                'email'     => $customerEmail,
+                'reference' => $txReference,
+                'order_id'  => $wcOrderId,
+                'post_id'   => $postId,
+            ]);
+
             wp_send_json_success([
                 'message' => __('Thank you! Your payment confirmation has been received. The merchant will verify and process your payment shortly.', 'walletup'),
                 'payment_id' => $paymentId,

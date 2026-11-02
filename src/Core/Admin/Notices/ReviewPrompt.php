@@ -114,7 +114,17 @@ class ReviewPrompt {
     }
 
     private static function shouldShow(): bool {
-        if ( self::daysActive() < self::MIN_DAYS_ACTIVE ) {
+        // 6.6.0: ask after value, never before a week. A confirmed payment or ten taps,
+        // whichever comes first; users who have been paid leave reviews.
+        if ( self::daysActive() < 7 ) {
+            return false;
+        }
+        if ( class_exists( '\\WalletUpPro\\Core\\Retention\\FreeCounter' ) ) {
+            $all = \WalletUpPro\Core\Retention\FreeCounter::allTime();
+            if ( (int) $all['confirmations'] < 1 && (int) $all['clicks'] < 10 ) {
+                return false;
+            }
+        } elseif ( self::daysActive() < self::MIN_DAYS_ACTIVE ) {
             return false;
         }
         $state = get_user_meta( get_current_user_id(), self::META_KEY, true );

@@ -563,6 +563,29 @@ class OnboardingHandler
                 $gatewayKey = 'woocommerce_wallet_up_settings';
                 $gatewaySettings = (array) get_option($gatewayKey, []);
                 $gatewaySettings['enabled'] = (self::isPremium() && !empty($data['gatewayEnabled'])) ? 'yes' : 'no';
+                if (!self::isPremium() && isset($data['methodsAtCheckout']) && is_array($data['methodsAtCheckout'])) {
+                    // 6.6.0: the free plan places one method at checkout through FreeP2pGateway.
+                    $chosen = '';
+                    foreach ($data['methodsAtCheckout'] as $methodId => $on) {
+                        $methodId = sanitize_key((string) $methodId);
+                        $wants = !empty($on) && $on !== 'false' && $on !== '0';
+                        if ($wants && in_array($methodId, self::FREE_METHOD_IDS, true) && \WalletUpPro\Core\Payments\MethodStatusResolver::isConfigured($methodId)) {
+                            if ($chosen === '') {
+                                $chosen = $methodId;
+                            } else {
+                                $notEnabled[] = $methodId; // second and later methods at checkout are Pro
+                            }
+                        } elseif ($wants) {
+                            $notEnabled[] = $methodId;
+                        }
+                    }
+                    $p2p = (array) get_option('woocommerce_wallet_up_p2p_settings', []);
+                    $p2p['enabled'] = $chosen !== '' ? 'yes' : 'no';
+                    if ($chosen !== '') {
+                        $p2p['method'] = $chosen;
+                    }
+                    update_option('woocommerce_wallet_up_p2p_settings', $p2p);
+                }
                 if (isset($data['methodsAtCheckout']) && is_array($data['methodsAtCheckout'])) {
                     $canPlaceP2pAtCheckout = self::isPremium();
                     foreach ($data['methodsAtCheckout'] as $methodId => $on) {

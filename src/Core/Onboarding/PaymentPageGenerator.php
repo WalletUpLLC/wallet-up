@@ -118,10 +118,16 @@ class PaymentPageGenerator
             if (!$pageId) {
                 throw new \Exception(esc_html__('Could not create page', 'walletup'));
             }
+            // 6.6.0: the page goes live at once and the assistant lands on it, so the
+            // first thing a new user owns is a URL they can send, not a draft to finish.
+            wp_update_post(['ID' => $pageId, 'post_status' => 'publish']);
+            update_option('wallet_up_payment_page_id', (int) $pageId, false);
             wp_send_json_success([
                 'pageId'     => $pageId,
-                'editUrl'    => esc_url_raw(get_edit_post_link($pageId, 'raw')),
-                'previewUrl' => esc_url_raw(add_query_arg('preview', 'true', get_permalink($pageId))),
+                'editUrl'    => esc_url_raw(get_permalink($pageId)),
+                'editorUrl'  => esc_url_raw(get_edit_post_link($pageId, 'raw')),
+                'viewUrl'    => esc_url_raw(get_permalink($pageId)),
+                'previewUrl' => esc_url_raw(get_permalink($pageId)),
                 'title'      => $title,
                 'scope'      => $onlyMethodId !== '' ? 'single' : 'all',
             ]);

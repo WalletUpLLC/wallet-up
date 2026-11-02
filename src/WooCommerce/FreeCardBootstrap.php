@@ -50,6 +50,10 @@ final class FreeCardBootstrap
         if (class_exists(StripeCardGateway::class)) {
             $gateways[] = StripeCardGateway::class;
         }
+        // 6.6.0: one peer-to-peer method at checkout is part of the free plan.
+        if (class_exists(FreeP2pGateway::class)) {
+            $gateways[] = FreeP2pGateway::class;
+        }
         return $gateways;
     }
 
@@ -72,17 +76,18 @@ final class FreeCardBootstrap
             return;
         }
         add_action('woocommerce_blocks_payment_method_type_registration', static function ($registry) {
-            $cls = '\\WalletUpPro\\WooCommerce\\Blocks\\StripeCardBlocksSupport';
-            if (!class_exists($cls)) {
-                return;
-            }
-            try {
-                $support = new $cls();
-                $support->initialize();
-                $registry->register($support);
-            } catch (\Throwable $e) {
-                \WalletUpPro\Core\Error\ErrorHandler::getInstance()
-                    ->log('Free card block registration failed: ' . $e->getMessage());
+            foreach (['\\WalletUpPro\\WooCommerce\\Blocks\\StripeCardBlocksSupport', '\\WalletUpPro\\WooCommerce\\Blocks\\FreeP2pBlocksSupport'] as $cls) {
+                if (!class_exists($cls)) {
+                    continue;
+                }
+                try {
+                    $support = new $cls();
+                    $support->initialize();
+                    $registry->register($support);
+                } catch (\Throwable $e) {
+                    \WalletUpPro\Core\Error\ErrorHandler::getInstance()
+                        ->log('Free block registration failed for ' . $cls . ': ' . $e->getMessage());
+                }
             }
         }, 10);
     }

@@ -423,6 +423,15 @@ class Plugin extends BaseSingleton
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\FreeExperience::class)) {
             \WalletUpPro\Core\Admin\FreeExperience::init();
         }
+        if (class_exists(\WalletUpPro\Core\Retention\FreeCounter::class)) {
+            \WalletUpPro\Core\Retention\FreeCounter::init();
+        }
+        // 6.6.0: the visitor's "I've sent it" form must work on the free plan too; the Pro
+        // block below registers the same callback, and add_action de-duplicates it.
+        if (class_exists(\WalletUpPro\Core\Payments\PaymentGatewayHandler::class)) {
+            add_action('wp_ajax_walletup_confirm_payment_sent', [\WalletUpPro\Core\Payments\PaymentGatewayHandler::class, 'handleConfirmPaymentSent']);
+            add_action('wp_ajax_nopriv_walletup_confirm_payment_sent', [\WalletUpPro\Core\Payments\PaymentGatewayHandler::class, 'handleConfirmPaymentSent']);
+        }
 
         if (is_admin() && class_exists(\WalletUpPro\Core\Admin\OnboardingHandler::class)) {
             \WalletUpPro\Core\Admin\OnboardingHandler::init();
@@ -991,6 +1000,9 @@ class Plugin extends BaseSingleton
     public function deactivate(): void
     {
         try {
+            if (class_exists(\WalletUpPro\Core\Retention\FreeCounter::class)) {
+                \WalletUpPro\Core\Retention\FreeCounter::unschedule();
+            }
             if (class_exists('WooCommerce')) {
                 if (class_exists('WC_Cache_Helper')) {
                     \WC_Cache_Helper::get_transient_version('payment_gateways', true);

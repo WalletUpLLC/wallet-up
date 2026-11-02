@@ -36,11 +36,25 @@ class OnboardingBanner
             return;
         }
 
+        // 6.6.0: once a visitor has tapped a code or link the reminder has done its job.
+        if (class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') && \WalletUpPro\Core\Retention\FreeCounter::hasClicks()) {
+            return;
+        }
+
         $finding = self::setupFinding();
         $needsAttention = $finding !== null && ($finding['state'] ?? '') !== 'ready';
         $onboardingPending = !get_option(OnboardingHandler::OPTION_COMPLETED) && OnboardingHandler::getPending() !== '';
+        $neverViewed = null;
+        if (!$needsAttention && !$onboardingPending && class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter')) {
+            $pageId = (int) get_option('wallet_up_payment_page_id', 0);
+            $activated = (int) get_option('wallet_up_activated_at', 0);
+            $all = \WalletUpPro\Core\Retention\FreeCounter::allTime();
+            if ($pageId > 0 && get_post_status($pageId) === 'publish' && (int) $all['impressions'] === 0 && $activated > 0 && time() - $activated > DAY_IN_SECONDS) {
+                $neverViewed = (string) get_permalink($pageId);
+            }
+        }
 
-        if (!$needsAttention && !$onboardingPending) {
+        if (!$needsAttention && !$onboardingPending && $neverViewed === null) {
             return;
         }
 
@@ -49,7 +63,12 @@ class OnboardingBanner
             return;
         }
 
-        if ($needsAttention) {
+        if ($neverViewed !== null) {
+            $heading  = esc_html__('Your payment page is live, but nobody has opened it yet.', 'walletup');
+            $body     = esc_html__('Send the link in your next invoice or message, or add the Payment Button block to a page people already visit.', 'walletup');
+            $cta      = esc_html__('Copy page link', 'walletup');
+            $url      = esc_url($neverViewed);
+        } elseif ($needsAttention) {
             $pageSlug = ($finding['page'] ?? '') !== '' ? (string) $finding['page'] : 'wallet-up-onboarding';
             $heading  = esc_html__('Finish setting up Wallet Up', 'walletup');
             $body     = esc_html((string) ($finding['text'] ?? ''));
@@ -69,7 +88,7 @@ class OnboardingBanner
             <p style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0;">
                 <strong><?php echo $heading; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?></strong>
                 <span style="color:#50575e;"><?php echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?></span>
-                <a href="<?php echo $url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" class="button button-primary" style="margin-left:auto;">
+                <a href="<?php echo $url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" class="button button-primary" style="margin-left:auto;"<?php echo $neverViewed !== null ? ' data-wup-copy="' . esc_attr($neverViewed) . '" target="_blank" rel="noopener"' : ''; ?>>
                     <?php echo $cta; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped on assignment ?>
                 </a>
             </p>
@@ -78,6 +97,8 @@ class OnboardingBanner
                 var n = document.getElementById('wallet-up-onboarding-banner');
                 if (!n) return;
                 n.addEventListener('click', function(e){
+                    var cp = e.target.closest('[data-wup-copy]');
+                    if (cp && navigator.clipboard) { navigator.clipboard.writeText(cp.getAttribute('data-wup-copy')).then(function(){ cp.textContent = '<?php echo esc_js(__('Copied', 'walletup')); ?>'; }); }
                     if (!e.target.classList.contains('notice-dismiss')) return;
                     var fd = new FormData();
                     fd.append('action', 'wallet_up_dismiss_onboarding_banner');

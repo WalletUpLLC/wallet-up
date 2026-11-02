@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 6.6.0 - November 4, 2026 =
+* New: One of your payment methods can appear at your WooCommerce checkout on the free plan. Pick it in setup or under WooCommerce → Settings → Payments → Wallet Up; the order waits on hold and the customer pays from the order-received page and confirms there. Pro adds the other methods, grouped display, per-method discounts and automatic verification.
+* New: The dashboard answers "did anyone pay me?" with a This week card: views, taps and confirmed payments, with the latest confirmations.
+* New: With notifications on, you get an email the first time someone taps your link, an email for every visitor confirmation, and one summary after your first week.
+* Improved: "Create page with this block" publishes the page and takes you to it, so the first thing you own is a link you can send.
+* Improved: The review request waits for a confirmed payment or ten taps, never before a week, instead of a fixed timer.
+* Improved: The setup reminder disappears after the first tap, and instead tells you when your page is live but nobody has opened it.
+
 = 6.5.0 - November 3, 2026 =
 * New: Zelle is part of the free plan. Visitors see your Zelle email or phone with the amount and a copy button; upload the QR code from your bank app under Payments and they can scan it instead.
 * New: The setup assistant says on its first screen which payment apps work in your country, and suggests PayPal.me where Cash App and Venmo do not. Set your country and currency under Settings.

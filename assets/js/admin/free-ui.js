@@ -99,8 +99,32 @@
     var anchor = findText('button', /Just go to dashboard/); (anchor && anchor.parentElement ? anchor.parentElement : card).insertAdjacentElement('beforebegin', box);
   }
 
+  /* ---- Dashboard: "This week" card answers "did anyone pay me?" ---- */
+  function stat(n, label) { var d = el('div', 'flex-1 min-w-[100px]'); d.appendChild(el('div', 'text-2xl font-bold text-gray-900', String(n))); d.appendChild(el('div', 'text-xs text-gray-500', label)); return d; }
+  function mountWeek() {
+    if (cfg.isPremium || !cfg.counts || document.getElementById('wup-this-week')) return;
+    var h = findText('h1', /^Dashboard$/); if (!h) return;
+    var container = h.closest('.space-y-6'); if (!container) return;
+    var c = cfg.counts, w = c.week || {};
+    var card = el('div', 'rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden'); card.id = 'wup-this-week';
+    var head = el('div', 'w-full flex items-center justify-between p-4'); head.appendChild(el('span', 'font-semibold text-gray-900 text-base', t.weekTitle || 'This week')); card.appendChild(head);
+    var body = el('div', 'px-4 pb-4 border-t border-gray-100 pt-4 space-y-3 text-sm text-gray-600'); card.appendChild(body);
+    var row = el('div', 'flex flex-wrap gap-4'); row.appendChild(stat(w.impressions || 0, t.views || 'views')); row.appendChild(stat(w.clicks || 0, t.taps || 'taps')); row.appendChild(stat(w.confirmations || 0, t.confirmed || 'confirmed payments')); body.appendChild(row);
+    if (c.recent && c.recent.length) {
+      body.appendChild(el('div', 'text-xs font-semibold uppercase tracking-wide text-gray-500 pt-2', t.recentTitle || 'Latest confirmations'));
+      var ul = el('ul', 'space-y-1');
+      c.recent.forEach(function (r) { var li = el('li', 'flex items-center justify-between gap-2'); li.appendChild(el('span', '', (r.name || '—') + ' · ' + r.symbol + r.amount + ' · ' + r.method + ' · ' + r.when)); if (r.order) { var a = el('a', 'text-purple-600 hover:underline text-xs', t.viewOrder || 'View order'); a.href = '/wp-admin/post.php?post=' + r.order + '&action=edit'; li.appendChild(a); } ul.appendChild(li); });
+      body.appendChild(ul);
+    } else if (!(w.impressions || w.clicks || w.confirmations)) {
+      body.appendChild(el('p', 'pt-2', t.noActivity || ''));
+      var ol = el('ol', 'list-decimal ml-5 space-y-1'); [t.tip1, t.tip2, t.tip3].forEach(function (x) { if (x) ol.appendChild(el('li', '', x)); }); body.appendChild(ol);
+    }
+    if (!c.notify) { var p = el('p', 'text-xs text-gray-500 pt-2'); var a2 = el('a', 'text-purple-600 hover:underline', t.notifyOff || ''); a2.href = '#'; a2.addEventListener('click', function (e) { e.preventDefault(); var em = window.prompt('Email', cfg.adminEmail || ''); if (!em) return; post('wallet_up_notify_optin', { email: em }).then(function (j) { if (j && j.success) { cfg.counts.notify = j.data.email; p.textContent = fmt(t.notifyOn, j.data.email); } }); }); p.appendChild(a2); body.appendChild(p); }
+    var first = container.children[1] || null; container.insertBefore(card, first ? first.nextSibling : null);
+  }
+
   var pending = null;
-  function tick() { pending = null; try { mountGeo(); mountZelleHint(); mountZelleUpload(); mountNotify(); } catch (e) { /* never break the admin */ } }
+  function tick() { pending = null; try { mountGeo(); mountZelleHint(); mountZelleUpload(); mountNotify(); mountWeek(); } catch (e) { /* never break the admin */ } }
   function schedule() { if (pending) return; pending = setTimeout(tick, 150); }
   document.addEventListener('DOMContentLoaded', function () { schedule(); var r = root(); if (r && window.MutationObserver) new MutationObserver(schedule).observe(r, { childList: true, subtree: true }); });
 })();

@@ -59,6 +59,8 @@ final class FreeExperience
             'methodNames'  => $names,
             'zelleQrUrl'   => is_array($qr) ? (string) ($qr['zelle'] ?? '') : '',
             'notifyEmail'  => (string) get_option(self::OPTION_NOTIFY, ''),
+            'counts'       => class_exists('\\WalletUpPro\\Core\\Retention\\FreeCounter') ? \WalletUpPro\Core\Retention\FreeCounter::dashboardData() : null,
+            'isPremium'    => function_exists('WalletUpPro\\wallet_up_premium_active') && \WalletUpPro\wallet_up_premium_active(),
             'adminEmail'   => (string) get_option('admin_email', ''),
             'i18n'         => [
                 'geoLine'      => __('Your site looks like it is in %s.', 'walletup'),
@@ -78,6 +80,17 @@ final class FreeExperience
                 'notifyLater'  => __('Not now', 'walletup'),
                 'notifyOn'     => __('Notifications are on. We will email %s.', 'walletup'),
                 'error'        => __('Could not save. Please try again.', 'walletup'),
+                'weekTitle'    => __('This week', 'walletup'),
+                'views'        => __('views', 'walletup'),
+                'taps'         => __('taps', 'walletup'),
+                'confirmed'    => __('confirmed payments', 'walletup'),
+                'recentTitle'  => __('Latest confirmations', 'walletup'),
+                'noActivity'   => __('No visitor has opened your payment code yet. Three ways people get paid with Wallet Up:', 'walletup'),
+                'tip1'         => __('Send the link in your next invoice or message.', 'walletup'),
+                'tip2'         => __('Add the Payment Button block to a page people already visit.', 'walletup'),
+                'tip3'         => __('Download the QR from the card above and print it for the counter.', 'walletup'),
+                'viewOrder'    => __('View order', 'walletup'),
+                'notifyOff'    => __('Email me when someone taps or confirms a payment', 'walletup'),
             ],
         ]);
     }

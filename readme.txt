@@ -4,7 +4,7 @@ Tags: cash app, venmo, paypal, zelle, qr code
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 6.5.0
+Stable tag: 6.6.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate Link: https://walletup.app/donate
@@ -19,10 +19,10 @@ Cash App, Venmo and Zelle pay out in the United States. PayPal.me works in most 
 
 = What is free and what is Pro =
 
-* **Free:** Cash App, Venmo, PayPal.me and Zelle codes, payment buttons, pay links and a tip jar on any page or post. Optional card payments at WooCommerce checkout through a Stripe account you connect (a platform fee applies to card payments only, see "What does it cost?").
-* **Pro:** Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, crypto and mobile money, Cash App, Venmo and PayPal as WooCommerce checkout options, WPForms payment fields, donation pages, QR Studio, short links and analytics.
+* **Free:** Cash App, Venmo, PayPal.me and Zelle codes, payment buttons, pay links and a tip jar on any page or post, one of them as a WooCommerce checkout option, and email when someone pays. Optional card payments at WooCommerce checkout through a Stripe account you connect (a platform fee applies to card payments only, see "What does it cost?").
+* **Pro:** Meta Pay, Interac e-Transfer, PayID, BPAY, PayTo, crypto and mobile money, all methods together at WooCommerce checkout with discounts and verification, WPForms payment fields, donation pages, QR Studio, short links and analytics.
 
-If you are installing this to put Cash App or Venmo on your WooCommerce checkout, that is a Pro feature. The free plugin places them on pages, not at checkout.
+Installing this for your WooCommerce checkout? The free plugin shows one of your methods there as a manual payment option; Pro adds the rest, grouped display, discounts and automatic verification.
 
 Customers scan a QR code or click a payment link - no merchant account, no monthly fees, no WalletUp fee. Payments go directly to your own Cash App, Venmo, PayPal or Zelle account.
 
@@ -136,9 +136,9 @@ Upgrade to [Wallet Up Pro](https://walletup.app/) for advanced capabilities:
 = WooCommerce Setup =
 
 1. Activate WooCommerce
-2. Connect Stripe under **Wallet Up > Payments** to take cards at checkout
-3. Customers see the card option on both the classic and block checkout
-4. Add the peer-to-peer methods as checkout options with Wallet Up Pro
+2. In setup, tick "Show [method] at my WooCommerce checkout", or enable **Wallet Up** under WooCommerce > Settings > Payments and pick the method
+3. Optionally connect Stripe under **Wallet Up > Sell with cards** to take cards too
+4. Add the remaining methods, grouped display and discounts with Wallet Up Pro
 
 = Requirements =
 
@@ -169,7 +169,7 @@ The platform fee applies to every connected Stripe account on every plan, Free, 
 
 = Does it work with WooCommerce? =
 
-Yes. Connect Stripe to take cards at WooCommerce checkout in the free version, on both the classic and block checkout. Wallet Up Pro adds Cash App, Venmo, PayPal and the other methods as checkout options too.
+Yes. The free version shows one of your methods (Cash App, Venmo, PayPal or Zelle) at checkout as a manual payment option, and can take cards through Stripe. Wallet Up Pro adds the rest of the methods at checkout, grouped display, per-method discounts and automatic verification.
 
 = Can I offer discounts for specific payment methods? =
 
@@ -213,6 +213,14 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 10. WPForms Integration - payment fields in forms (Pro)
 
 == Changelog ==
+= 6.6.0 - November 4, 2026 =
+* New: One of your payment methods can appear at your WooCommerce checkout on the free plan. Pick it in setup or under WooCommerce → Settings → Payments → Wallet Up; the order waits on hold and the customer pays from the order-received page and confirms there. Pro adds the other methods, grouped display, per-method discounts and automatic verification.
+* New: The dashboard answers "did anyone pay me?" with a This week card: views, taps and confirmed payments, with the latest confirmations.
+* New: With notifications on, you get an email the first time someone taps your link, an email for every visitor confirmation, and one summary after your first week.
+* Improved: "Create page with this block" publishes the page and takes you to it, so the first thing you own is a link you can send.
+* Improved: The review request waits for a confirmed payment or ten taps, never before a week, instead of a fixed timer.
+* Improved: The setup reminder disappears after the first tap, and instead tells you when your page is live but nobody has opened it.
+
 = 6.5.0 - November 3, 2026 =
 * New: Zelle is part of the free plan. Visitors see your Zelle email or phone with the amount and a copy button; upload the QR code from your bank app under Payments and they can scan it instead.
 * New: The setup assistant says on its first screen which payment apps work in your country, and suggests PayPal.me where Cash App and Venmo do not. Set your country and currency under Settings.

@@ -76,7 +76,7 @@ class IntegrationDetector
             $ctaData   = $hasProAction
                 ? sprintf(' data-wup-attach="%s" data-wup-attach-nonce="%s"', esc_attr($integration['proAction']), esc_attr(wp_create_nonce('wallet_up_admin_nonce')))
                 : '';
-            $ctaTarget = ($isPremium || $hasProAction) ? '' : ' target="_blank" rel="noopener noreferrer"';
+            $ctaTarget = ($isPremium || $hasProAction || strpos((string) $ctaUrl, admin_url()) === 0) ? '' : ' target="_blank" rel="noopener noreferrer"';
             $noticeClass = 'notice-info';
             $ctaClass    = 'button button-primary';
         }
@@ -245,6 +245,10 @@ class IntegrationDetector
                     if (is_array($grouped) && ($grouped['enabled'] ?? 'no') === 'yes') {
                         return true;
                     }
+                    $p2p = get_option('woocommerce_wallet_up_p2p_settings', []);
+                    if (is_array($p2p) && ($p2p['enabled'] ?? 'no') === 'yes') {
+                        return true;
+                    }
                     global $wpdb;
                     $sql = "SELECT option_name, option_value FROM {$wpdb->options}
                             WHERE option_name LIKE %s";
@@ -261,9 +265,9 @@ class IntegrationDetector
                 'onEmptyBody'   => __('Wallet Up is on, but no payment methods are set to show at your WooCommerce checkout yet.', 'walletup'),
                 'onEmptyCta'    => __('Set up methods', 'walletup'),
                 'onEmptyUrl'    => admin_url('admin.php?page=wallet-up-seller'),
-                'freeBody' => __('The free plan does not add Cash App, Venmo or PayPal to the WooCommerce checkout. You can place them on any page with a block or shortcode; checkout options are part of Pro.', 'walletup'),
-                'freeCta'  => __('See Pro', 'walletup'),
-                'freeUrl'  => $upgrade('woocommerce'),
+                'freeBody' => __('Wallet Up can show one of your payment methods at your WooCommerce checkout for free. Pro adds the rest, grouped display, per-method discounts and automatic verification.', 'walletup'),
+                'freeCta'  => __('Turn it on', 'walletup'),
+                'freeUrl'  => admin_url('admin.php?page=wc-settings&tab=checkout&section=wallet_up_p2p'),
                 'proBody'  => __('Enable Wallet Up at your WooCommerce checkout — one click.', 'walletup'),
                 'proCta'   => __('Enable in checkout', 'walletup'),
                 'proAction'=> 'wallet_up_enable_wc_gateway',

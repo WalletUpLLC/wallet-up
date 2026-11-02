@@ -120,6 +120,13 @@ class DisplayHandler
             $beacon = empty($data['skip_impression'])
                 ? self::countImpression((string) $method, intval($post_id), (string) $mode, (string) ($data['post_title'] ?? ''), intval($data['order_id'] ?? 0))
                 : '';
+            $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
+            $isBot = $ua !== '' && preg_match('/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headless|monitor|pingdom|uptime/i', $ua);
+            $nonVisitor = $isBot || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST);
+            if (self::$previewOverride === null && empty($data['skip_impression']) && !$nonVisitor) {
+                /** 6.6.0: fires for every real visitor render; the free counter listens. Pro analytics count through countImpression above. */
+                do_action('wallet_up_display_rendered', (string) $method, intval($post_id), (string) $mode);
+            }
 
             if ($this->confirmFormApplies($data)) {
                 $wcOrderId = intval($data['order_id'] ?? 0);
