@@ -1,0 +1,202 @@
+{
+  "label": "zipfinal-670",
+  "checks": {
+    "landing": "http://127.0.0.1:8080/wp-admin/admin.php?page=wallet-up-onboarding",
+    "onboarding_mounted_fallback_hidden": {
+      "mounted": true,
+      "fallback": "none",
+      "formInPage": true
+    },
+    "mount_failed_after_normal": false,
+    "footprint_after": {
+      "plugin_files": 35,
+      "plugin_kb": 477,
+      "peak_mb": 6,
+      "freemius_loaded": false,
+      "top": [
+        [
+          85,
+          "src/Plugin.php"
+        ],
+        [
+          59,
+          "src/Core/Display/DisplayHandler.php"
+        ],
+        [
+          45,
+          "wallet-up-start.php"
+        ],
+        [
+          42,
+          "vendor/composer/autoload_static.php"
+        ],
+        [
+          31,
+          "src/Core/Assets/AssetManager.php"
+        ],
+        [
+          20,
+          "src/Core/Config/PaymentMethodsConfig.php"
+        ],
+        [
+          19,
+          "src/Core/Database/DatabaseManager.php"
+        ],
+        [
+          19,
+          "src/Core/PaymentRegistry.php"
+        ]
+      ]
+    },
+    "footprint_logged_in_owner": {
+      "plugin_files": 38,
+      "plugin_kb": 539,
+      "freemius_loaded": false
+    },
+    "footprint_before_measured_on_6_6_0": {
+      "plugin_files": 96,
+      "plugin_kb": 2436,
+      "freemius_loaded": true
+    },
+    "blocked_onboarding": {
+      "mounted": false,
+      "fallback": "block",
+      "text": "Wallet Up setup The visual setup wizard has not loaded. You can finish setup with this form instead; it does the same thing. Your name or bu"
+    },
+    "mount_failed_recorded": "1793672230",
+    "mount_failed_screen": "onboarding",
+    "blocked_dashboard_unconfigured": {
+      "fallback": "block",
+      "text": "Wallet Up The visual dashboard has not loaded. Everything you need is below; the dashboard will come back once its script can run. Finish setup with the simple form Setup check Setup check: 3 of 9 passed ✓ PHP version PHP 8.3.6. ✓ QR code engine GD is available, so QR images render on the server. ✗ ",
+      "rows": 9
+    },
+    "critical_notice": "Wallet Up screens load: The visual admin did not load on the setup screen 4 seconds ago. Another plugin or a browser extension may be blocking its script; the simple forms on this screen work without it.",
+    "after_simple_form_url": "http://127.0.0.1:8080/wp-admin/admin.php?page=wallet-up&fallback_setup=done",
+    "blocked_dashboard_configured": {
+      "fallback": "block",
+      "hasQr": true,
+      "link": "https://www.paypal.com/paypalme/TestShop",
+      "saved": true,
+      "pageLink": "http://127.0.0.1:8080/?page_id=7",
+      "text": "Setup saved. Open your payment page Wallet Up The visual dashboard has not loaded. Everything you need is below; the dashboard will come back once its script can run. Your PayPal.me code and link TestShop https://www.paypal.com/paypalme/TestShop Payment page: "
+    },
+    "simple_form_saved": {
+      "accounts": {
+        "holder_owner": "Test Shop",
+        "holder_email": "admin@example.com",
+        "paypal_holder": "TestShop"
+      },
+      "enabled": {
+        "paypal": true
+      },
+      "completed": "1",
+      "page_id": "7"
+    },
+    "simple_form_page": {
+      "status": "publish",
+      "link": "http://127.0.0.1:8080/?page_id=7",
+      "title": "Pay with PayPal.me"
+    },
+    "nojs_dashboard": {
+      "card": true,
+      "checks": true,
+      "visibleQr": 2
+    },
+    "mount_failed_cleared_after_ok": false,
+    "dashboard_card": {
+      "summary": "6 of 9 passed",
+      "detailsOpen": true,
+      "rows": 9,
+      "labels": [
+        "PHP version",
+        "QR code engine",
+        "A payment method is switched on",
+        "Account details saved",
+        "A page shows your code",
+        "Visitors have seen your code",
+        "Wallet Up screens load",
+        "Scheduled tasks run",
+        "WooCommerce checkout"
+      ],
+      "marks": [
+        "✓",
+        "✓",
+        "✓",
+        "✓",
+        "✓",
+        "–",
+        "✗",
+        "✓",
+        "–"
+      ]
+    },
+    "payments_card": {
+      "h1": "Payments",
+      "card": true
+    },
+    "plugins_row": "Version 6.7.0 | By WalletUp.app | Visit plugin site | Setup check: 7 of 9 passed",
+    "plugins_row_optin_link": true,
+    "critical_notice_normal": "Wallet Up screens load: The visual admin did not load on the dashboard 1 hour ago. Another plugin or a browser extension may be blocking its script; the simple forms on this screen work without it.",
+    "critical_notice_visible": true,
+    "critical_cleared_by_mount": false,
+    "visitor_page": {
+      "paypal": true,
+      "qr": true
+    },
+    "scan_redirect": {
+      "status": 302,
+      "location": "https://example.com/paid"
+    },
+    "live_section_renders": true,
+    "owner_views_not_counted": {
+      "before": 3,
+      "afterOwner": 3,
+      "ok": true
+    },
+    "legacy_shortcode_off": {
+      "comment": true,
+      "noLink": true
+    },
+    "zelle_no_generic_qr": {
+      "paytoCard": true,
+      "dataUriImgs": 0,
+      "qrWrapper": false
+    },
+    "tap_beacon_without_nonce": {
+      "status": 200,
+      "body": "{\"success\":true,\"data\":{\"ok\":true}}"
+    },
+    "tap_beacon_bad_method_status": 400,
+    "visitor_counted": {
+      "views": 1,
+      "taps": 1
+    },
+    "create_page_reuses": {
+      "first": 7,
+      "second": 7,
+      "same": true
+    },
+    "published_pay_pages": 0,
+    "settings_cards": [
+      "Where you are",
+      "Notifications",
+      "Branding",
+      "Setup assistant"
+    ],
+    "notify_off_visible": false,
+    "timeline_note": "Sent with your answer so we can tell how far setup got: installed 48 seconds ago · 3 methods saved · 4 page views · admin loaded · PHP 8.3 · the United States",
+    "timeline_pv_positive": true,
+    "free_counts": {
+      "2026-11-03": {
+        "i": 4,
+        "c": 1,
+        "f": 0
+      }
+    },
+    "debug_log_plugin_lines": [],
+    "debug_log_fatals": 0
+  },
+  "console_errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

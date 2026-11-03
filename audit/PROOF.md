@@ -227,3 +227,8 @@ Brand colours: 6.3.11 introduces `src/Core/Brand.php` (#674FBF, dark #503AA1, wh
 The three proof drivers were run again on the rebased tree: `proof/6.3.11-base-fresh`, `proof/6.3.11-base-regression-650`, `proof/6.3.11-base-regression-660`. Results on the rebased tree, all from fresh installs: visitor page view 35 plugin files / 477 KB / no Freemius (upstream's OptionPrimer and ActivityCache account for the four extra files); every row of the 6.7.0 fresh run, the 6.5.0 run and the 6.6.0 WooCommerce run unchanged from the 6.3.9-based proofs; 0 PHP fatals, 0 plugin console errors.
 
 An independent multi-agent check of the rebase (every original hunk present, every upstream hunk preserved, bundle edits valid against the new identifiers) is recorded in `revamp/agent-reports/rebase-verification.md`.
+
+
+# The installable zip
+
+`wallet-up-6.7.0.zip` is built from the committed head with `git archive` (plugin files only: no audit folder, no git metadata), 921 files, 3.8 MB, every PHP file passing `php -l` and every bundle passing a module syntax check. It was installed through Plugins → Add New → Upload Plugin in a fresh sandbox (`harness/upload-zip.js`; the sandbox needed `upload_max_filesize` above 2 MB) and all three drivers were run against that install: `proof/zip-install-fresh`, `proof/zip-install-regression-650`, `proof/zip-install-regression-660`. All rows match the branch proofs; 0 fatals.
