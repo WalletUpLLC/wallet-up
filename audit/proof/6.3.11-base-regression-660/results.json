@@ -1,0 +1,118 @@
+{
+  "label": "6311-reg-660",
+  "checks": {
+    "product_id": 14,
+    "checkout_checkbox_present": true,
+    "checkout_checkbox_pro_badge": false,
+    "step3_note": "One payment method at your WooCommerce checkout is included in the free plan. Tick the box and PayPal appears as a payment option; the order waits on hold until you see the money. Pro adds more methods at checkout, grouped display, per-method discounts and automatic verification.",
+    "step4": "You're ready to accept payments. | Wallet Up setup",
+    "after_create_url": "http://127.0.0.1:8080/?page_id=15",
+    "after_create_is_frontend": true,
+    "page_id_option": "15",
+    "page_status": "publish",
+    "p2p_settings": {
+      "enabled": "yes",
+      "method": "paypal"
+    },
+    "gateways_after_wizard": [
+      "bacs:off",
+      "cheque:off",
+      "cod:off",
+      "wallet_up_card:off",
+      "wallet_up_p2p:on"
+    ],
+    "wizard_enabled_p2p": true,
+    "checkout_has_gateway": true,
+    "checkout_gateway_label": "Pay with PayPal.me",
+    "after_place_order_url": "http://127.0.0.1:8080/?page_id=13&order-received=17&key=wc_order_SV5z7YEUp3vCF",
+    "thankyou_has_qr": true,
+    "thankyou_has_confirm_form": true,
+    "thankyou_error": null,
+    "order": {
+      "id": 17,
+      "status": "on-hold",
+      "method": "wallet_up_p2p",
+      "title": "Pay with PayPal.me",
+      "total": "12.50",
+      "notes": [
+        "_wallet_up_payment_initiated=2026-11-03 01:43:00",
+        "_wallet_up_payment_method=paypal"
+      ]
+    },
+    "confirm_form_ids": [
+      "walletup-confirm-2271-toggle:BUTTON:inline-block",
+      "walletup-confirm-2271:DIV:none",
+      "walletup-confirm-2271-ref:INPUT:inline-block",
+      "walletup-confirm-2271-btn:BUTTON:inline-block",
+      "walletup-confirm-2271-msg:DIV:none"
+    ],
+    "confirm_response": "{\"success\":true,\"data\":{\"message\":\"Thank you! Your payment confirmation has been received. The merchant will verify and process your payment shortly.\",\"payment_id\":\"wup_fe84fb602073ea8b3cc2267fd64f1c5",
+    "confirm_message": "Thank you! Your payment confirmation has been received. The merchant will verify and process your payment shortly.",
+    "pay_page": "http://127.0.0.1:8080/?page_id=15",
+    "pay_page_has_link": true,
+    "tap_beacon_sent": true,
+    "confirm_wrong_order_key": {
+      "status": 403,
+      "body": "{\"success\":false,\"data\":{\"message\":\"This order could not be matched. Please use the link from your order email.\"}}"
+    },
+    "confirm_bad_method": {
+      "status": 400,
+      "body": "{\"success\":false,\"data\":{\"message\":\"Unknown payment method.\"}}"
+    },
+    "wizard_state_wc": {
+      "displayMode": "grouped",
+      "gatewayEnabled": true,
+      "methodsAtCheckout": {
+        "paypal": true
+      }
+    },
+    "counts": {
+      "days": {
+        "2026-11-03": {
+          "i": 2,
+          "c": 1,
+          "f": 1
+        }
+      },
+      "recent": [
+        {
+          "ts": 1793670187,
+          "name": "Ada Lovelace",
+          "amount": 12.5,
+          "method": "paypal",
+          "order": 17
+        }
+      ],
+      "first_click_at": 1793670192,
+      "first_click_email_at": 1793670192,
+      "digest_sent_at": 0,
+      "mail_day": "2026-11-03",
+      "mail_count": 1,
+      "first_click_method": "paypal"
+    },
+    "cron_ran": {
+      "ran": "wallet_up_free_daily"
+    },
+    "email_instruction_dupes": 0,
+    "mails": [
+      "[Test Shop]: You've got a new order: #17",
+      "Your Test Shop order has been received!",
+      "Ada Lovelace says they sent you $12.50 via PayPal.me",
+      "Someone just tapped your PayPal.me link",
+      "Your first week with Wallet Up: 2 views, 1 taps"
+    ],
+    "mail_to": [
+      "admin@example.com",
+      "ada@example.com",
+      "owner@example.com"
+    ],
+    "this_week_card": "This week 2 views 1 taps 1 confirmed payments LATEST CONFIRMATIONS Ada Lovelace · $12.50 · PayPal.me · 19 seconds View order",
+    "setup_progress_hidden": true,
+    "review_prompt_shown": true,
+    "wp_dashboard_notices": [
+      "Wallet Up — thanks for using Wallet Up for the past 8 days. If it has been useful, would you take a "
+    ],
+    "wc_home_notice": "Wallet Up Wallet Up is enabled at your WooCommerce checkout. Disable Dismiss this notice."
+  },
+  "console_errors": []
+}

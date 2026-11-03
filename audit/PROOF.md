@@ -207,3 +207,23 @@ Left as is, with the reason:
 - `PaymentPageGenerator::registerLiveSection()` is unused but public; Pro code may call it, so it stays.
 - The reviewer's note that `PaymentGatewayHandler::init()` runs on light requests was wrong: that call is inside the premium-only block.
 - Screenshots 2 and 5 on WordPress.org still show Pro screens; the readme labels them as Pro. Replacing the images is a release task outside this repository.
+
+
+# Rebased onto the official 6.3.11 release
+
+The branch originally started from 6.3.9. The official `wallet-up.6.3.11.zip` from WordPress.org was committed as a new base (commit "Update to the official Wallet Up 6.3.11 release") and the nine commits of work were re-applied on top of it with three-way merges. Conflicts and how they were resolved:
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `wallet-up.php`, `wallet-up-start.php`, `readme.txt` | version numbers and the changelog | the branch's versions (6.4.0 → 6.7.0) win; upstream's 6.3.10 and 6.3.11 changelog entries stay below the branch entries; upstream's `OptionPrimer::prime()` call kept |
+| `src/Core/PaymentRegistry.php` | upstream routed the notice link colour through `Brand::HEX`; the branch rewrote the notice | branch markup with `Brand::HEX` |
+| `src/Core/Display/DisplayHandler.php` | upstream replaced server-side impression counting with `countImpression()` plus a client beacon; the branch added the `wallet_up_display_rendered` action | both: upstream counting kept, the action fires for real visitors beside it |
+| `src/Plugin.php` | upstream added `ActivityCache::register()` next to the lines the branch gated behind the light-request check | `ActivityCache` registered on every request; `DeactivationOffer` and `SetupHelp` stay gated |
+| four admin bundles | upstream rebuilt them (new hashed names, new minified identifiers) | the 37 string-level edits were re-applied against the new files, using the new identifiers (`re()` for the premium check, `ke()` for the selected-methods helper); the old bundle files are gone |
+| deleted assets | upstream had already removed `assets/js/report/dd` and the `.wup` bundles | nothing to do |
+
+Brand colours: 6.3.11 introduces `src/Core/Brand.php` (#674FBF, dark #503AA1, white on brand). The inline "Turn on" button and the visitor confirm button added by the branch now use `Brand::HEX` and `Brand::ON_BRAND_HEX`; the admin cards use the Tailwind purple-600 token, which 6.3.11 maps to the same colour.
+
+The three proof drivers were run again on the rebased tree: `proof/6.3.11-base-fresh`, `proof/6.3.11-base-regression-650`, `proof/6.3.11-base-regression-660`. Results on the rebased tree, all from fresh installs: visitor page view 35 plugin files / 477 KB / no Freemius (upstream's OptionPrimer and ActivityCache account for the four extra files); every row of the 6.7.0 fresh run, the 6.5.0 run and the 6.6.0 WooCommerce run unchanged from the 6.3.9-based proofs; 0 PHP fatals, 0 plugin console errors.
+
+An independent multi-agent check of the rebase (every original hunk present, every upstream hunk preserved, bundle edits valid against the new identifiers) is recorded in `revamp/agent-reports/rebase-verification.md`.
