@@ -209,7 +209,7 @@ class PaymentRegistry
                 . '<form method="post" action="%4$s" style="display:inline;margin-left:6px;">'
                 . '<input type="hidden" name="action" value="wallet_up_turn_on_method"><input type="hidden" name="method" value="%5$s">'
                 . '<input type="hidden" name="redirect_to" value="%6$s">%7$s'
-                . '<button type="submit" style="cursor:pointer;background:#674FBF;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:600;">%8$s</button></form>'
+                . '<button type="submit" style="cursor:pointer;background:' . Brand::HEX . ';color:' . Brand::ON_BRAND_HEX . ';border:0;border-radius:6px;padding:6px 12px;font-weight:600;">%8$s</button></form>'
                 . ' <span style="color:#6b7280;font-size:12px;">%9$s</span></div>',
                 $style,
                 esc_html__('Wallet Up:', 'walletup'),

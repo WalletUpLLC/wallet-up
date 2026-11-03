@@ -655,7 +655,7 @@ class DisplayHandler
                     <p style="font-size:13px;color:#374151;margin:0 0 12px;font-weight:600">%3$s</p>
                     %8$s
                     <input type="text" id="%1$s-ref" placeholder="%4$s" style="width:100%%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;margin-bottom:12px;box-sizing:border-box" />
-                    <button type="button" id="%1$s-btn" style="width:100%%;padding:10px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+                    <button type="button" id="%1$s-btn" style="width:100%%;padding:10px;background:' . \WalletUpPro\Core\Brand::HEX . ';color:' . \WalletUpPro\Core\Brand::ON_BRAND_HEX . ';border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
                         %5$s
                     </button>
                     <div id="%1$s-msg" style="margin-top:8px;font-size:12px;display:none"></div>
