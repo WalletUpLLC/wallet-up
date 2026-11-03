@@ -3,10 +3,10 @@ namespace WalletUpPro\WooCommerce\Blocks;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use WalletUpPro\Core\Error\ErrorHandler;
-use WalletUpPro\Core\Payments\MethodStatusResolver;
 use WalletUpPro\WooCommerce\Express\ExpressMethodRanking;
 use WalletUpPro\WooCommerce\WooCommerceIntegration;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -37,10 +37,7 @@ final class WalletUpPayBlocksSupport extends AbstractPaymentMethodType
             if (!self::isExpressEnabled()) {
                 return false;
             }
-            $snapshot = MethodStatusResolver::snapshot();
-            $hasStripe = self::stripeAvailable();
-            $hasMethods = !empty($snapshot['liveAtCheckout']) || !empty($snapshot['configured']);
-            return $hasStripe || $hasMethods;
+            return !empty(ExpressMethodRanking::rank()) || (self::stripeAvailable() && !self::cartNeedsShipping());
         } catch (Exception $e) {
             $this->errorHandler->log('WalletUp Pay is_active error: ' . $e->getMessage());
             return false;
@@ -85,7 +82,7 @@ final class WalletUpPayBlocksSupport extends AbstractPaymentMethodType
 
         return [
             'title'        => __('WalletUp Pay', 'walletup'),
-            'brandColor'   => '#674FBF',
+            'brandColor'   => Brand::HEX,
             'methods'      => array_values($methods),
             'stripe'       => [
                 'available'      => self::stripeAvailable(),
@@ -150,10 +147,15 @@ final class WalletUpPayBlocksSupport extends AbstractPaymentMethodType
         }
     }
 
+    public static function expressCardAllowed(): bool
+    {
+        return !class_exists('\\WalletUpPro\\Core\\Payments\\Availability\\MethodAvailability')
+            || \WalletUpPro\Core\Payments\Availability\MethodAvailability::shows(\WalletUpPro\Core\Config\AutomatedApiConfig::STRIPE, \WalletUpPro\Core\Payments\Availability\SurfaceRegistry::EXPRESS);
+    }
+
     private static function stripeAvailable(): bool
     {
-        $card = get_option('woocommerce_wallet_up_card_settings', []);
-        if (($card['enabled'] ?? 'no') !== 'yes') {
+        if (!self::expressCardAllowed() || !\WalletUpPro\WooCommerce\StoreCheckout::gatewayAvailable(\WalletUpPro\WooCommerce\StoreCheckout::CARD_GATEWAY)) {
             return false;
         }
         return self::stripePublishableKey() !== '';

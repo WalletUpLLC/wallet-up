@@ -13,7 +13,6 @@ class DatabaseManager
     private string $metaTableName;
     private ?string $lastError = null;
     private ErrorHandler $errorHandler;
-    private array $tableExistsCache = [];
 
     public function __construct(string $tableName)
     {
@@ -48,7 +47,6 @@ class DatabaseManager
 
     public function cleanup(): void
     {
-        $this->tableExistsCache = [];
         $this->lastError = null;
     }
 
@@ -88,17 +86,7 @@ class DatabaseManager
 
     public function tableExists(?string $tableName = null): bool
     {
-        $tableToCheck = $tableName ?? $this->tableName;
-
-        if (!isset($this->tableExistsCache[$tableToCheck])) {
-            $escaped_table = esc_sql($tableToCheck);
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-            $this->tableExistsCache[$tableToCheck] = $this->wpdb->get_var(
-                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safely derived from wpdb prefix.
-                "SHOW TABLES LIKE '{$escaped_table}'"
-            ) !== null;
-        }
-        return $this->tableExistsCache[$tableToCheck];
+        return SchemaCache::tableExists($tableName ?? $this->tableName);
     }
     public function columnExists(string $table, string $column): bool
     {
@@ -368,42 +356,6 @@ class DatabaseManager
         }
 
         wp_cache_set($cache_key, $results, 'wallet_up', 300);
-        return $results;
-    }
-
-    public function getWooCommerceAnalytics(array $args = []): array
-    {
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name safely derived from wpdb prefix; dates via prepare placeholders.
-        $query = $this->wpdb->prepare(
-            "SELECT
-                payment_method,
-                COUNT(DISTINCT CASE WHEN event_type = 'wc_new_order' THEN order_id END) as orders,
-                COUNT(DISTINCT CASE WHEN event_type = 'wc_order_status_change'
-                    AND order_status = 'completed' THEN order_id END) as completed_orders,
-                SUM(order_total) as total_amount,
-                COUNT(DISTINCT CASE WHEN event_type = 'wc_payment_displayed' THEN id END) as displays,
-                COUNT(CASE WHEN event_type IN ('scan', 'click') THEN 1 END) as interactions
-                FROM {$this->tableName}
-                WHERE created_at BETWEEN %s AND %s
-                GROUP BY payment_method",
-            $args['start_date'],
-            $args['end_date']
-        );
-
-        $wc_cache_key = 'wallet_up_' . md5('wc_analytics_db_' . ($args['start_date'] ?? '') . '_' . ($args['end_date'] ?? ''));
-        $cached = wp_cache_get($wc_cache_key, 'wallet_up');
-        if (false !== $cached) {
-            return $cached;
-        }
-
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query prepared above, results cached via wp_cache_set.
-        $results = $this->wpdb->get_results($query);
-        if ($results === null) {
-            $this->lastError = $this->wpdb->last_error;
-            return [];
-        }
-
-        wp_cache_set($wc_cache_key, $results, 'wallet_up', 300);
         return $results;
     }
 

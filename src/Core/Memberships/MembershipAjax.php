@@ -638,10 +638,7 @@ class MembershipAjax
         self::guardAdmin();
         wp_send_json_success([
             'settings' => MembershipAccess::settings(),
-            'pages'    => array_map(
-                static fn($p) => ['id' => (int) $p->ID, 'title' => (string) $p->post_title],
-                get_pages(['number' => 100, 'sort_column' => 'post_title']) ?: []
-            ),
+            'pages'    => \WalletUpPro\Core\Admin\PageSearch::find('', (int) (MembershipAccess::settings()['redirect_page_id'] ?? 0)),
         ]);
     }
 

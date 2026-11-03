@@ -48,23 +48,8 @@ class MembershipShortcode
         }
         $baseUrl = WALLET_UP_URL . 'walup-react/dist/';
 
-        $cssFiles = [];
-        $seen = [];
-        $collect = function ($key) use (&$collect, $manifest, &$cssFiles, &$seen) {
-            if (empty($manifest[$key]) || !empty($seen[$key])) {
-                return;
-            }
-            $seen[$key] = true;
-            foreach (($manifest[$key]['css'] ?? []) as $c) {
-                $cssFiles[$c] = true;
-            }
-            foreach (($manifest[$key]['imports'] ?? []) as $imp) {
-                $collect($imp);
-            }
-        };
-        $collect($entryKey);
         $i = 0;
-        foreach (array_keys($cssFiles) as $cssFile) {
+        foreach (\WalletUpPro\Core\Assets\ViteManifest::css($manifest, $entryKey) as $cssFile) {
             wp_enqueue_style('walup-membership-form-css-' . ($i++), $baseUrl . $cssFile, [], WALLET_UP_PRO_VERSION);
         }
 

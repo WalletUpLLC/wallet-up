@@ -6,6 +6,7 @@ use WalletUpPro\Core\Display\DisplayHandler;
 use WalletUpPro\Core\Analytics\AnalyticsHandler;
 use WalletUpPro\Core\Error\ErrorHandler;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -87,7 +88,7 @@ abstract class PaymentMethod
             $this->displaySettings = get_option('wallet_up_display_settings', [
                 'defaultMode' => 'qr',
                 'qrSize' => 'medium',
-                'qrColor' => '#674FBF',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => false,
                 'qrStyle' => 'square',

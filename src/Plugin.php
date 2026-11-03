@@ -30,6 +30,7 @@ use WalletUpPro\Core\Cron\GeoIPUpdater;
 use Automattic\WooCommerce\Utilities\CacheHelper as WC_Cache_Helper;
 use Exception;
 use WalletUpPro\Core\RewriteRulesManager;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -216,9 +217,11 @@ class Plugin extends BaseSingleton
                 \WalletUpPro\Core\Payments\Availability\MethodAvailability::register();
                 if (is_admin()) {
                     \WalletUpPro\Core\Payments\Availability\AvailabilityAdmin::register();
+                    \WalletUpPro\Core\Admin\PageSearch::register();
                 }
             }
             \WalletUpPro\Core\Retention\DeactivationOffer::register();
+            \WalletUpPro\Core\Admin\ActivityCache::register();
             if (class_exists(\WalletUpPro\Core\Support\SetupHelp::class)) {
                 \WalletUpPro\Core\Support\SetupHelp::register();
             }
@@ -1038,6 +1041,7 @@ class Plugin extends BaseSingleton
                 global $wpdb;
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Cleanup on deactivation when explicitly configured.
                 $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}wallet_up_donations");
+                \WalletUpPro\Core\Database\SchemaCache::forget();
                 delete_option('wallet_up_donation_settings');
                 delete_option('wallet_up_flush_rules');
             }
@@ -1052,6 +1056,7 @@ class Plugin extends BaseSingleton
                 global $wpdb;
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Cleanup on deactivation when explicitly configured.
                 $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}wallet_up_payers");
+                \WalletUpPro\Core\Database\SchemaCache::forget();
                 delete_option('wallet_up_payer_settings');
                 delete_option('wallet_up_flush_rules');
             }
@@ -1938,7 +1943,7 @@ public function handleSaveUserTimezone(): void
             'wallet_up_display_settings' => [
                 'defaultMode' => 'qr',
                 'qrSize' => 'medium',
-                'qrColor' => '#674FBF',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => false,
                 'qrStyle' => 'square',
@@ -2225,9 +2230,9 @@ public function handleSaveUserTimezone(): void
         $transaction_table = $wpdb->prefix . 'wallet_up_payer_transactions';
         
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-        $tables_exist = $wpdb->get_var("SHOW TABLES LIKE '$payers_table'") == $payers_table &&
+        $tables_exist = \WalletUpPro\Core\Database\SchemaCache::tableExists($payers_table) &&
                         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-                        $wpdb->get_var("SHOW TABLES LIKE '$transaction_table'") == $transaction_table;
+                        \WalletUpPro\Core\Database\SchemaCache::tableExists($transaction_table);
         
         set_transient($cache_key, $tables_exist, 3600);
         

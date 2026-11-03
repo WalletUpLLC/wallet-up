@@ -14,6 +14,7 @@ use WalletUpPro\Services\URLShortenerService;
 use WalletUpPro\Core\Donations\DonationHandler;
 use WalletUpPro\Core\Payers\PayerHandler;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -21,6 +22,9 @@ if (!defined('ABSPATH')) {
 
 class AdminManager
 {
+    public const PAYPAL_WEBHOOK_ID_PATTERN = '/' . self::PAYPAL_WEBHOOK_ID_SHAPE . '/';
+    public const PAYPAL_WEBHOOK_ID_SHAPE = '^[A-Z0-9]{8,40}$';
+
     private $registry;
     private $assetManager;
     private $version;
@@ -634,7 +638,7 @@ class AdminManager
                         }
                         $qrCode = $this->qrcodeservice->generateQR($vCard, array_merge([
                             'qrSize' => 'large',
-                            'qrColor' => '#674FBF',
+                            'qrColor' => Brand::HEX,
                             'qrBackground' => '#FFFFFF',
                             'qrBorder' => true,
                             'qrStyle' => 'square'
@@ -798,7 +802,7 @@ class AdminManager
             $displaySettings = get_option('wallet_up_display_settings', [
                 'defaultMode' => 'qr',
                 'qrSize' => 'medium',
-                'qrColor' => '#674FBF',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => true,
                 'qrStyle' => 'square',
@@ -979,7 +983,7 @@ class AdminManager
             $qrService = new QRCodeService();
             $qrImage = $qrService->generateQR($data, [
                 'qrSize' => 300,
-                'qrColor' => '#674FBF',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => true,
                 'qrStyle' => 'square'
@@ -1060,6 +1064,9 @@ class AdminManager
             $mode = sanitize_text_field(wp_unslash($_POST['mode'] ?? ''));
             $analyticsHandler = AnalyticsHandler::getInstance();
 
+            if ($mode === 'all' && sanitize_key(wp_unslash($_POST['confirm'] ?? '')) !== 'all') {
+                throw new Exception(esc_html__('Confirm removing all analytics data.', 'walletup'));
+            }
             if ($mode === 'all') {
                 $result = $analyticsHandler->deleteAllAnalytics();
             } elseif ($mode === 'range') {
@@ -1726,7 +1733,7 @@ class AdminManager
             return array(
                 'defaultMode' => 'qr',
                 'qrSize' => 'medium',
-                'qrColor' => '#674FBF',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => true,
                 'qrStyle' => 'square',
@@ -1744,7 +1751,7 @@ class AdminManager
             ? $input['qrSize'] : 'medium';
 
         $sanitized['qrColor'] = isset($input['qrColor']) && preg_match('/^#[a-f0-9]{6}$/i', $input['qrColor'])
-            ? $input['qrColor'] : '#674FBF';
+            ? $input['qrColor'] : Brand::HEX;
         $sanitized['qrBackground'] = isset($input['qrBackground']) && preg_match('/^#[a-f0-9]{6}$/i', $input['qrBackground'])
             ? $input['qrBackground'] : '#FFFFFF';
 
@@ -1792,7 +1799,7 @@ class AdminManager
                     'default' => [
                         'defaultMode' => 'qr',
                         'qrSize' => 'medium',
-                        'qrColor' => '#674FBF',
+                        'qrColor' => Brand::HEX,
                         'qrBackground' => '#FFFFFF',
                         'qrBorder' => true,
                         'qrStyle' => 'square',
@@ -2001,15 +2008,20 @@ class AdminManager
         if (!class_exists('WooCommerce')) {
             wp_send_json_success(['wc_active' => false, 'gateway_enabled' => false, 'enabled' => []]);
         }
-        $s = get_option('woocommerce_wallet_up_settings', []);
-        $gatewayEnabled = is_array($s) && ($s['enabled'] ?? 'no') === 'yes';
-        $enabled = [];
-        if ($this->registry && method_exists($this->registry, 'getAllMethods')) {
-            foreach (array_keys($this->registry->getAllMethods()) as $id) {
-                $enabled[$id] = $gatewayEnabled && is_array($s) && ($s["enable_{$id}"] ?? 'no') === 'yes';
-            }
+        if (!class_exists('\\WalletUpPro\\WooCommerce\\StoreCheckout')) {
+            wp_send_json_success(['wc_active' => false, 'gateway_enabled' => false, 'enabled' => []]);
         }
-        wp_send_json_success(['wc_active' => true, 'gateway_enabled' => $gatewayEnabled, 'enabled' => $enabled]);
+        $offered = \WalletUpPro\WooCommerce\StoreCheckout::visibleP2p();
+        $enabled = [];
+        foreach (\WalletUpPro\Core\Config\PaymentMethodsConfig::getAllMethodIds() as $id) {
+            $enabled[$id] = in_array((string) $id, $offered, true);
+        }
+        wp_send_json_success([
+            'wc_active' => true,
+            'master' => \WalletUpPro\WooCommerce\StoreCheckout::masterOn(),
+            'gateway_enabled' => \WalletUpPro\WooCommerce\StoreCheckout::p2pOn(),
+            'enabled' => $enabled,
+        ]);
     }
 
     /**
@@ -2032,25 +2044,23 @@ class AdminManager
         if ($method === '') {
             wp_send_json_error(['message' => esc_html__('Missing method', 'walletup')]);
         }
+        if (!class_exists('\\WalletUpPro\\WooCommerce\\StoreCheckout')) {
+            wp_send_json_error(['message' => esc_html__('WooCommerce is not active', 'walletup'), 'wc_active' => false]);
+        }
         update_option("wallet_up_method_{$method}_enabled", 'yes');
         if ($this->registry && method_exists($this->registry, 'enableMethod')) {
             $this->registry->enableMethod($method);
         }
-        $s = get_option('woocommerce_wallet_up_settings', []);
-        if (!is_array($s)) {
-            $s = [];
+        \WalletUpPro\WooCommerce\StoreCheckout::setMethodOn($method, true);
+        if (\WalletUpPro\WooCommerce\StoreCheckout::hasGroupedGateway()) {
+            \WalletUpPro\WooCommerce\StoreCheckout::setP2pOn(true);
         }
-        $s['enabled'] = 'yes';
-        $s["enable_{$method}"] = 'yes';
-        update_option('woocommerce_wallet_up_settings', $s);
-        if (function_exists('WC') && WC()->payment_gateways()) {
-            $gateways = WC()->payment_gateways()->payment_gateways();
-            if (isset($gateways['wallet_up'])) {
-                $gateways['wallet_up']->update_option('enabled', 'yes');
-                $gateways['wallet_up']->update_option("enable_{$method}", 'yes');
-            }
-        }
-        wp_send_json_success(['message' => esc_html__('Enabled at checkout', 'walletup'), 'method' => $method]);
+        wp_send_json_success([
+            'message' => esc_html__('Enabled at checkout', 'walletup'),
+            'method' => $method,
+            'master' => \WalletUpPro\WooCommerce\StoreCheckout::masterOn(),
+            'atCheckout' => \WalletUpPro\WooCommerce\StoreCheckout::offersMethod($method),
+        ]);
     }
 
     public function handleActivityCounts(): void
@@ -2258,7 +2268,7 @@ class AdminManager
         $table_exists = wp_cache_get($table_check_key, 'wallet_up');
         if (false === $table_exists) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safely derived from wpdb prefix.
-            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$analytics_table'") === $analytics_table;
+            $table_exists = \WalletUpPro\Core\Database\SchemaCache::tableExists($analytics_table);
             wp_cache_set($table_check_key, $table_exists, 'wallet_up', 3600);
         }
 
@@ -3371,6 +3381,9 @@ class AdminManager
             if (isset($_POST['webhook_id'])) {
                 $rawWebhookId = sanitize_text_field(wp_unslash($_POST['webhook_id']));
                 if ($rawWebhookId !== '' && strpos($rawWebhookId, '•') === false) {
+                    if (!preg_match(self::PAYPAL_WEBHOOK_ID_PATTERN, $rawWebhookId)) {
+                        throw new \Exception(esc_html__('That does not look like a PayPal Webhook ID. Copy it again from the PayPal Developer Dashboard.', 'walletup'));
+                    }
                     $settings['webhook_id'] = $rawWebhookId;
                 }
             }
@@ -3892,20 +3905,20 @@ class AdminManager
         $review_url = 'https://wordpress.org/support/plugin/wallet-up/reviews/#new-post';
         $nonce = wp_create_nonce('wallet_up_admin_nonce');
         ?>
-        <div class="notice notice-info wallet-up-review-prompt" id="wallet-up-review-prompt" style="padding:12px 16px;border-left-color:#6366f1;display:flex;align-items:flex-start;gap:12px;">
-            <span style="font-size:28px;line-height:1;" aria-hidden="true">&#9733;</span>
+        <div class="notice notice-info wallet-up-review-prompt" id="wallet-up-review-prompt" style="padding:12px 16px;display:flex;align-items:flex-start;gap:12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="flex-shrink:0;margin-top:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <div style="flex:1;">
                 <p style="margin:0 0 10px;font-size:14px;">
                     <?php echo esc_html__('Enjoying Wallet Up? You\'ve been using it for over a week! If it\'s helped your business accept payments, a quick review would mean the world to us.', 'walletup'); ?>
                 </p>
                 <p style="margin:0;display:flex;gap:8px;flex-wrap:wrap;">
-                    <a href="<?php echo esc_url($review_url); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary" style="display:inline-flex;align-items:center;gap:4px;">
-                        <?php echo esc_html__('Leave a Review', 'walletup'); ?> &#9733;
+                    <a href="<?php echo esc_url($review_url); ?>" target="_blank" rel="noopener noreferrer" class="button button-primary" style="display:inline-flex;align-items:center;gap:4px;<?php echo esc_attr(\WalletUpPro\Core\Brand::buttonStyle()); ?>">
+                        <?php echo esc_html__('Leave a Review', 'walletup'); ?>
                     </a>
-                    <button type="button" class="button wallet-up-review-dismiss" data-action="snooze">
+                    <button type="button" class="button wallet-up-review-dismiss" data-action="snooze" style="<?php echo esc_attr(\WalletUpPro\Core\Brand::outlineStyle()); ?>">
                         <?php echo esc_html__('Remind Me Later', 'walletup'); ?>
                     </button>
-                    <button type="button" class="button wallet-up-review-dismiss" data-action="permanent">
+                    <button type="button" class="button wallet-up-review-dismiss" data-action="permanent" style="<?php echo esc_attr(\WalletUpPro\Core\Brand::outlineStyle()); ?>">
                         <?php echo esc_html__('I Already Did', 'walletup'); ?>
                     </button>
                 </p>

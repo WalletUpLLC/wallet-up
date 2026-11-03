@@ -167,7 +167,7 @@ class PaymentRegistry
     {
         $name = PaymentMethodsConfig::getMethodName($methodId) ?: $methodId;
         $url  = \WalletUpPro\wallet_up_upgrade_url();
-        $link = '<a href="' . esc_url($url) . '" style="color:#674FBF;font-weight:600;">';
+        $link = '<a href="' . esc_url($url) . '" style="color:' . Brand::HEX . ';font-weight:600;">';
 
         return sprintf(
             '<div class="walletup-upgrade-notice" style="padding:16px;border:1px solid #e2e8f0;border-radius:8px;text-align:center;color:#4a5568;">%s</div>',
@@ -189,7 +189,7 @@ class PaymentRegistry
         $methodName = PaymentMethodsConfig::getMethodName($methodId) ?: $methodId;
         return sprintf(
             '<div class="walletup-shortcode-notice" style="padding:14px 16px;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:10px;color:#4c1d95;font-size:14px;line-height:1.5;">' .
-            '<strong>%s</strong> %s <a href="%s" style="color:#674FBF;font-weight:600;text-decoration:underline;">%s</a>.' .
+            '<strong>%s</strong> %s <a href="%s" style="color:' . Brand::HEX . ';font-weight:600;text-decoration:underline;">%s</a>.' .
             '</div>',
             esc_html__('Wallet Up:', 'walletup'),
             esc_html(sprintf(
@@ -303,7 +303,7 @@ class PaymentRegistry
     }
     public function isMethodEnabled(string $methodId): bool
     {
-        return !empty($this->enabledMethods[$methodId]);
+        return \WalletUpPro\Core\Payments\MethodStatusResolver::flag($this->enabledMethods[$methodId] ?? false);
     }
 
     private function backfillEnabledFromHolders(array $availableMethodIds): void
@@ -363,7 +363,7 @@ class PaymentRegistry
             'display' => [
                 'defaultMode' => 'qr',
                 'qrSize' => 'medium',
-                'qrColor' => '#674fbf',
+                'qrColor' => Brand::HEX,
                 'qrBackground' => '#FFFFFF',
                 'qrBorder' => false,
                 'qrStyle' => 'square',

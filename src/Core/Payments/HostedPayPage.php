@@ -2,6 +2,7 @@
 namespace WalletUpPro\Core\Payments;
 
 use WalletUpPro\Core\Config\PaymentMethodsConfig;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -66,12 +67,6 @@ final class HostedPayPage
         exit;
     }
 
-    /**
-     * These rails publish no merchant-mintable link, but the same bank transfer is chargeable
-     * through Stripe once the connected account's country supports it — Canada settles them as
-     * pre-authorised debit, Australia as BECS or PayTo. Stripe picks the method, so the payer can
-     * finish here instead of copying details into a banking app.
-     */
     private static function payNowAssets(string $method, string $amount, string $reference): string
     {
         if ($amount === '' || (float) $amount <= 0) {
@@ -99,7 +94,7 @@ final class HostedPayPage
         }
 
         $base = WALLET_UP_URL . 'walup-react/dist/';
-        foreach (($m['src/hostedPay.jsx']['css'] ?? []) as $i => $css) {
+        foreach (\WalletUpPro\Core\Assets\ViteManifest::css($m, 'src/hostedPay.jsx') as $i => $css) {
             wp_enqueue_style('walletup-hosted-pay-' . $i, $base . $css, [], WALLET_UP_VERSION);
         }
         wp_enqueue_script('walletup-hosted-pay', $base . $m['src/hostedPay.jsx']['file'], [], WALLET_UP_VERSION, true);
@@ -109,7 +104,6 @@ final class HostedPayPage
                 : $tag;
         }, 10, 3);
 
-        // pre-authorised debit needs CAD, BECS and PayTo need AUD. That is a reason to withhold
         $settles = strtoupper((string) (PaymentMethodsConfig::PAYMENT_METHODS[$method]['settlement_currency'] ?? ''));
         $currency = strtoupper(self::storeCurrency());
         if ($settles === '' || $currency !== $settles) {
@@ -144,7 +138,7 @@ final class HostedPayPage
     private static function render(string $method, string $amount, string $reference): void
     {
         $name  = PaymentMethodsConfig::PAYMENT_METHODS[$method]['name'] ?? $method;
-        $brand = PaymentMethodsConfig::PAYMENT_METHODS[$method]['brand_color'] ?? '#674FBF';
+        $brand = PaymentMethodsConfig::PAYMENT_METHODS[$method]['brand_color'] ?? Brand::HEX;
         $payNow = self::payNowAssets($method, $amount, $reference);
 
         $atts = 'scan="no"';
@@ -168,7 +162,7 @@ final class HostedPayPage
     /* translators: %1$s: payment method, %2$s: site name */
     echo esc_html(sprintf(__('Pay with %1$s · %2$s', 'walletup'), $name, get_bloginfo('name')));
 ?></title>
-<?php wp_head(); ?>
+<?php add_filter('wp_robots', 'wp_robots_no_robots'); wp_head(); ?>
 <style>
 .walup-hosted{max-width:560px;margin:0 auto;padding:24px 16px 48px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a}
 .walup-hosted__brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
@@ -178,8 +172,6 @@ final class HostedPayPage
 .walup-hosted__lede{margin:0 0 20px;font-size:.875rem;color:#64748b}
 .walup-hosted__card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px}
 .walup-hosted__pay{margin-bottom:14px}
-/* The code is the first thing a payer looks for, so it sits centred in the card whatever
-   alignment the shared shortcode markup brings with it. */
 .walup-hosted__card .walletup-qr-link{text-align:center}
 .walup-hosted__card img[data-walletup-qr]{display:block;margin-left:auto;margin-right:auto;float:none}
 .walup-hosted__ok{margin:0;padding:12px 14px;border-radius:10px;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;font-size:.875rem;font-weight:600;text-align:center}

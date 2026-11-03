@@ -23,8 +23,8 @@ class WalletUpProPaymentPendingEmail extends WC_Email
         $this->id = 'walletup_payment_pending';
         $this->customer_email = true;
         
-        $this->title = __('WalletUpPro Payment Pending', 'walletup');
-        $this->description = __('Email sent to customers when their WalletUpPro payment is pending confirmation.', 'walletup');
+        $this->title = __('WalletUp Pay payment pending', 'walletup');
+        $this->description = __('Email sent to customers when their WalletUp Pay payment is pending confirmation.', 'walletup');
         
         $this->template_html = 'emails/walletup-payment-pending.php';
         $this->template_plain = 'emails/plain/walletup-payment-pending.php';

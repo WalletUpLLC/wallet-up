@@ -257,7 +257,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
         $this->init_form_fields();
 
         $this->enabled = $this->get_option('enabled', 'yes');
-        $this->title = $this->get_option('title', __('WalletUpPro Pay', 'walletup'));
+        $this->title = $this->get_option('title', WooCommerceConfig::defaultTitle());
         $this->description = $this->get_option('description', __('Pay with your preferred mobile payment app', 'walletup'));
         $this->instructions = $this->get_option('instructions', __('Please ensure you have completed your payment using the QR code above.', 'walletup'));
 
@@ -291,7 +291,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
                 'title' => __('Title', 'walletup'),
                 'type' => 'text',
                 'description' => __('Payment method title that customers see.', 'walletup'),
-                'default' => __('WalletUpPro Pay', 'walletup'),
+                'default' => WooCommerceConfig::defaultTitle(),
                 'desc_tip' => true
             ],
             'description' => [
@@ -346,41 +346,25 @@ class WalletUpProGateway extends \WC_Payment_Gateway
                 return false;
             }
 
-            if (isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? '')), '/wc/store/') !== false) {
-                return true;
-            }
-            
-            $valid_contexts = [
-                is_checkout(),
-                is_wc_endpoint_url('order-pay'),
-                is_admin(),
-                wp_doing_ajax()
-            ];
-
-            if (!array_filter($valid_contexts)) {
-                return false;
-            }
-
-            $availableMethods = $this->registry->getAllMethods();
-            
-            if (!empty($availableMethods)) {
-                $this->errorHandler->log('Gateway available with ' . count($availableMethods) . ' methods from registry');
-                return true;
-            }
-            
-            $hasEnabledMethod = false;
-            foreach ($this->get_form_fields() as $key => $field) {
-                if (strpos($key, 'enable_') === 0 && $this->get_option($key) === 'yes') {
-                    $hasEnabledMethod = true;
-                    break;
+            $isStoreApi = isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? '')), '/wc/store/') !== false;
+            if (!$isStoreApi) {
+                $valid_contexts = [
+                    is_checkout(),
+                    is_wc_endpoint_url('order-pay'),
+                    is_admin(),
+                    wp_doing_ajax()
+                ];
+                if (!array_filter($valid_contexts)) {
+                    return false;
                 }
             }
-            
-            if (!$hasEnabledMethod) {
-                return false;
-            }
 
-            return true;
+            foreach (StoreCheckout::groupedOffers() as $methodId) {
+                if (WalletUpMethodGateway::passesCartChecks($methodId)) {
+                    return true;
+                }
+            }
+            return false;
 
         } catch (Exception $e) {
             $this->errorHandler->log('Gateway availability error: ' . $e->getMessage());
@@ -493,14 +477,10 @@ class WalletUpProGateway extends \WC_Payment_Gateway
             echo '<div class="wallet-up-methods-container">';
             foreach ($methods as $id => $method) {
                 echo sprintf(
-                    '<div class="wallet-up-method-item%s" data-method="%s">
-                         <img src="%s" alt="%s" class="wallet-up-method-icon" />
-                         <span class="wallet-up-method-name">%s</span>
-                     </div>',
+                    '<div class="wallet-up-method-item%s" data-method="%s">%s<span class="wallet-up-method-name">%s</span></div>',
                     $id === $initialMethod ? ' selected' : '',
                     esc_attr($id),
-                    esc_url($method['icon']),
-                    esc_attr($method['name']),
+                    $method['icon'] !== '' ? sprintf('<img src="%s" alt="%s" class="wallet-up-method-icon" />', esc_url($method['icon']), esc_attr($method['name'])) : '',
                     esc_html($method['name'])
                 );
             }
@@ -617,7 +597,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
                 }
 
                 .woocommerce #payment .wallet-up-modern-wrapper .wallet-up-method-item.selected {
-                    border-color: #674FBF; /* zi2-dry: ignore */
+                    border-color: <?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>; /* zi2-dry: ignore */
                     background: #F4F4FF; /* zi2-dry: ignore */
                 }
 
@@ -669,7 +649,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
                     content: '';
                     width: 28px;
                     height: 28px;
-                    border: 3px solid #674FBF; /* zi2-dry: ignore */
+                    border: 3px solid <?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>; /* zi2-dry: ignore */
                     border-radius: 50%;
                     border-top-color: transparent;
                     animation: walletUpSpin 0.8s linear infinite;
@@ -1165,7 +1145,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
 
         return array_merge([
             'defaultMode' => $settings['wcSettings']['display_mode'] ?? 'qr',
-        ], $settings['wcQRSettings']);
+        ], WooCommerceConfig::storeDisplaySettings());
     }
     private function generateGenericLink($url, $amount, $method)
     {
@@ -1232,7 +1212,7 @@ class WalletUpProGateway extends \WC_Payment_Gateway
 
     private function get_method_icon(string $methodId): string
     {
-        return \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($methodId);
+        return WooCommerceMethodSettings::iconUrl($methodId);
     }
     public function getMethodFromRegistry($methodId)
     {
@@ -2503,12 +2483,12 @@ class WalletUpProGateway extends \WC_Payment_Gateway
         $tableName = $wpdb->prefix . 'walletup_payment_transactions';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fresh schema check required.
-        $result = (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $tableName));
+        $result = \WalletUpPro\Core\Database\SchemaCache::tableExists($tableName);
 
         if (!$result) {
             do_action('walletup_create_payment_transactions_table');
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            $result = (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $tableName));
+            $result = \WalletUpPro\Core\Database\SchemaCache::tableExists($tableName);
 
             if (!$result && isset($this->errorHandler)) {
                 $this->errorHandler->log(

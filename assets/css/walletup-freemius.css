@@ -5,11 +5,11 @@
     --fs-ds-blue-100: #d8b4fe;
     --fs-ds-blue-200: #c084fc;
     --fs-ds-blue-300: #a855f7;
-    --fs-ds-blue-400: #9333ea;
-    --fs-ds-blue-500: #7c3aed;
-    --fs-ds-blue-600: #6d28d9;
-    --fs-ds-blue-700: #5b21b6;
-    --fs-ds-blue-800: #4c1d95;
+    --fs-ds-blue-400: #674FBF;
+    --fs-ds-blue-500: #674FBF;
+    --fs-ds-blue-600: #503AA1;
+    --fs-ds-blue-700: #412E87;
+    --fs-ds-blue-800: #35246F;
     --fs-ds-blue-900: #3b0764;
 
     --fs-ds-neutral-10: #f9fafb;
@@ -34,13 +34,13 @@
 
 #fs_pricing #fs_pricing_wrapper,
 #fs_pricing #fs_pricing_app {
-    --fs-ds-theme-primary-accent-color: #7c3aed;
-    --fs-ds-theme-primary-accent-color-hover: #6d28d9;
+    --fs-ds-theme-primary-accent-color: #674FBF;
+    --fs-ds-theme-primary-accent-color-hover: #503AA1;
     --fs-ds-theme-background-color: #ffffff;
     --fs-ds-theme-background-shade: #f9fafb;
     --fs-ds-theme-background-accented: #f3f4f6;
-    --fs-ds-theme-background-hover: #f5f3ff;
-    --fs-ds-theme-background-dark: #4c1d95;
+    --fs-ds-theme-background-hover: #F6F3FE;
+    --fs-ds-theme-background-dark: #35246F;
     --fs-ds-theme-background-darkest: #3b0764;
     --fs-ds-theme-text-color: #374151;
     --fs-ds-theme-heading-text-color: #111827;
@@ -50,28 +50,28 @@
     --fs-ds-theme-divider-color: #e5e7eb;
     --fs-ds-theme-border-color: #e5e7eb;
     --fs-ds-theme-button-primary-background-color: #674FBF;
-    --fs-ds-theme-button-primary-background-hover-color: #6d28d9;
+    --fs-ds-theme-button-primary-background-hover-color: #503AA1;
     --fs-ds-theme-button-primary-text-color: #ffffff;
     --fs-ds-theme-button-primary-border-color: #674FBF;
-    --fs-ds-theme-button-primary-border-hover-color: #6d28d9;
-    --fs-ds-theme-button-primary-border-focus-color: #a78bfa;
+    --fs-ds-theme-button-primary-border-hover-color: #503AA1;
+    --fs-ds-theme-button-primary-border-focus-color: #9783E2;
     --fs-ds-theme-button-background-color: #ffffff;
-    --fs-ds-theme-button-background-hover-color: #f5f3ff;
+    --fs-ds-theme-button-background-hover-color: #F6F3FE;
     --fs-ds-theme-button-text-color: #374151;
     --fs-ds-theme-button-border-color: #d1d5db;
-    --fs-ds-theme-button-border-hover-color: #7c3aed;
-    --fs-ds-theme-button-border-focus-color: #a78bfa;
+    --fs-ds-theme-button-border-hover-color: #674FBF;
+    --fs-ds-theme-button-border-focus-color: #9783E2;
     --fs-ds-theme-button-disabled-background-color: #f3f4f6;
     --fs-ds-theme-button-disabled-text-color: #9ca3af;
     --fs-ds-theme-button-disabled-border-color: #e5e7eb;
-    --fs-ds-theme-package-popular-background: #7c3aed;
+    --fs-ds-theme-package-popular-background: #674FBF;
     --fs-ds-theme-testimonial-star-color: #f59e0b;
     --fs-ds-theme-success-color: #059669;
     --fs-ds-theme-error-color: #dc2626;
     --fs-ds-theme-warn-color: #d97706;
-    --fs-ds-theme-notice-info-background: #f5f3ff;
-    --fs-ds-theme-notice-info-border: #c4b5fd;
-    --fs-ds-theme-notice-info-color: #5b21b6;
+    --fs-ds-theme-notice-info-background: #F6F3FE;
+    --fs-ds-theme-notice-info-border: #BDAFF1;
+    --fs-ds-theme-notice-info-color: #412E87;
     --fs-ds-theme-notice-warn-background: #fffbeb;
     --fs-ds-theme-notice-warn-border: #fcd34d;
     --fs-ds-theme-notice-warn-color: #92400e;
@@ -109,7 +109,7 @@
 }
 
 #fs_pricing #fs_pricing_app .fs-package:hover {
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(103, 79, 191, 0.1) !important;
 }
 
 #fs_pricing #fs_pricing_app .fs-package-content {
@@ -141,8 +141,8 @@
 }
 
 #fs_pricing #fs_pricing_app .fs-featured-plan {
-    border-color: #7c3aed !important;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.15) !important;
+    border-color: #674FBF !important;
+    box-shadow: 0 4px 16px rgba(103, 79, 191, 0.15) !important;
 }
 
 #fs_pricing #fs_pricing_app .fs-annual-discount {
@@ -181,7 +181,7 @@
 #fs_pricing #fs_pricing_app .fs-upgrade-button-container .fs-button:hover,
 #fs_pricing #fs_pricing_app .fs-upgrade-button-container button:hover,
 #fs_pricing #fs_pricing_app .fs-upgrade-button-container a:hover {
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(103, 79, 191, 0.3) !important;
 }
 
 #fs_pricing #fs_pricing_app .fs-button {
@@ -245,7 +245,7 @@
 }
 
 #fs_pricing #fs_pricing_app .fs-ajax-loader {
-    color: #7c3aed !important;
+    color: #674FBF !important;
 }
 
 #fs_pricing.fs-full-size-wrapper {
@@ -281,14 +281,14 @@
 }
 
 .fs-section .nav-tab-wrapper .nav-tab:hover {
-    color: #7c3aed !important;
-    background: #f5f3ff !important;
+    color: #674FBF !important;
+    background: #F6F3FE !important;
 }
 
 .fs-section .nav-tab-wrapper .nav-tab.nav-tab-active,
 .fs-section .nav-tab-wrapper .nav-tab-active {
-    color: #7c3aed !important;
-    border-bottom-color: #7c3aed !important;
+    color: #674FBF !important;
+    border-bottom-color: #674FBF !important;
     font-weight: 600 !important;
     background: transparent !important;
 }
@@ -296,7 +296,7 @@
 .fs-notice {
     border-radius: 10px !important;
     border: 1px solid #e5e7eb !important;
-    border-left: 4px solid #7c3aed !important;
+    border-left: 4px solid #674FBF !important;
     background: #faf5ff !important;
     padding: 14px 18px !important;
     margin-bottom: 20px !important;
@@ -306,12 +306,12 @@
 }
 
 .fs-notice.success {
-    border-left-color: #7c3aed !important;
+    border-left-color: #674FBF !important;
     background: #faf5ff !important;
 }
 
 .fs-notice a {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     text-decoration: underline !important;
 }
 
@@ -341,7 +341,7 @@
 }
 
 #fs_account h3 .dashicons {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     font-size: 20px !important;
     width: 20px !important;
     height: 20px !important;
@@ -357,18 +357,18 @@
 }
 
 #fs_account .fs-header-actions a {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     text-decoration: none !important;
     font-weight: 500 !important;
     transition: color 0.15s ease !important;
 }
 
 #fs_account .fs-header-actions a:hover {
-    color: #6d28d9 !important;
+    color: #503AA1 !important;
 }
 
 #fs_account .fs-header-actions .dashicons {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     font-size: 16px !important;
     width: 16px !important;
     height: 16px !important;
@@ -411,19 +411,19 @@
 .fs-key-value-table code,
 .fs-key-value-table var,
 .fs-key-value-table input[type="text"] {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     background: none !important;
     font-size: 14px !important;
     font-family: "SF Mono", Monaco, "Cascadia Code", Consolas, monospace !important;
 }
 
 .fs-key-value-table a {
-    color: #7c3aed !important;
+    color: #674FBF !important;
     text-decoration: none !important;
 }
 
 .fs-key-value-table a:hover {
-    color: #6d28d9 !important;
+    color: #503AA1 !important;
     text-decoration: underline !important;
 }
 
@@ -439,7 +439,7 @@ span.fs-tag {
 
 label.fs-tag.fs-success,
 span.fs-tag.fs-success {
-    background: #7c3aed !important;
+    background: #674FBF !important;
     color: #fff !important;
 }
 
@@ -451,7 +451,7 @@ span.fs-tag.fs-warn {
 
 label.fs-tag.fs-info,
 span.fs-tag.fs-info {
-    background: #8b5cf6 !important;
+    background: #7C65D2 !important;
     color: #fff !important;
 }
 
@@ -472,7 +472,7 @@ span.fs-tag.fs-error {
     font-size: 13px !important;
     font-weight: 500 !important;
     text-shadow: none !important;
-    box-shadow: 0 1px 2px rgba(124, 58, 237, 0.15) !important;
+    box-shadow: 0 1px 2px rgba(103, 79, 191, 0.15) !important;
     transition: all 0.15s ease !important;
     cursor: pointer !important;
     line-height: 1.6 !important;
@@ -481,16 +481,16 @@ span.fs-tag.fs-error {
 #fs_account .button:hover,
 .fs-section .button:hover,
 #fs_pricing .button:hover {
-    background: #6d28d9 !important;
-    border-color: #6d28d9 !important;
-    box-shadow: 0 2px 4px rgba(124, 58, 237, 0.25) !important;
+    background: #503AA1 !important;
+    border-color: #503AA1 !important;
+    box-shadow: 0 2px 4px rgba(103, 79, 191, 0.25) !important;
 }
 
 #fs_account .button:focus,
 .fs-section .button:focus,
 #fs_pricing .button:focus {
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25) !important;
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.25) !important;
 }
 
 #fs_account .button-secondary,
@@ -544,9 +544,9 @@ span.fs-tag.fs-error {
 
 #fs_billing_address input:focus,
 #fs_billing_address select:focus {
-    border-color: #7c3aed !important;
+    border-color: #674FBF !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.15) !important;
 }
 
 #fs_sites .fs-scrollable-table .fs-table-body {
@@ -679,11 +679,11 @@ span.fs-tag.fs-error {
 }
 
 .fs-section a:not(.button):not(.nav-tab) {
-    color: #7c3aed !important;
+    color: #674FBF !important;
 }
 
 .fs-section a:not(.button):not(.nav-tab):hover {
-    color: #6d28d9 !important;
+    color: #503AA1 !important;
 }
 
 .fs-section input[type="text"],
@@ -703,9 +703,9 @@ span.fs-tag.fs-error {
 .fs-section input[type="password"]:focus,
 .fs-section textarea:focus,
 .fs-section select:focus {
-    border-color: #7c3aed !important;
+    border-color: #674FBF !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(103, 79, 191, 0.15) !important;
 }
 
 @media screen and (max-width: 782px) {

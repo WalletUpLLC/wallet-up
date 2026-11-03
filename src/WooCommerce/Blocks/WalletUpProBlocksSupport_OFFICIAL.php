@@ -79,30 +79,7 @@ final class WalletUpProBlocksSupport_OFFICIAL extends AbstractPaymentMethodType
     public function is_active() {
         try {
 
-            $gateway_settings = get_option('woocommerce_wallet_up_settings', []);
-            $gateway_enabled = !empty($gateway_settings['enabled']) && $gateway_settings['enabled'] === 'yes';
-
-            if (!$gateway_enabled) {
-                $this->errorHandler->log('WalletUpPro blocks not active - Gateway is disabled in WooCommerce settings');
-                return false;
-            }
-
-            $display_mode = get_option('wallet_up_wc_display_mode', 'grouped');
-            if ($display_mode === 'individual') {
-                $this->errorHandler->log('WalletUpPro blocks not active - Individual display mode, each method has own gateway');
-                return false;
-            }
-
-            $enabled_methods = $this->registry->getAllMethods();
-            $has_enabled_method = !empty($enabled_methods);
-
-            if (!$has_enabled_method) {
-                $this->errorHandler->log('WalletUpPro blocks not active - No payment methods enabled');
-                return false;
-            }
-
-            $this->errorHandler->log('WalletUpPro blocks active - Gateway enabled and methods available');
-            return true;
+            return !empty(\WalletUpPro\WooCommerce\StoreCheckout::groupedOffers());
 
         } catch (Exception $e) {
             $this->errorHandler->log('Error checking block active status: ' . $e->getMessage());
@@ -262,7 +239,7 @@ final class WalletUpProBlocksSupport_OFFICIAL extends AbstractPaymentMethodType
             $venmoApiSettings = get_option('wallet_up_venmo_api_settings', []);
 
             return [
-                'title' => $this->get_setting('title', __('WalletUpPro Pay', 'walletup')),
+                'title' => $this->get_setting('title', \WalletUpPro\WooCommerce\WooCommerceConfig::defaultTitle()),
                 'description' => $this->get_setting('description', ''),
                 'supports' => $this->get_supported_features(),
                 'methods' => $methods,
@@ -286,7 +263,7 @@ final class WalletUpProBlocksSupport_OFFICIAL extends AbstractPaymentMethodType
         } catch (Exception $e) {
             $this->errorHandler->log('Payment method data error: ' . $e->getMessage());
             return [
-                'title' => $this->get_setting('title', __('WalletUpPro Pay', 'walletup')),
+                'title' => $this->get_setting('title', \WalletUpPro\WooCommerce\WooCommerceConfig::defaultTitle()),
                 'description' => $this->get_setting('description', ''),
                 'supports' => $this->get_supported_features(),
                 'methods' => []
@@ -373,6 +350,6 @@ final class WalletUpProBlocksSupport_OFFICIAL extends AbstractPaymentMethodType
     }
 
     private function get_method_icon(string $methodId): string {
-        return \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($methodId);
+        return \WalletUpPro\WooCommerce\WooCommerceMethodSettings::iconUrl($methodId);
     }
 }

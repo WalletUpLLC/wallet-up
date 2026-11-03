@@ -4,7 +4,7 @@ Tags: payment gateway, cash app, venmo, qr code, woocommerce
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 6.3.9
+Stable tag: 6.3.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate Link: https://walletup.app/donate
@@ -156,7 +156,7 @@ The plugin is free, and Cash App, Venmo, PayPal and every other peer-to-peer met
 
 Card payments are optional. If you connect Stripe to take them, they carry a **WalletUp platform fee of 2% of each successful card transaction**, collected automatically as a Stripe application fee. It comes out of your payout and is not added to what your customer is charged. Stripe's own processing fees are separate and set by Stripe.
 
-The platform fee applies to every connected Stripe account on every plan, Free, Pro, Lifetime and Business alike. Pro licence holders have a second route: enter your own Stripe API keys in the plugin and card payments run between your site and Stripe without WalletUp's platform, with no platform fee. The current rate is set out in the Fee Schedule in the Payment Platform Terms at https://pay.walletup.app/merchant/terms and may change on notice.
+The platform fee applies to every connected Stripe account on every plan, Free, Pro, Lifetime and Business alike. Pro license holders have a second route: enter your own Stripe API keys in the plugin and card payments run between your site and Stripe without WalletUp's platform, with no platform fee. The current rate is set out in the Fee Schedule in the Payment Platform Terms at https://pay.walletup.app/merchant/terms and may change on notice.
 
 = Does it work with WooCommerce? =
 
@@ -204,6 +204,44 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 10. WPForms Integration - payment fields in forms (Pro)
 
 == Changelog ==
+= 6.3.11 - November 2, 2026 =
+* Improved (Pro): The order confirmation page and every store payment display use the QR code appearance you set in Seller.
+* Improved (Pro): Impressions count each visitor who sees a payment option once per page and half hour, and leave out your own visits and admin previews.
+* Improved (Pro): The order screen shows the impressions for that order.
+* Improved (Pro): Impressions include donation forms, campaigns, mobile money and cached pages.
+* Improved (Pro): The donation total and the amount in the payment instructions always match to the cent.
+* Improved (Pro): The Seller banner, the menu badges and Activity show the same count of payments awaiting your confirmation.
+* Improved (Pro): One Save button on Payments saves every change on the page, and you are asked before leaving with unsaved changes.
+* Improved (Pro): The setup assistant opens from Settings any time you want to run it again.
+* Improved (Pro): Donation form cards show the payment methods your donors see, with an Edit form button on each card.
+* Improved (Pro): Short URL has its own page, and QR Studio opens on ZenithQR.
+* Improved (Pro): Clearer text contrast and sizes across the admin, in the WalletUp purple.
+* Improved (Pro): Search for the page to send non-members to, on sites of any size.
+* Improved (Pro): Email templates are edited in one place, under Settings.
+* Improved (Pro): The checkout option, store emails, widgets and form tags use the WalletUp Pay and Wallet Up names.
+* Improved (Pro): Where you get paid shows Cash App Pay (automatic) at your store with its own on/off switch.
+* Improved (Pro): Switching Where you get paid back on keeps the store, form and page changes you made while it was off.
+* New (Pro): The whole admin, the payment and donation pages and the emails are available in French and Spanish.
+* Improved (Pro): Wallet Up follows the language each person picks in their WordPress profile.
+* Improved: Pages load with far fewer database queries and no database writes on ordinary visits.
+* Improved (Pro): Donation and campaign pages show their picture, title and description when shared on Facebook, X, LinkedIn and messaging apps.
+* Improved (Pro): Email template previews open right away and follow your edits as you type.
+* Improved (Pro): A test email shows who it went to, its subject, the mail service and the time, or the reason it was not sent.
+* Improved (Pro): Advanced email settings have their own Save button.
+* Improved (Pro): QR pages, payer pages and the classic store checkout count impressions the same way as the rest of Wallet Up.
+* Improved (Pro): The express card button follows the card setting in Where you get paid.
+
+= 6.3.10 - October 29, 2026 =
+* New (Pro): Where you get paid, on the Payments page: choose for each payment method the places your customers see it. It is on by default and you can switch it off any time.
+* New (Pro): Members can pay one-time membership tiers with wallet apps, and you confirm each payment from Memberships.
+* New (Pro): Payment pages made before your latest payment changes are listed with a one-click update.
+* Improved (Pro): The Seller tab and the WooCommerce Payments settings share the same switches, so a method you turn off in either place stays off at checkout.
+* Improved (Pro): Wallet Up and WalletUp Pay appear at checkout only when they have a payment method to offer.
+* Improved (Pro): Seller and Payments tell you when Wallet Up is off at your WooCommerce checkout.
+* Improved (Pro): When your checkout offers a single payment method, it is selected for the customer automatically.
+* Improved (Pro): The order confirmation page shows product names exactly as your store formats them.
+* Improved (Pro): The Show Method Icon setting in Seller applies everywhere the method appears at checkout.
+
 = 6.3.9 - October 23, 2026 =
 * Improved: Mobile money methods appear at checkout, on forms and on pay pages as soon as their phone number is saved.
 * Improved: Donation forms show your payment details for each method before the donor pays.
@@ -216,7 +254,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved (Pro): A clear message with what to do next when your site cannot reach the payment service.
 
 = 6.3.8 - October 22, 2026 =
-* Improved: Nonprofit licence activation links straight to your Pro download, with simple steps to upload it from the Plugins screen.
+* Improved: Nonprofit license activation links straight to your Pro download, with simple steps to upload it from the Plugins screen.
 * Improved (Pro): Stripe keys entered on the WooCommerce card payments screen are checked as a matching live or test pair and used by every Stripe checkout on your store.
 * Improved (Pro): Card payment messages appear in your site language.
 * Improved (Pro): The dashboard shows one setup card, and setup opens at the step that finishes your payment page.
@@ -228,7 +266,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved (Pro): Orders are marked paid from Stripe only for live payments that cover the order total while your store takes live payments.
 * Improved (Pro): Store pages stay fast while Apple Pay setup runs in the background.
 * Improved: The Plugins screen labels the free and Pro editions correctly, whichever one is installed.
-* Improved: The licence activation reminder appears only when your account holds a licence that is not active on this site, and names Pro correctly in every edition.
+* Improved: The license activation reminder appears only when your account holds a license that is not active on this site, and names Pro correctly in every edition.
 
 = 6.3.5 - October 20, 2026 =
 * Improved (Pro): The card payment form at WooCommerce checkout shows the test card notice only while Stripe is in test mode.
@@ -239,7 +277,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 = 6.3.4 - October 20, 2026 =
 * Improved: The dashboard and setup assistant read fully in French and Spanish, with correct plurals.
 * Improved: Platform fee amounts follow each currency's own decimals.
-* Improved (Pro): Every Pro panel opens as soon as your licence is active, including display settings and manual Stripe keys.
+* Improved (Pro): Every Pro panel opens as soon as your license is active, including display settings and manual Stripe keys.
 * Improved (Pro): QR code scans are counted in your dashboard analytics.
 
 = 6.3.3 - October 19, 2026 =
@@ -247,14 +285,14 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved: A new install opens on the connect step first, then goes straight into setup.
 
 = 6.3.2 - October 17, 2026 =
-* New: Approved nonprofits activate their lifetime Pro licence and install Pro in one click from the dashboard.
+* New: Approved nonprofits activate their lifetime Pro license and install Pro in one click from the dashboard.
 * New: The setup assistant offers the nonprofit program to charities, nonprofits and churches.
 * Improved (Pro): A connected Stripe account counts as set up on the dashboard and the payment page.
 * Improved (Pro): The platform fee note explains why a fee applies or is waived.
 * Improved: Clearer French and Spanish wording about platform fees.
 
 = 6.3.1 - October 16, 2026 =
-* New: Charities, nonprofits and churches can apply for a free lifetime Wallet Up Pro licence from the dashboard.
+* New: Charities, nonprofits and churches can apply for a free lifetime Wallet Up Pro license from the dashboard.
 * Improved: Live previews show a clear note in place of steps that need your own site.
 * Improved: On nonprofit forms, donors giving by PayPal, Venmo or on a schedule can still cover processing fees.
 * Improved (Pro): Card setup status in the dashboard reads in plain language.
@@ -332,7 +370,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 
 = 6.0.3 - September 3, 2026 =
 * Improved: Setup names the account format each wallet expects, so a PayPal.Me handle, a Cashtag or a Venmo username is clear at the point you enter it.
-* New: A licence you have already paid for is recognised on Wallet Up screens, with a one-click download of the Pro version and the steps to install it.
+* New: A license you have already paid for is recognised on Wallet Up screens, with a one-click download of the Pro version and the steps to install it.
 
 = 6.0.2 - September 3, 2026 =
 * Improved: Payment account fields accept a pasted wallet link or handle, so setup takes your details in the form your wallet presents them.

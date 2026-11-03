@@ -81,6 +81,45 @@ final class AvailabilityMigration
     public static function apply(string $policy): array
     {
         $plan = self::plan($policy);
+        self::write($plan);
+        update_option(self::DONE_OPTION, ['at' => gmdate('c'), 'policy' => $policy], false);
+        MethodAvailability::flush();
+        return $plan;
+    }
+
+    public const OFF_SNAPSHOT_OPTION = 'wallet_up_availability_off_snapshot';
+
+    public static function rememberLegacy(): void
+    {
+        $snapshot = [];
+        foreach (self::targets() as $target) {
+            $snapshot[$target['key']] = $target['legacy'];
+        }
+        update_option(self::OFF_SNAPSHOT_OPTION, $snapshot, false);
+    }
+
+    public static function resyncChanged(string $policy): array
+    {
+        $snapshot = get_option(self::OFF_SNAPSHOT_OPTION, null);
+        if (!is_array($snapshot)) {
+            return [];
+        }
+        $plan = [];
+        foreach (self::targets() as $target) {
+            if (array_key_exists($target['key'], $snapshot) && $snapshot[$target['key']] === $target['legacy']) {
+                continue;
+            }
+            $row = self::rowFor($policy, $target);
+            $plan[] = ['key' => $target['key'], 'row' => $row];
+        }
+        self::write($plan);
+        delete_option(self::OFF_SNAPSHOT_OPTION);
+        MethodAvailability::flush();
+        return $plan;
+    }
+
+    private static function write(array $plan): void
+    {
         foreach ($plan as $item) {
             if ($item['row'] === null) {
                 continue;
@@ -88,9 +127,6 @@ final class AvailabilityMigration
             $previous = SurfaceStore::has($item['key']) ? SurfaceStore::read($item['key']) : null;
             SurfaceStore::write($item['key'], $item['row'] + ['previous' => ['policy' => self::currentPolicy(), 'row' => $previous]]);
         }
-        update_option(self::DONE_OPTION, ['at' => gmdate('c'), 'policy' => $policy], false);
-        MethodAvailability::flush();
-        return $plan;
     }
 
     public static function switchPolicy(string $policy): array

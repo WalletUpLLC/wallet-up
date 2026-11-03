@@ -85,7 +85,7 @@ class SubscriptionManager extends BaseSingleton
         global $wpdb;
         $table = $wpdb->prefix . 'walletup_subscriptions';
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        return $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table;
+        return \WalletUpPro\Core\Database\SchemaCache::tableExists($table);
     }
 
     public function createStripeSubscription(array $params): array

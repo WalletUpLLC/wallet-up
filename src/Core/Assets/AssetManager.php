@@ -299,18 +299,16 @@ class AssetManager
                 return $tag;
             }, 10, 2);
 
-            if (isset($entry['css']) && is_array($entry['css'])) {
-                foreach ($entry['css'] as $index => $css_file) {
-                    $style_handle = $script_handle . '-' . $index;
-                    wp_register_style(
-                        $style_handle,
-                        $dist_url . $css_file,
-                        self::getAdminDeps()['styles'],
-                        $this->version,
-                        'all'
-                    );
-                    wp_enqueue_style($style_handle);
-                }
+            foreach (ViteManifest::css($manifest, 'src/main.jsx') as $index => $css_file) {
+                $style_handle = $script_handle . '-' . $index;
+                wp_register_style(
+                    $style_handle,
+                    $dist_url . $css_file,
+                    self::getAdminDeps()['styles'],
+                    $this->version,
+                    'all'
+                );
+                wp_enqueue_style($style_handle);
             }
 
             $data = $this->getAdminDataForReact();
@@ -466,7 +464,7 @@ class AssetManager
             'nonce' => wp_create_nonce('wallet_up_admin_nonce'),
             'dismissNonce' => wp_create_nonce('wallet_up_dismiss_notice'),
             'ajaxUrl' => admin_url('admin-ajax.php'),
-            'locale' => get_locale(),
+            'locale' => determine_locale(),
             'pluginUrl' => WALLET_UP_URL,
             'version' => defined('WALLET_UP_VERSION') ? WALLET_UP_VERSION : '',
             'pluginDescription' => (defined('WALLET_UP_PRO_FILE') && file_exists(WALLET_UP_PRO_FILE)) ? trim(get_file_data(WALLET_UP_PRO_FILE, ['d' => 'Description'])['d'] ?? '') : '',
@@ -561,11 +559,16 @@ class AssetManager
             'enabledMethods' => get_option('wallet_up_enabled_methods', []),
             'methodStatus' => \WalletUpPro\Core\Payments\MethodStatusResolver::snapshot(),
             'availability' => [
+                'switchable' => (bool) has_action('wp_ajax_wallet_up_availability_settings'),
                 'enabled'  => \WalletUpPro\Core\Settings\SettingsRegistry::isAvailabilityV2(),
                 'policy'   => \WalletUpPro\Core\Settings\SettingsRegistry::isAvailabilityV2() ? \WalletUpPro\Core\Settings\SettingsRegistry::get(\WalletUpPro\Core\Settings\SettingsRegistry::SURFACE_POLICY) : null,
             ],
             'allPaymentMethods' => $this->getAllPaymentMethodsForReact(),
             'menuVisibility' => class_exists(\WalletUpPro\Core\Admin\MenuVisibility::class) ? \WalletUpPro\Core\Admin\MenuVisibility::all() : [],
+            'paypalWebhookIdShape' => \WalletUpPro\Core\Admin\AdminManager::PAYPAL_WEBHOOK_ID_SHAPE,
+            'adminModules' => class_exists(\WalletUpPro\Core\Admin\AdminV2MenuRegistrar::class)
+                ? array_map(static fn($m) => ['id' => $m['id'], 'slug' => $m['slug'], 'labelKey' => $m['labelKey'], 'alwaysOn' => !empty($m['always_on'])], \WalletUpPro\Core\Admin\AdminV2MenuRegistrar::modules())
+                : [],
             'cashappApi' => class_exists(\WalletUpPro\Payments\CashAppPayAPI::class) ? \WalletUpPro\Payments\CashAppPayAPI::getCredentials() : [],
             'venmoApi' => class_exists(\WalletUpPro\Payments\VenmoBraintreeAPI::class) ? \WalletUpPro\Payments\VenmoBraintreeAPI::getCredentials() : [],
             'wpforms' => $this->getWPFormsData(),

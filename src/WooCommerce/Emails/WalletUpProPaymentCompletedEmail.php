@@ -23,8 +23,8 @@ class WalletUpProPaymentCompletedEmail extends WC_Email
         $this->id = 'walletup_payment_completed';
         $this->customer_email = true;
         
-        $this->title = __('WalletUpPro Payment Completed', 'walletup');
-        $this->description = __('Email sent to customers when their WalletUpPro payment is completed.', 'walletup');
+        $this->title = __('WalletUp Pay payment completed', 'walletup');
+        $this->description = __('Email sent to customers when their WalletUp Pay payment is completed.', 'walletup');
         
         $this->template_html = 'emails/walletup-payment-completed.php';
         $this->template_plain = 'emails/plain/walletup-payment-completed.php';
@@ -167,7 +167,7 @@ class WalletUpProPaymentCompletedEmail extends WC_Email
      */
     public function get_default_additional_content()
     {
-        return __('Thank you for using WalletUpPro Pay! Your payment has been processed successfully.', 'walletup');
+        return __('Thank you for using WalletUp Pay! Your payment has been processed successfully.', 'walletup');
     }
 
     private function get_payment_method_name($order)

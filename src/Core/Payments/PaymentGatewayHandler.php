@@ -765,7 +765,7 @@ class PaymentGatewayHandler
 
             $analyticsTable = $wpdb->prefix . 'wallet_up_analytics';
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $analyticsTable)) === $analyticsTable) {
+            if (\WalletUpPro\Core\Database\SchemaCache::tableExists($analyticsTable)) {
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Write operation, caching not applicable.
                 $wpdb->insert($analyticsTable, [
                     'event_type'     => 'payment',

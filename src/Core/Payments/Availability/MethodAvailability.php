@@ -34,6 +34,7 @@ final class MethodAvailability
         'woocommerce_wallet_up_card_settings',
         'wallet_up_paypal_commerce_settings',
         'wallet_up_venmo_api_settings',
+        'wallet_up_cashapp_api_settings',
         self::AUTOMATED_SWITCH_OPTION,
         SurfaceStore::OPTION,
         SettingsRegistry::OPTION,
@@ -49,22 +50,50 @@ final class MethodAvailability
         }
         add_action('update_option_wallet_up_enabled_methods', [self::class, 'onEnabledMethodsChanged'], 10, 2);
         add_action('update_option_' . SettingsRegistry::OPTION, [self::class, 'onSettingsChanged'], 10, 2);
+        add_action('admin_init', [self::class, 'switchOnByDefault']);
         add_action('add_option_' . SettingsRegistry::OPTION, static function ($option, $value) {
             self::onSettingsChanged([], $value);
         }, 10, 2);
+    }
+
+    public const AUTO_ON_OPTION = 'wallet_up_availability_auto_on';
+
+    public static function switchOnByDefault(): void
+    {
+        if (wp_doing_ajax() || !current_user_can('manage_options')
+            || SettingsRegistry::isStored(SettingsRegistry::AVAILABILITY_V2) || get_option(self::AUTO_ON_OPTION, false)) {
+            return;
+        }
+        $policy = SettingsRegistry::isStored(SettingsRegistry::SURFACE_POLICY)
+            ? (string) SettingsRegistry::get(SettingsRegistry::SURFACE_POLICY)
+            : SettingsRegistry::defaultPolicy();
+        $changes = AvailabilityMigration::changes(AvailabilityMigration::plan($policy));
+        update_option(self::AUTO_ON_OPTION, ['at' => gmdate('c'), 'switched_on' => $changes === [], 'changes' => count($changes)], false);
+        if ($changes === []) {
+            SettingsRegistry::set(SettingsRegistry::AVAILABILITY_V2, true);
+        }
     }
 
     public static function onSettingsChanged($old, $new): void
     {
         $wasOn = is_array($old) && !empty($old[SettingsRegistry::AVAILABILITY_V2]);
         $isOn = is_array($new) && !empty($new[SettingsRegistry::AVAILABILITY_V2]);
-        if ($isOn && !$wasOn && !AvailabilityMigration::isDone()) {
-            self::flush();
+        if ($wasOn && !$isOn) {
+            AvailabilityMigration::rememberLegacy();
+            return;
+        }
+        if (!$isOn || $wasOn) {
+            return;
+        }
+        self::flush();
+        if (!AvailabilityMigration::isDone()) {
             if (!SettingsRegistry::isStored(SettingsRegistry::SURFACE_POLICY)) {
                 SettingsRegistry::set(SettingsRegistry::SURFACE_POLICY, SettingsRegistry::defaultPolicy());
             }
             AvailabilityMigration::apply((string) SettingsRegistry::get(SettingsRegistry::SURFACE_POLICY));
+            return;
         }
+        AvailabilityMigration::resyncChanged((string) SettingsRegistry::get(SettingsRegistry::SURFACE_POLICY));
     }
 
     public static function catalog(): array
@@ -79,13 +108,16 @@ final class MethodAvailability
         foreach (AutomatedApiConfig::getAllKeys() as $key) {
             $out[(string) $key] = $key === 'stripe' ? SurfaceRegistry::TYPE_CARD : SurfaceRegistry::TYPE_PROVIDER;
         }
+        if (class_exists(\WalletUpPro\Payments\CashAppPayAPI::class)) {
+            $out[AutomatedApiConfig::CASHAPP_API] = SurfaceRegistry::TYPE_STORE_PROVIDER;
+        }
         return self::$memo['catalog'] = $out;
     }
 
     public static function isAutomated(string $methodId): bool
     {
         $type = self::catalog()[$methodId] ?? '';
-        return $type === SurfaceRegistry::TYPE_CARD || $type === SurfaceRegistry::TYPE_PROVIDER;
+        return in_array($type, [SurfaceRegistry::TYPE_CARD, SurfaceRegistry::TYPE_PROVIDER, SurfaceRegistry::TYPE_STORE_PROVIDER], true);
     }
 
     public static function automatedSwitchedOn(string $methodId): bool
@@ -279,7 +311,11 @@ final class MethodAvailability
     private static function automatedReady(): array
     {
         if (!isset(self::$memo['automated'])) {
-            self::$memo['automated'] = AutomatedApiConfig::getEnabledApis(true);
+            $ready = AutomatedApiConfig::getEnabledApis(true);
+            if (class_exists(\WalletUpPro\Payments\CashAppPayAPI::class) && \WalletUpPro\Payments\CashAppPayAPI::hasCheckoutCredentials()) {
+                $ready[AutomatedApiConfig::CASHAPP_API] = true;
+            }
+            self::$memo['automated'] = $ready;
         }
         return self::$memo['automated'];
     }

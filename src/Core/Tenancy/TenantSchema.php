@@ -88,6 +88,6 @@ final class TenantSchema
     public static function exists(string $table): bool
     {
         global $wpdb;
-        return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table)) === $table;
+        return \WalletUpPro\Core\Database\SchemaCache::tableExists($table);
     }
 }

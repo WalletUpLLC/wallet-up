@@ -10,6 +10,7 @@ use WalletUpPro\WooCommerce\PaymentNotification;
 use WalletUpPro\WooCommerce\Emails\EmailManager;
 use WalletUpPro\WooCommerce\CheckoutSecurityHeaders;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -144,9 +145,7 @@ class WooCommerceIntegration
 
     public function buildCheckoutDisplayHtml(string $methodId, float $amount, bool $recordImpression = true): string
     {
-        $config = WooCommerceConfig::getInstance();
-        $settings = $config->getSettings();
-        $displayMode = $settings['wcSettings']['display_mode'] ?? 'qr'; // zi2-dry: ignore
+        $displayMode = self::checkoutDisplayMode();
 
         $method = $this->registry->getMethod($methodId);
         if (!$method) {
@@ -180,7 +179,7 @@ class WooCommerceIntegration
         ]);
         $payment_url = $method->getPaymentUrl($amount, $note, $checkout_context);
 
-        $qrSettings = $settings['wcQRSettings']; // zi2-dry: ignore
+        $qrSettings = WooCommerceConfig::storeDisplaySettings();
         $methodDesc = WooCommerceMethodSettings::get($methodId, 'description');
         if (!empty($methodDesc)) {
             $qrSettings['customMessage'] = WooCommerceMethodSettings::processVariables(
@@ -214,6 +213,12 @@ class WooCommerceIntegration
         );
     }
 
+    private static function checkoutDisplayMode(): string
+    {
+        $settings = WooCommerceConfig::getInstance()->getSettings();
+        return (string) ($settings['wcSettings']['display_mode'] ?? 'qr'); // zi2-dry: ignore
+    }
+
     public function handleRecordImpression(): void
     {
         if (!check_ajax_referer('wallet_up_wc_payment_display', 'nonce', false)) { // zi2-dry: ignore
@@ -221,35 +226,12 @@ class WooCommerceIntegration
             return;
         }
         $methodId = sanitize_key(wp_unslash($_POST['method'] ?? ''));
-        if ($methodId === '' || !in_array($methodId, \WalletUpPro\Core\Config\PaymentMethodsConfig::getAllMethodIds(), true)) {
+        if ($methodId === '' || !WooCommerceConfig::shouldShowQrOnCheckout() || !in_array($methodId, StoreCheckout::p2pOffers(), true)) {
             wp_send_json_error();
             return;
         }
-        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) wp_unslash($_SERVER['HTTP_USER_AGENT']) : '';
-        if ($ua !== '' && preg_match('/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headless|monitor|pingdom|uptime/i', $ua)) {
-            wp_send_json_success();
-            return;
-        }
-        if (WC()->session) {
-            $impressed = WC()->session->get('wallet_up_impressed_methods', []);
-            if (!is_array($impressed)) {
-                $impressed = [];
-            }
-            if (in_array($methodId, $impressed, true)) {
-                wp_send_json_success();
-                return;
-            }
-            $impressed[] = $methodId;
-            WC()->session->set('wallet_up_impressed_methods', $impressed);
-        }
-        if (class_exists(\WalletUpPro\Core\Analytics\AnalyticsHandler::class)) {
-            $pid = function_exists('wc_get_page_id') ? (int) wc_get_page_id('checkout') : 0;
-            try {
-                \WalletUpPro\Core\Analytics\AnalyticsHandler::getInstance()->recordImpression($methodId, $pid > 0 ? $pid : 0, 'qr', '');
-            } catch (\Exception $e) {
-                $this->errorHandler->log('Record impression error: ' . $e->getMessage());
-            }
-        }
+        $pid = function_exists('wc_get_page_id') ? (int) wc_get_page_id('checkout') : 0;
+        DisplayHandler::countImpression($methodId, max(0, $pid), self::checkoutDisplayMode());
         wp_send_json_success();
     }
 
@@ -259,7 +241,7 @@ class WooCommerceIntegration
             $this->get_option('display_mode', 'qr'),
             $method->getPaymentUrl($order->get_total(), sprintf('Order #%s at %s', $order->get_order_number(), get_bloginfo('name'))),
             $methodId,
-            get_option('wallet_up_display_settings', []),
+            WooCommerceConfig::storeDisplaySettings(),
             [
                 'amount' => $order->get_total(),
                 'order_id' => $order->get_id(),
@@ -316,6 +298,7 @@ class WooCommerceIntegration
         add_filter('woocommerce_payment_gateways', [$this, 'registerGateway']);
 
         add_filter('woocommerce_available_payment_gateways', [$this, 'gateMasterDisabled'], 99);
+        StoreCheckout::register();
         add_action('admin_enqueue_scripts', [$this, 'renderMasterOffWcSettingsNotice']);
 
         add_action('wp_enqueue_scripts', [$this, 'enqueueCheckoutMethodStyles']);
@@ -798,7 +781,8 @@ class WooCommerceIntegration
                 'wcSettings' => $settings['wcSettings'] ?? WooCommerceConfig::DEFAULT_SETTINGS,
                 'wcQRSettings' => $settings['wcQRSettings'] ?? WooCommerceConfig::DEFAULT_QR_SETTINGS,
                 'methodSettings' => $settings['methodSettings'] ?? [],
-                'methodDetails' => $settings['methodDetails'] ?? []
+                'methodDetails' => $settings['methodDetails'] ?? [],
+                'storeCheckout' => StoreCheckout::summary()
             ];
 
             wp_send_json_success($response_data);
@@ -858,22 +842,14 @@ class WooCommerceIntegration
                 'methodSettings' => $settings['methodSettings']
             ]);
 
-            $gateways = WC()->payment_gateways()->payment_gateways();
-            if (isset($gateways['wallet_up'])) {
-                $gateway = $gateways['wallet_up'];
-                foreach ($settings['wcSettings'] as $key => $value) {
-                    $gateway->update_option($key, $value);
-                }
-
-            }
-            
             $config->clearCache();
 
             \WalletUpPro\Core\Security\AuditLog::record('woocommerce_settings_saved');
 
             wp_send_json_success([
                 'message' => 'Settings saved successfully',
-                'settings' => $settings
+                'settings' => $settings,
+                'storeCheckout' => StoreCheckout::summary()
             ]);
 
         } catch (Exception $e) {
@@ -1034,7 +1010,7 @@ class WooCommerceIntegration
                 'qr',
                 'https://example.com/pay',
                 $method,
-                get_option('wallet_up_display_settings', []),
+                WooCommerceConfig::storeDisplaySettings(),
                 ['amount' => '82.40', 'post_id' => 0, 'order_id' => 999999999]
             );
         } finally {
@@ -1135,11 +1111,12 @@ class WooCommerceIntegration
                     'date_created' => $date_created ? $date_created->date('Y-m-d H:i:s') : '',
                     'status' => $order->get_status(),
                     'total' => $this->formatCurrencyAmount($order->get_total(), $order->get_currency()),
-                    /* translators: %s: Payment method name */
                     'payment_method_title' => $method_name ? sprintf(
-                        __('WalletUpPro Pay (%s)', 'walletup'),
+                        /* translators: 1: Gateway title, 2: Payment method name */
+                        __('%1$s (%2$s)', 'walletup'),
+                        WooCommerceConfig::defaultTitle(),
                         $method_name
-                    ) : __('WalletUpPro Pay', 'walletup'),
+                    ) : WooCommerceConfig::defaultTitle(),
                     'view_url' => $order->get_edit_order_url(),
                     'currency' => $currency,
                     'customer_name' => $customer_name, // Added customer name
@@ -1487,14 +1464,7 @@ class WooCommerceIntegration
 
     public static function isMasterEnabled(): bool
     {
-        $s = get_option('wallet_up_woocommerce_settings', []);
-        if (!is_array($s)) {
-            return false;
-        }
-        if (!isset($s['enabled'])) {
-            return true;
-        }
-        return $s['enabled'] === 'yes' || $s['enabled'] === true || $s['enabled'] === 1 || $s['enabled'] === '1';
+        return StoreCheckout::masterOn();
     }
 
     public function enqueueCheckoutMethodStyles(): void
@@ -1552,17 +1522,17 @@ class WooCommerceIntegration
             .woocommerce-list__item[id^="wallet_up"],
             .woocommerce table.wc_gateways tr[data-gateway_id^="wallet_up"] {
                 --wup-gated-label: "' . esc_js($gated_label) . '";
-                background: rgba(103, 79, 191, 0.045) !important;
+                background: rgba(' . Brand::RGB . ', 0.045) !important;
                 opacity: 0.86;
             }
             .wup-master-gate-badge {
                 display: inline-block;
                 margin-left: 8px;
                 padding: 2px 9px;
-                border: 1px solid rgba(103, 79, 191, 0.45);
+                border: 1px solid rgba(' . Brand::RGB . ', 0.45);
                 border-radius: 999px;
-                background: rgba(103, 79, 191, 0.08);
-                color: #674FBF;
+                background: rgba(' . Brand::RGB . ', 0.08);
+                color: ' . Brand::HEX . ';
                 font-size: 11px;
                 font-weight: 500;
                 font-style: normal;
@@ -1571,7 +1541,7 @@ class WooCommerceIntegration
             }
             .woocommerce table.wc_gateways tr[data-gateway_id^="wallet_up"] td.name::after {
                 content: " · " var(--wup-gated-label);
-                color: #674FBF;
+                color: ' . Brand::HEX . ';
                 font-size: 11px;
                 font-style: italic;
                 margin-left: 6px;
@@ -1579,15 +1549,15 @@ class WooCommerceIntegration
             .wup-master-gate-banner {
                 display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
                 margin: 16px 0; padding: 14px 18px;
-                background: rgba(103, 79, 191, 0.06);
-                border: 1px solid rgba(103, 79, 191, 0.22);
-                border-left: 4px solid #674FBF;
+                background: rgba(' . Brand::RGB . ', 0.06);
+                border: 1px solid rgba(' . Brand::RGB . ', 0.22);
+                border-left: 4px solid ' . Brand::HEX . ';
                 border-radius: 8px;
                 color: #2c2540;
             }
-            .wup-master-gate-banner .wup-mg-strong { font-weight: 600; color: #674FBF; }
+            .wup-master-gate-banner .wup-mg-strong { font-weight: 600; color: ' . Brand::HEX . '; }
             .wup-master-gate-banner .button-primary {
-                background: #674FBF; border-color: #674FBF; box-shadow: none;
+                background: ' . Brand::HEX . '; border-color: ' . Brand::HEX . '; box-shadow: none;
             }
             .wup-master-gate-banner .button-primary:hover {
                 background: #5a45a8; border-color: #5a45a8;
@@ -1821,7 +1791,7 @@ class WooCommerceIntegration
 
             $settings = [
                 'enabled' => $gateway->get_option('enabled', 'yes'),
-                'title' => $gateway->get_option('title', 'WalletUpPro Pay'),
+                'title' => $gateway->get_option('title', WooCommerceConfig::defaultTitle()),
                 'description' => $gateway->get_option('description'),
                 'display_mode' => $gateway->get_option('display_mode', 'qr')
             ];
@@ -1982,7 +1952,7 @@ class WooCommerceIntegration
             if ($gateway instanceof WalletUpProGateway) {
                 $settings = [
                     'enabled' => $gateway->get_option('enabled', 'yes'),
-                    'title' => $gateway->get_option('title', __('WalletUpPro Pay', 'walletup')),
+                    'title' => $gateway->get_option('title', WooCommerceConfig::defaultTitle()),
                     'description' => $gateway->get_option('description', __('Pay with your preferred mobile payment app', 'walletup')),
                     'display_mode' => $gateway->get_option('display_mode', 'qr'),
                 ];
@@ -2095,8 +2065,10 @@ class WooCommerceIntegration
                 $.post(wuAjaxUrl, { action: 'wallet_up_record_impression', method: method, nonce: wuImpNonce });
             }
             var unselectAll = function () {
-                $('input[name=payment_method]:checked').prop('checked', false).trigger('change.suppress');
-                $('.wc_payment_method, li.wc_payment_method').removeClass('woocommerce-payment-method--selected');
+                if ($('input[name=payment_method]').length > 1) {
+                    $('input[name=payment_method]:checked').prop('checked', false).trigger('change.suppress');
+                    $('.wc_payment_method, li.wc_payment_method').removeClass('woocommerce-payment-method--selected');
+                }
                 $('input[name=wallet_up_payment_method]:checked').prop('checked', false);
                 $('#wallet_up_payment_method').val('');
                 $('.walletup-method-item.selected, .walletup-method-item[aria-selected="true"]').removeClass('selected').attr('aria-selected', 'false');
@@ -2169,6 +2141,9 @@ class WooCommerceIntegration
             }
             function walletUpGateGuard() {
                 if ($('input[name=payment_method]').length === 0) { $('.wallet-up-gate-error').remove(); return; }
+                if ($('input[name=payment_method]').length === 1 && !$('input[name=payment_method]:checked').length) {
+                    $('input[name=payment_method]').prop('checked', true);
+                }
                 var pm = $('input[name=payment_method]:checked').val() || '';
                 if (!pm) {
                     walletUpGateError(<?php echo wp_json_encode(__('Please select a payment method before placing your order.', 'walletup')); ?>);

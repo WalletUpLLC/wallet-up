@@ -46,12 +46,7 @@ final class WalletUpMethodBlocksSupport extends AbstractPaymentMethodType
                 return false;
             }
 
-            $gateway_settings = get_option('woocommerce_wallet_up_' . $this->method_id . '_settings', []);
-            if (isset($gateway_settings['enabled']) && $gateway_settings['enabled'] !== 'yes') {
-                return false;
-            }
-
-            return true;
+            return in_array((string) $this->method_id, \WalletUpPro\WooCommerce\StoreCheckout::individualIds(), true);
         } catch (Exception $e) {
             $this->errorHandler->log('Method blocks is_active error for ' . $this->method_id . ': ' . $e->getMessage());
             return false;
@@ -155,9 +150,7 @@ final class WalletUpMethodBlocksSupport extends AbstractPaymentMethodType
         $baseTitle = WooCommerceMethodSettings::getEffectiveTitle($this->method_id);
         $title = WooCommerceMethodSettings::appendDiscountBadge($this->method_id, $baseTitle);
 
-        $icon_url = WooCommerceMethodSettings::get($this->method_id, 'hide_icon', false)
-            ? ''
-            : \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($this->method_id);
+        $icon_url = WooCommerceMethodSettings::iconUrl((string) $this->method_id);
 
         return [
             'title' => $title,

@@ -165,7 +165,7 @@ final class CheckoutHandoff
             case 'connect':
                 return __('Choose an option below to continue. Your checkout opens right after.', 'walletup');
             case 'licence':
-                return __('Enter your licence key below to finish. To buy one, go back to walletup.app and choose "Pay here".', 'walletup');
+                return __('Enter your license key below to finish. To buy one, go back to walletup.app and choose "Pay here".', 'walletup');
             case self::ACTION_NETWORK:
                 return __('This site is part of a network, so Pro is bought for the whole network. Go back to walletup.app and choose "Pay here".', 'walletup');
         }

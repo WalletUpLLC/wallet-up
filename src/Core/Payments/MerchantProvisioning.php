@@ -59,6 +59,10 @@ class MerchantProvisioning
         return self::BACKEND_URL;
     }
 
+    private const FS_INSTALL_OPTION = 'walletup_fs_install_id';
+    private const FS_LICENSE_OPTION = 'walletup_fs_license_key';
+    private const FS_SIGNATURE_OPTION = 'walletup_fs_cache_signature';
+
     public function init(): void
     {
         add_action('admin_init', [$this, 'maybeProvision'], 99);
@@ -133,10 +137,16 @@ class MerchantProvisioning
         $license = is_array($licenses) ? ($licenses[0] ?? null) : null;
         $licenseKey = $license ? $license->secret_key : '';
 
+        $signature = wp_hash($installId . '|' . $licenseKey);
+        $stored = (!$installId || get_option(self::FS_INSTALL_OPTION) !== false) && (!$licenseKey || get_option(self::FS_LICENSE_OPTION) !== false);
+        if ($stored && get_option(self::FS_SIGNATURE_OPTION) === $signature) {
+            return;
+        }
         if ($installId)
-            update_option('walletup_fs_install_id', $encryption->encrypt($installId), false);
+            update_option(self::FS_INSTALL_OPTION, $encryption->encrypt($installId), false);
         if ($licenseKey)
-            update_option('walletup_fs_license_key', $encryption->encrypt($licenseKey), false);
+            update_option(self::FS_LICENSE_OPTION, $encryption->encrypt($licenseKey), false);
+        update_option(self::FS_SIGNATURE_OPTION, $signature, true);
     }
 
     public function provision(): array

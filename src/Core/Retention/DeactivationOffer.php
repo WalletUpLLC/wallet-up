@@ -209,7 +209,7 @@ final class DeactivationOffer
             ],
             self::REASON_CANT_PAY         => [
                 'title' => __('You keep your setup', 'walletup'),
-                'body'  => __('Your payment links and QR codes keep working, and nothing is deleted. The premium tools pause until the licence is active again, and come straight back when it is.', 'walletup'),
+                'body'  => __('Your payment links and QR codes keep working, and nothing is deleted. The premium tools pause until the license is active again, and come straight back when it is.', 'walletup'),
                 'url'    => self::accountUrl(),
                 'action' => __('Manage your plan', 'walletup'),
             ],

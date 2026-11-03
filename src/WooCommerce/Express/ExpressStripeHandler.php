@@ -28,6 +28,9 @@ class ExpressStripeHandler
             if (!class_exists('WooCommerce') || !WC()->cart || WC()->cart->is_empty()) {
                 throw new Exception(__('Your cart is empty.', 'walletup'));
             }
+            if (!\WalletUpPro\WooCommerce\Blocks\WalletUpPayBlocksSupport::expressCardAllowed()) {
+                throw new Exception(\WalletUpPro\Core\Payments\Availability\MethodAvailability::refusal());
+            }
 
             // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized field-by-field below
             $pm = sanitize_text_field(wp_unslash($_POST['payment_method_id'] ?? ''));

@@ -164,8 +164,8 @@ class PremiumActivationNotice {
         ?>
         <div class="notice notice-info" style="border-left-color:#7c3aed;">
             <p style="font-size:14px;line-height:1.6;margin:8px 0 4px;">
-                <strong><?php /* translators: %s: Pro product name */ echo esc_html( sprintf( __( 'Your %s licence is ready for this site.', 'walletup' ), WALLET_UP_PRO_PRODUCT_NAME ) ); ?></strong>
-                <?php esc_html_e( 'Your account has a licence that is not active here yet. Activate it to unlock Pro and get the Pro download. There is nothing more to pay.', 'walletup' ); ?>
+                <strong><?php /* translators: %s: Pro product name */ echo esc_html( sprintf( __( 'Your %s license is ready for this site.', 'walletup' ), WALLET_UP_PRO_PRODUCT_NAME ) ); ?></strong>
+                <?php esc_html_e( 'Your account has a license that is not active here yet. Activate it to unlock Pro and get the Pro download. There is nothing more to pay.', 'walletup' ); ?>
             </p>
             <p style="margin:8px 0 12px;">
                 <a href="<?php echo esc_url( $activateUrl ); ?>" class="button button-primary"><?php esc_html_e( 'Activate my license', 'walletup' ); ?></a>

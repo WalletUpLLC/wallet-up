@@ -218,7 +218,7 @@
                                 <input type="checkbox" id="scan-include-minified" />
                                 <span>Include minified React/Vite dist files</span>
                             </label>
-                            <p class="description" style="margin-left: 30px; color: #666; font-size: 13px;">
+                            <p class="description" style="margin-left: 30px; color: #777; font-size: 13px;">
                                 This will scan heavily minified JavaScript files in dist/build folders. 
                                 May find additional UI strings but could also include false positives.
                             </p>
@@ -241,7 +241,7 @@
                                 <strong>File Path:</strong>
                             </label>
                             <input type="text" id="code-file-path" placeholder="walup-react/dist/assets/minified.js" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
-                            <p class="description" style="margin-top: 5px; color: #666; font-size: 13px;">
+                            <p class="description" style="margin-top: 5px; color: #777; font-size: 13px;">
                                 Enter the path to the file you want to translate. Supports PHP, JS, JSX, CSS files.<br>
                                 Example: <code>walup-react/dist/assets/minified.js</code> or an absolute path <code>/path/to/wp-content/plugins/wallet-up-pro/walup-react/dist/assets/minified.js</code>
                             </p>
@@ -465,7 +465,7 @@
 
                     .stat-label {
                         font-size: 14px;
-                        color: #666;
+                        color: #777;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                     }
@@ -506,7 +506,7 @@
                         left: auto;
                         top: 50%;
                         transform: translateY(-50%);
-                        color: #666;
+                        color: #777;
                         width: 20px;
                         height: 20px;
                         line-height: 20px;
@@ -704,19 +704,19 @@
                         .translation-item .column-original:before {
                             content: "Original: ";
                             font-weight: 600;
-                            color: #666;
+                            color: #777;
                         }
                         
                         .translation-item .column-translation:before {
                             content: "Translation: ";
                             font-weight: 600;
-                            color: #666;
+                            color: #777;
                         }
                         
                         .translation-item .column-context:before {
                             content: "Context: ";
                             font-weight: 600;
-                            color: #666;
+                            color: #777;
                         }
                         
                         .translation-item input[type="text"] {
@@ -868,7 +868,7 @@
                     .action-btn {
                         background: none;
                         border: none;
-                        color: #666;
+                        color: #777;
                         cursor: pointer;
                         padding: 4px;
                         border-radius: 4px;
@@ -1146,7 +1146,7 @@
                         .string-meta small {
                             display: block;
                             font-size: 11px;
-                            color: #666;
+                            color: #777;
                         }
                     }
                     
@@ -1393,7 +1393,7 @@
                     
                     .dismiss-btn .dashicons-hidden,
                     .restore-btn .dashicons-visibility {
-                        color: #666;
+                        color: #777;
                     }
                     
                     .dismiss-btn:hover .dashicons-hidden {
@@ -1411,7 +1411,7 @@
                     
                     #dismiss-selected:hover {
                         background-color: #e0e0e0;
-                        border-color: #666;
+                        border-color: #777;
                     }
                 </style>
             `);
@@ -2191,7 +2191,7 @@
                                         <span class="dashicons dashicons-lock" style="font-size: 16px; color: #674FBF; margin-right: 5px;"></span>
                                         .wup (Encrypted)
                                     </strong>
-                                    <div style="margin-left: 28px; margin-top: 5px; color: #666; font-size: 13px; line-height: 1.5;">
+                                    <div style="margin-left: 28px; margin-top: 5px; color: #777; font-size: 13px; line-height: 1.5;">
                                         Site-specific encrypted format. Maximum security but can only be imported on this site.
                                     </div>
                                 </div>
@@ -2203,7 +2203,7 @@
                                         <span class="dashicons dashicons-admin-site-alt3" style="font-size: 16px; color: #4caf50; margin-right: 5px;"></span>
                                         .json (Portable)
                                     </strong>
-                                    <div style="margin-left: 28px; margin-top: 5px; color: #666; font-size: 13px; line-height: 1.5;">
+                                    <div style="margin-left: 28px; margin-top: 5px; color: #777; font-size: 13px; line-height: 1.5;">
                                         Unencrypted JSON format. Can be imported on any site. Ideal for cross-site transfers.
                                     </div>
                                 </div>
@@ -2419,9 +2419,9 @@
             this.closeCodeFileDialog();
 
             this.showProgressDialog(1);
-            $('#progress-dialog h3').html(`Translating Code File<br><small style="font-size: 14px; color: #666;">${this.escapeHtml(fileName)}</small>`);
+            $('#progress-dialog h3').html(`Translating Code File<br><small style="font-size: 14px; color: #777;">${this.escapeHtml(fileName)}</small>`);
             $('#progress-success, #progress-failed').parent().hide();
-            $('#progress-current').parent().html(`<div style="color: #666; font-size: 14px;" id="progress-status">Analyzing file structure...</div>`);
+            $('#progress-current').parent().html(`<div style="color: #777; font-size: 14px;" id="progress-status">Analyzing file structure...</div>`);
 
             $('#progress-eta-text').text('Processing file...');
 
@@ -2704,7 +2704,7 @@
             const $dialog = $(`
                 <div class="translation-dialog" id="details-dialog">
                     <div class="dialog-content" style="position: relative;">
-                        <button class="dialog-close-x" id="close-x-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 5px; line-height: 1;" title="Close">&times;</button>
+                        <button class="dialog-close-x" id="close-x-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #777; padding: 5px; line-height: 1;" title="Close">&times;</button>
                         <h3>Translation Details</h3>
                         <div style="margin: 20px 0;">
                             <p><strong>Original Text:</strong><br>${this.escapeHtml(string.original)}</p>
@@ -2799,7 +2799,7 @@
                                 <div class="progress-numbers" style="font-size: 18px; font-weight: 600; color: #23282d;">
                                     <span id="progress-current">0</span> / <span id="progress-total">${totalItems}</span>
                                 </div>
-                                <div class="progress-status" style="margin-top: 10px; color: #666;">
+                                <div class="progress-status" style="margin-top: 10px; color: #777;">
                                     <span id="progress-success" style="color: #4caf50;">0 successful</span> • 
                                     <span id="progress-failed" style="color: #f44336;">0 failed</span>
                                 </div>

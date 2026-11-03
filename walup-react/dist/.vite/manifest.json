@@ -1,23 +1,12 @@
 {
-  "_NonprofitOfferCard.BAWlAtHX.js": {
-    "file": "assets/NonprofitOfferCard.BAWlAtHX.js",
-    "name": "NonprofitOfferCard",
-    "imports": [
-      "_loader-circle.BwcL2Xcc.js",
-      "_client.ySKnF1Cn.js",
-      "_alert.CUO6vUMX.js",
-      "_credit-card.3n7xZSld.js",
-      "_useTranslation.Cb9bYI5g.js"
-    ]
-  },
-  "_WalletUpAdminFree.YsSh7r2p.js": {
-    "file": "assets/WalletUpAdminFree.YsSh7r2p.js",
+  "_WalletUpAdminFree.DM0WSI0E.js": {
+    "file": "assets/WalletUpAdminFree.DM0WSI0E.js",
     "name": "WalletUpAdminFree",
     "isDynamicEntry": true,
     "imports": [
       "_preload-helper.CTSyBIan.js",
       "_client.ySKnF1Cn.js",
-      "_NonprofitOfferCard.BAWlAtHX.js",
+      "_onboarding.DbdH1NIP.js",
       "_alert.CUO6vUMX.js",
       "_useTranslation.Cb9bYI5g.js",
       "_loader-circle.BwcL2Xcc.js",
@@ -84,8 +73,19 @@
       "_client.ySKnF1Cn.js"
     ]
   },
-  "_paymentMethods.N7iPqH6l.js": {
-    "file": "assets/paymentMethods.N7iPqH6l.js",
+  "_onboarding.DbdH1NIP.js": {
+    "file": "assets/onboarding.DbdH1NIP.js",
+    "name": "onboarding",
+    "imports": [
+      "_loader-circle.BwcL2Xcc.js",
+      "_client.ySKnF1Cn.js",
+      "_alert.CUO6vUMX.js",
+      "_credit-card.3n7xZSld.js",
+      "_useTranslation.Cb9bYI5g.js"
+    ]
+  },
+  "_paymentMethods.BHyZrjvL.js": {
+    "file": "assets/paymentMethods.BHyZrjvL.js",
     "name": "paymentMethods"
   },
   "_preload-helper.CTSyBIan.js": {
@@ -103,14 +103,15 @@
       "_loader-circle.BwcL2Xcc.js"
     ]
   },
-  "_tooltip.BC0gswYe.js": {
-    "file": "assets/tooltip.BC0gswYe.js",
+  "_tooltip.CtdyWU-m.js": {
+    "file": "assets/tooltip.CtdyWU-m.js",
     "name": "tooltip",
     "imports": [
       "_client.ySKnF1Cn.js",
-      "_NonprofitOfferCard.BAWlAtHX.js",
+      "_onboarding.DbdH1NIP.js",
       "_alert.CUO6vUMX.js",
       "_purify.es.j-UDs5jb.js",
+      "_useTranslation.Cb9bYI5g.js",
       "_credit-card.3n7xZSld.js",
       "_loader-circle.BwcL2Xcc.js"
     ]
@@ -152,17 +153,17 @@
     ]
   },
   "src/components/onboarding/OnboardingFlow.jsx": {
-    "file": "assets/OnboardingFlow.qvrX2Ki5.js",
+    "file": "assets/OnboardingFlow.DMNDYnRM.js",
     "name": "OnboardingFlow",
     "src": "src/components/onboarding/OnboardingFlow.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_client.ySKnF1Cn.js",
       "_alert.CUO6vUMX.js",
-      "_NonprofitOfferCard.BAWlAtHX.js",
+      "_onboarding.DbdH1NIP.js",
       "_useTranslation.Cb9bYI5g.js",
       "_loader-circle.BwcL2Xcc.js",
-      "_paymentMethods.N7iPqH6l.js",
+      "_paymentMethods.BHyZrjvL.js",
       "_hand-coins.D2Ij6R4E.js",
       "_credit-card.3n7xZSld.js",
       "_context.ZwV2gUb-.js"
@@ -199,7 +200,7 @@
     ]
   },
   "src/components/shortcodes/ShortcodeBuilder.jsx": {
-    "file": "assets/ShortcodeBuilder.21cNiQxj.js",
+    "file": "assets/ShortcodeBuilder.CIl_FSig.js",
     "name": "ShortcodeBuilder",
     "src": "src/components/shortcodes/ShortcodeBuilder.jsx",
     "isDynamicEntry": true,
@@ -207,13 +208,13 @@
       "_client.ySKnF1Cn.js",
       "src/main.jsx",
       "_purify.es.j-UDs5jb.js",
-      "_NonprofitOfferCard.BAWlAtHX.js",
+      "_onboarding.DbdH1NIP.js",
       "_alert.CUO6vUMX.js",
-      "_tooltip.BC0gswYe.js",
+      "_tooltip.CtdyWU-m.js",
       "_loader-circle.BwcL2Xcc.js",
       "_credit-card.3n7xZSld.js",
-      "_WalletUpAdminFree.YsSh7r2p.js",
-      "_paymentMethods.N7iPqH6l.js",
+      "_WalletUpAdminFree.DM0WSI0E.js",
+      "_paymentMethods.BHyZrjvL.js",
       "_useTranslation.Cb9bYI5g.js",
       "_dollar-sign.DJn0rikc.js",
       "_preload-helper.CTSyBIan.js",
@@ -222,18 +223,18 @@
     ]
   },
   "src/components/shortcodes/ShortcodeTemplates.jsx": {
-    "file": "assets/ShortcodeTemplates.u5snN54o.js",
+    "file": "assets/ShortcodeTemplates.DE9hDsNz.js",
     "name": "ShortcodeTemplates",
     "src": "src/components/shortcodes/ShortcodeTemplates.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_client.ySKnF1Cn.js",
-      "_NonprofitOfferCard.BAWlAtHX.js",
+      "_onboarding.DbdH1NIP.js",
       "_alert.CUO6vUMX.js",
-      "_tooltip.BC0gswYe.js",
-      "_paymentMethods.N7iPqH6l.js",
+      "_tooltip.CtdyWU-m.js",
+      "_paymentMethods.BHyZrjvL.js",
       "_loader-circle.BwcL2Xcc.js",
-      "_WalletUpAdminFree.YsSh7r2p.js",
+      "_WalletUpAdminFree.DM0WSI0E.js",
       "_hand-coins.D2Ij6R4E.js",
       "_credit-card.3n7xZSld.js",
       "_dollar-sign.DJn0rikc.js",
@@ -259,7 +260,7 @@
     ]
   },
   "src/main.jsx": {
-    "file": "assets/main.EFjv-G5D.js",
+    "file": "assets/main.DO2LuORF.js",
     "name": "main",
     "src": "src/main.jsx",
     "isEntry": true,
@@ -270,10 +271,10 @@
     ],
     "dynamicImports": [
       "src/components/onboarding/OnboardingFlow.jsx",
-      "_WalletUpAdminFree.YsSh7r2p.js"
+      "_WalletUpAdminFree.DM0WSI0E.js"
     ],
     "css": [
-      "assets/main.D1GEqE9a.css"
+      "assets/main.CXy95Ny6.css"
     ]
   }
 }

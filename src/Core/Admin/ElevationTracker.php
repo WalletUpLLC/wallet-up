@@ -34,9 +34,9 @@ class ElevationTracker
         $analyticsTable = $wpdb->prefix . 'wallet_up_analytics';
         $donationsTable = $wpdb->prefix . 'wallet_up_donations';
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-        $checks['db_analytics_table'] = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $analyticsTable)) === $analyticsTable;
+        $checks['db_analytics_table'] = \WalletUpPro\Core\Database\SchemaCache::tableExists($analyticsTable);
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-        $checks['db_donations_table'] = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $donationsTable)) === $donationsTable;
+        $checks['db_donations_table'] = \WalletUpPro\Core\Database\SchemaCache::tableExists($donationsTable);
 
         $checks['option_transfer_call'] = is_array(get_option('wallet_up_transfer_call', []));
         $checks['option_display_settings'] = is_array(get_option('wallet_up_display_settings', []));

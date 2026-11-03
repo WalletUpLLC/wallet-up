@@ -93,6 +93,14 @@ class WooCommerceMethodSettings
         return $value;
     }
 
+    public static function iconUrl(string $methodId): string
+    {
+        if (self::get($methodId, 'hide_icon', false)) {
+            return '';
+        }
+        return \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($methodId);
+    }
+
     public static function set(string $methodId, string $field, $value): void
     {
         if (!in_array($field, self::VALID_FIELDS, true)) {

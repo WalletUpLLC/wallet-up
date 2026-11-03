@@ -27,6 +27,7 @@ final class SurfaceRegistry
     public const TYPE_MOBILE   = 'mobile_money';
     public const TYPE_CARD     = 'card';
     public const TYPE_PROVIDER = 'provider';
+    public const TYPE_STORE_PROVIDER = 'store_provider';
 
     private const WALLET_TYPES = [self::TYPE_WALLET, self::TYPE_CRYPTO, self::TYPE_MOBILE];
     private const ALL_TYPES    = [self::TYPE_WALLET, self::TYPE_CRYPTO, self::TYPE_MOBILE, self::TYPE_CARD, self::TYPE_PROVIDER];
@@ -35,7 +36,7 @@ final class SurfaceRegistry
     {
         return [
             self::DONATIONS      => ['types' => self::ALL_TYPES, 'contexts' => ['form', 'campaign', 'page'], 'edit' => 'wallet-up-donations', 'readonly' => false],
-            self::STORE          => ['types' => self::ALL_TYPES, 'contexts' => [], 'edit' => 'wallet-up-seller', 'readonly' => false],
+            self::STORE          => ['types' => array_merge(self::ALL_TYPES, [self::TYPE_STORE_PROVIDER]), 'contexts' => [], 'edit' => 'wallet-up-seller', 'readonly' => false],
             self::EXPRESS        => ['types' => self::ALL_TYPES, 'contexts' => [], 'edit' => 'wallet-up-seller', 'readonly' => false],
             self::WPFORMS        => ['types' => self::ALL_TYPES, 'contexts' => [], 'edit' => 'wallet-up-shortcodes', 'readonly' => false],
             self::PAY_PAGES      => ['types' => self::WALLET_TYPES, 'contexts' => ['payer'], 'edit' => 'wallet-up-payments', 'readonly' => false],

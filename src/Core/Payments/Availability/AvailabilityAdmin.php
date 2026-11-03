@@ -21,6 +21,7 @@ final class AvailabilityAdmin
     private const PAGES_MAX     = 50;
 
     private const MERCHANT_SETTINGS = [
+        SettingsRegistry::AVAILABILITY_V2,
         SettingsRegistry::SURFACE_POLICY,
         SettingsRegistry::ASK_INCLUDES_EXISTING,
         SettingsRegistry::MEMBERSHIPS_WALLETS,

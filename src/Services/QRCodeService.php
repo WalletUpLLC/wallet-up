@@ -13,6 +13,7 @@ use Endroid\QrCode\Writer\Result\ResultInterface;
 use Exception;
 use WalletUpPro\Core\BaseSingleton;
 use WalletUpPro\Core\Error\ErrorHandler;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -124,9 +125,6 @@ class QRCodeService extends BaseSingleton
 
             $this->checkRequiredExtensions();
 
-           /*  if (isset($this->errorHandler)) {
-                $this->errorHandler->log('Fileinfo extension available: ' . ($this->hasFileinfo ? 'Yes' : 'No'));
-            } */
         } catch (Exception $e) {
             $this->lastError = $e->getMessage();
             if (isset($this->errorHandler)) {
@@ -340,8 +338,6 @@ class QRCodeService extends BaseSingleton
             if ($cachedQR) {
                 $this->errorHandler->log('Retrieved QR from cache for: ' . substr($data, 0, 30) . '...');
 
-                $this->trackQRGeneration('cache_hit', $data, $settings);
-
                 return $cachedQR;
             }
 
@@ -379,8 +375,6 @@ class QRCodeService extends BaseSingleton
             }
 
             $this->cacheQR($cacheKey, $result);
-
-            $this->trackQRGeneration('generated', $data, $settings);
 
             return $result;
 
@@ -439,7 +433,7 @@ class QRCodeService extends BaseSingleton
         return [
             'size' => "{$size}x{$size}",
             'margin' => ($settings['qrBorder'] ?? true) ? ($settings['marginSize'] ?? 10) : 0,
-            'color' => str_replace('#', '', $settings['qrColor'] ?? '674FBF'),
+            'color' => str_replace('#', '', $settings['qrColor'] ?? Brand::HEX),
             'bgcolor' => str_replace('#', '', $settings['qrBackground'] ?? 'F4F4FF'),
             'data' => urlencode($data),
             'style' => $settings['qrStyle'] ?? 'rounded',
@@ -472,38 +466,6 @@ class QRCodeService extends BaseSingleton
 
         return max(0, min(127, (int) $opacity));
     }
-    /*  private function getErrorCorrectionLevel(string $level)
-     {
-         $className = 'Endroid\\QrCode\\ErrorCorrectionLevel';
-
-         $caseName = ucfirst(strtolower($level));
-
-         // If the class isn't found, return the string value
-         if (!class_exists($className)) {
-             return strtolower($level);
-         }
-
-         // Use reflection to safely access the enum value
-         try {
-             // For PHP 8.1+ with enum support
-             if (PHP_VERSION_ID >= 80100) {
-                 $reflection = new \ReflectionClass($className);
-                 $cases = $reflection->getConstants();
-
-                 foreach ($cases as $case => $value) {
-                     if (strtolower($case) === strtolower($level)) {
-                         return constant("$className::$case");
-                     }
-                 }
-             }
-
-             // Final fallback - try direct instantiation with string value
-             return strtolower($level);
-         } catch (\Throwable $e) {
-             // If anything fails, return the string value as fallback
-             return strtolower($level);
-         }
-     } */
     private function getErrorCorrectionLevel(string $level): ErrorCorrectionLevel
     {
         $normalizedLevel = strtolower($level);
@@ -520,38 +482,6 @@ class QRCodeService extends BaseSingleton
                 return ErrorCorrectionLevel::High;
         }
     }
-    /*  private function getRoundBlockSizeMode(string $mode)
-     {
-         $className = 'Endroid\\QrCode\\RoundBlockSizeMode';
-
-         $caseName = ucfirst(strtolower($mode));
-
-         // If the class isn't found, return the string value
-         if (!class_exists($className)) {
-             return strtolower($mode);
-         }
-
-         // Use reflection to safely access the enum value
-         try {
-             // For PHP 8.1+ with enum support
-             if (PHP_VERSION_ID >= 80100) {
-                 $reflection = new \ReflectionClass($className);
-                 $cases = $reflection->getConstants();
-
-                 foreach ($cases as $case => $value) {
-                     if (strtolower($case) === strtolower($mode)) {
-                         return constant("$className::$case");
-                     }
-                 }
-             }
-
-             // Final fallback - try direct instantiation with string value
-             return strtolower($mode);
-         } catch (\Throwable $e) {
-             // If anything fails, return the string value as fallback
-             return strtolower($mode);
-         }
-     } */
     private function getRoundBlockSizeMode(string $mode): RoundBlockSizeMode
     {
         $normalizedMode = strtolower($mode);
@@ -610,7 +540,7 @@ class QRCodeService extends BaseSingleton
                 ->setRoundBlockSizeMode($roundBlockSizeMode);
 
             $bgColorRgb = $this->hexToRgb($settings['qrBackground'] ?? '#F4F4FF');
-            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? '#674FBF');
+            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? Brand::HEX);
 
             [$fgColorRgb, $fgOpacity] = $this->ensureScannableForeground($fgColorRgb, $bgColorRgb, $fgOpacity);
 
@@ -763,44 +693,6 @@ class QRCodeService extends BaseSingleton
                 return $result;
         }
     }
-    /*   private function createModifiedResult(string $newPngData, ResultInterface $originalResult): ResultInterface
-      {
-          return new class ($newPngData, $originalResult) implements ResultInterface {
-              private $data;
-              private $originalResult;
-
-              public function __construct(string $data, ResultInterface $originalResult)
-              {
-                  $this->data = $data;
-                  $this->originalResult = $originalResult;
-              }
-
-              public function getString(): string
-              {
-                  return $this->data;
-              }
-
-              public function getDataUri(): string
-              {
-                  return 'data:image/png;base64,' . base64_encode($this->data);
-              }
-
-              public function saveToFile(string $path): void
-              {
-                  file_put_contents($path, $this->data);
-              }
-
-              public function getMatrix(): \Endroid\QrCode\Matrix\MatrixInterface
-              {
-                  return $this->originalResult->getMatrix();
-              }
-
-              public function getMimeType(): string
-              {
-                  return 'image/png';
-              }
-          };
-      } */
 
     /**
      * Helper method to draw circular QR code
@@ -948,7 +840,7 @@ private function applyDotStyle(ResultInterface $result, array $settings): Result
 
         $moduleSize = (int) floor(min($width, $height) / $moduleCount);
 
-        $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? '#674FBF');
+        $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? Brand::HEX);
         $fgColor = imagecolorallocate($dotImage, $fgColorRgb[0], $fgColorRgb[1], $fgColorRgb[2]);
 
         imagealphablending($dotImage, true);
@@ -1253,7 +1145,7 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
         }
 
         if (!preg_match('/^[0-9a-fA-F]{6}/', $hex)) {
-            return [103, 79, 191];
+            return Brand::rgbComponents();
         }
 
         return [
@@ -1808,44 +1700,6 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
         }
     }
 
-    /*   private function createModifiedResult(string $newPngData, ResultInterface $originalResult): ResultInterface
-      {
-          return new class ($newPngData, $originalResult) implements ResultInterface {
-              private $data;
-              private $originalResult;
-
-              public function __construct(string $data, ResultInterface $originalResult)
-              {
-                  $this->data = $data;
-                  $this->originalResult = $originalResult;
-              }
-
-              public function getString(): string
-              {
-                  return $this->data;
-              }
-
-              public function getDataUri(): string
-              {
-                  return 'data:image/png;base64,' . base64_encode($this->data);
-              }
-
-              public function saveToFile(string $path): void
-              {
-                  file_put_contents($path, $this->data);
-              }
-
-              public function getMatrix(): \Endroid\QrCode\Matrix\MatrixInterface
-              {
-                  return $this->originalResult->getMatrix();
-              }
-
-              public function getMimeType(): string
-              {
-                  return 'image/png';
-              }
-          };
-      } */
     private function applyCircularStyle(ResultInterface $result, array $settings): ResultInterface
     {
         try {
@@ -1928,7 +1782,7 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
                 }
             }
 
-            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? '#674FBF');
+            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? Brand::HEX);
             $fgColor = imagecolorallocate($temp, $fgColorRgb[0], $fgColorRgb[1], $fgColorRgb[2]);
 
             foreach ($patterns as $pattern) {
@@ -2086,7 +1940,7 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
             $bgColor = imagecolorallocate($temp, $bgColorRgb[0], $bgColorRgb[1], $bgColorRgb[2]);
             imagefilledrectangle($temp, 0, 0, $width, $height, $bgColor);
 
-            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? '#674FBF');
+            $fgColorRgb = $this->hexToRgb($settings['qrColor'] ?? Brand::HEX);
             $fgColor = imagecolorallocate($temp, $fgColorRgb[0], $fgColorRgb[1], $fgColorRgb[2]);
 
             $moduleSize = $this->calculateModuleSize($image, $width, $height);
@@ -2546,68 +2400,6 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
      * @param int $moduleSize Module size
      * @return array Array of pattern info (position and size)
      */
-    /*  private function detectQRPatterns($image, int $width, int $height, int $moduleSize): array
-     {
-         // Initialize patterns array
-         $patterns = [];
-
-         // Ensure module size is valid
-         $moduleSize = max(1, $moduleSize);
-
-         // QR codes always have finder patterns in the three corners
-         // Each finder pattern is 7x7 modules
-         $patternSize = $moduleSize * 7;
-
-         // Safety check to avoid invalid patterns
-         if ($patternSize <= 0 || $patternSize >= $width || $patternSize >= $height) {
-             // Fallback calculation if moduleSize calculation failed
-             $patternSize = min($width, $height) / 5; // Approximately 1/5 of the size
-         }
-
-         // Safety margin - ensure we don't exceed image bounds
-         $safeWidth = $width - 1;
-         $safeHeight = $height - 1;
-
-         // Top-left corner
-         $patterns[] = [
-             'x' => 0,
-             'y' => 0,
-             'size' => min($patternSize, $safeWidth, $safeHeight)
-         ];
-
-         // Top-right corner (ensure it doesn't go beyond right edge)
-         $topRightX = max(0, $safeWidth - $patternSize);
-         $patterns[] = [
-             'x' => $topRightX,
-             'y' => 0,
-             'size' => min($patternSize, $safeWidth - $topRightX, $safeHeight)
-         ];
-
-         // Bottom-left corner (ensure it doesn't go beyond bottom edge)
-         $bottomLeftY = max(0, $safeHeight - $patternSize);
-         $patterns[] = [
-             'x' => 0,
-             'y' => $bottomLeftY,
-             'size' => min($patternSize, $safeWidth, $safeHeight - $bottomLeftY)
-         ];
-
-         // Validate patterns - make sure they don't overlap
-         foreach ($patterns as $i => $pattern) {
-             // Skip if the pattern is too small to be useful
-             if ($pattern['size'] < 5) {
-                 unset($patterns[$i]);
-                 continue;
-             }
-
-             // Validate and sanitize coordinates
-             $patterns[$i]['x'] = max(0, min($safeWidth - 1, $pattern['x']));
-             $patterns[$i]['y'] = max(0, min($safeHeight - 1, $pattern['y']));
-             $patterns[$i]['size'] = min($pattern['size'], $safeWidth - $patterns[$i]['x'], $safeHeight - $patterns[$i]['y']);
-         }
-
-         // Reset array keys after potential removals
-         return array_values($patterns);
-     } */
 
     /**
      * Improved module size calculation based on QR code image
@@ -2617,124 +2409,6 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
      * @param int $height Image height
      * @return int Estimated module size
      */
-    /*  private function calculateModuleSize($image, int $width, int $height): int
-     {
-         // For safety, use a reasonable default if dimensions are invalid
-         if ($width <= 0 || $height <= 0) {
-             return 5; // Reasonable default
-         }
-
-         // Analyze the image to detect the module size
-         $minDimension = min($width, $height);
-
-         // QR codes have a standard structure - try to detect module size by sampling
-         // the image horizontally and vertically to find pattern transitions
-
-         // Sample from the center of the image
-         $centerX = (int) ($width / 2);
-         $centerY = (int) ($height / 2);
-
-         // Look for horizontal transitions near the center
-         $horizontalTransitions = [];
-         $lastColor = null;
-         $transitionStart = 0;
-
-         for ($x = $centerX - (int) ($minDimension / 3); $x < $centerX + (int) ($minDimension / 3); $x++) {
-             if ($x < 0 || $x >= $width) {
-                 continue;
-             }
-
-             $color = imagecolorat($image, $x, $centerY);
-             $rgb = imagecolorsforindex($image, $color);
-             $isForeground = ($rgb['alpha'] <= 20); // Consider it foreground if not transparent
-
-             if ($lastColor === null) {
-                 $lastColor = $isForeground;
-                 $transitionStart = $x;
-             } else if ($lastColor !== $isForeground) {
-                 // We found a transition
-                 $transitionLength = $x - $transitionStart;
-                 if ($transitionLength > 1) { // Ignore noise
-                     $horizontalTransitions[] = $transitionLength;
-                 }
-                 $lastColor = $isForeground;
-                 $transitionStart = $x;
-             }
-         }
-
-         // Look for vertical transitions near the center
-         $verticalTransitions = [];
-         $lastColor = null;
-         $transitionStart = 0;
-
-         for ($y = $centerY - (int) ($minDimension / 3); $y < $centerY + (int) ($minDimension / 3); $y++) {
-             if ($y < 0 || $y >= $height) {
-                 continue;
-             }
-
-             $color = imagecolorat($image, $centerX, $y);
-             $rgb = imagecolorsforindex($image, $color);
-             $isForeground = ($rgb['alpha'] <= 20); // Consider it foreground if not transparent
-
-             if ($lastColor === null) {
-                 $lastColor = $isForeground;
-                 $transitionStart = $y;
-             } else if ($lastColor !== $isForeground) {
-                 // We found a transition
-                 $transitionLength = $y - $transitionStart;
-                 if ($transitionLength > 1) { // Ignore noise
-                     $verticalTransitions[] = $transitionLength;
-                 }
-                 $lastColor = $isForeground;
-                 $transitionStart = $y;
-             }
-         }
-
-         // Analyze the transitions to estimate module size
-         $allTransitions = array_merge($horizontalTransitions, $verticalTransitions);
-
-         if (count($allTransitions) > 0) {
-             // Sort transitions and find the most common sizes
-             sort($allTransitions);
-
-             $counts = array_count_values($allTransitions);
-             arsort($counts);
-             $mostCommon = key($counts);
-
-             return max(1, (int) $mostCommon);
-         }
-
-         // Fallback methods if transitions analysis fails
-
-         // Method 1: Standard approximation based on QR code version
-         $estimatedModuleSize = (int) ($minDimension / 33); // QR codes have 21-177 modules (Version 1-40)
-
-         // Method 2: Size of the QR code finder pattern (always 7 modules)
-         // Look for the top-left finder pattern (typically starts at 0,0)
-         $patternSize = 0;
-         $lastWhite = false;
-
-         for ($x = 0; $x < $minDimension / 4; $x++) {
-             $color = imagecolorat($image, $x, 0);
-             $rgb = imagecolorsforindex($image, $color);
-             $isBlack = ($rgb['alpha'] <= 20);
-
-             if ($isBlack && $lastWhite) {
-                 // We've found the first black after white, marks the end of the finder pattern
-                 $patternSize = $x;
-                 break;
-             }
-
-             $lastWhite = !$isBlack;
-         }
-
-         if ($patternSize > 0) {
-             return max(1, (int) ($patternSize / 7)); // Finder pattern is 7 modules wide
-         }
-
-         // Final fallback
-         return max(1, $estimatedModuleSize);
-     } */
 
     private function findConnectedModules($image, int $width, int $height, int $moduleSize): array
     {
@@ -3503,21 +3177,6 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
      * @return array
      * @throws Exception
      */
-    /*     private function hexToRgb(string $hex): array
-        {
-            $hex = ltrim($hex, '#');
-            if (strlen($hex) === 3) {
-                $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
-            }
-            if (strlen($hex) !== 6) {
-                throw new Exception(esc_html('Invalid hex color provided: ' . $hex));
-            }
-            return [
-                hexdec(substr($hex, 0, 2)),
-                hexdec(substr($hex, 2, 2)),
-                hexdec(substr($hex, 4, 2))
-            ];
-        } */
 
     /**
      * Process and generate QR code from uploaded file with fileinfo fallback
@@ -4078,21 +3737,10 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
 
             $payment_method = $settings['payment_method'] ?? $this->detectPaymentMethod($data);
 
-            $analytics_event_type = 'qr_generated';
-            switch($event_type) {
-                case 'generated':
-                    $analytics_event_type = 'qr_generated';
-                    break;
-                case 'cache_hit':
-                    $analytics_event_type = 'qr_cache_hit';
-                    break;
-                case 'click':
-                    $analytics_event_type = 'click';
-                    break;
-                case 'scan':
-                    $analytics_event_type = 'scan';
-                    break;
+            if (!in_array($event_type, ['click', 'scan'], true)) {
+                return;
             }
+            $analytics_event_type = $event_type;
 
             $tracking_data = [
                 'post_id' => get_the_ID() ?: 0,
@@ -4111,7 +3759,7 @@ private function isTimingPatternModule(int $x, int $y, int $moduleCount): bool
             $table = $wpdb->prefix . 'wallet_up_analytics';
             
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fresh data required for accurate results.
-            if ($wpdb->get_var("SHOW TABLES LIKE '$table'") === $table) {
+            if (\WalletUpPro\Core\Database\SchemaCache::tableExists($table)) {
                 $insert_data = [
                     'event_type' => $analytics_event_type,
                     'payment_method' => $payment_method,

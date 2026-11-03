@@ -92,7 +92,7 @@ class ConfirmationPage
             $displayMode,
             $method->getPaymentUrl($total, $note),
             $methodId,
-            get_option('wallet_up_display_settings', []),
+            WooCommerceConfig::storeDisplaySettings(),
             ['amount' => $total, 'order_id' => $order->get_id(), 'currency' => $currency]
         );
 
@@ -440,7 +440,7 @@ class ConfirmationPage
                 $body .= '<table style="width:100%;border-collapse:collapse;">';
                 foreach ($items as $it) {
                     $body .= '<tr style="border-bottom:1px solid #f3f4f6;">'
-                        . '<td style="padding:10px 0;color:#374151;font-size:0.95rem;">' . esc_html($it['name']) . ' <span style="color:#9ca3af;">&times; ' . esc_html($it['qty']) . '</span></td>'
+                        . '<td style="padding:10px 0;color:#374151;font-size:0.95rem;">' . wp_kses_post($it['name']) . ' <span style="color:#9ca3af;">&times; ' . esc_html($it['qty']) . '</span></td>'
                         . '<td style="padding:10px 0;text-align:right;color:#374151;font-weight:500;font-size:0.95rem;">' . wp_kses_post($it['total']) . '</td>'
                         . '</tr>';
                 }

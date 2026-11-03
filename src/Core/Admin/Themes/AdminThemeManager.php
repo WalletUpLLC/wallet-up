@@ -2,6 +2,7 @@
 namespace WalletUpPro\Core\Admin\Themes;
 
 use WalletUpPro\Core\Error\ErrorHandler;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -242,11 +243,11 @@ JS;
             }
             $url = str_replace(["'", '"', "\n", "\r", '\\', '<', '>'], '', $icon);
             $sel = 'body.wallet-up-admin-theme #' . $sid . ' .wp-menu-image.svg';
-            $out .= $sel . '{background-image:none!important;filter:none!important;background-color:#674fbf!important;'
+            $out .= $sel . '{background-image:none!important;filter:none!important;background-color:' . Brand::HEX . '!important;'
                 . "-webkit-mask:url('" . $url . "') center/20px 20px no-repeat!important;"
                 . "mask:url('" . $url . "') center/20px 20px no-repeat!important;}";
             $out .= 'body.wallet-up-admin-theme #' . $sid . ':hover .wp-menu-image.svg,'
-                . 'body.wallet-up-admin-theme #' . $sid . '.opensub .wp-menu-image.svg{background-color:#674fbf!important;}';
+                . 'body.wallet-up-admin-theme #' . $sid . '.opensub .wp-menu-image.svg{background-color:' . Brand::HEX . '!important;}';
             $out .= 'body.wallet-up-admin-theme #' . $sid . '.current .wp-menu-image.svg,'
                 . 'body.wallet-up-admin-theme #' . $sid . '.wp-has-current-submenu .wp-menu-image.svg,'
                 . 'body.wallet-up-admin-theme #' . $sid . '.wp-menu-open .wp-menu-image.svg{background-color:#ffffff!important;}';
@@ -279,7 +280,7 @@ JS;
                 border-radius: 10px;
             }
                 padding: 9px 0 0;
-                background-color: #674fbf;
+                background-color: ' . Brand::HEX . ';
                 border: solid 4px;
                 border-radius: 20px;
             }

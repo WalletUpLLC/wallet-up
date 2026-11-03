@@ -6,6 +6,7 @@ use WalletUpPro\Core\Error\ErrorHandler;
 use WalletUpPro\Core\Analytics\QRTracker;
 use WalletUpPro\Core\Security\RateLimiter;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -493,7 +494,7 @@ class QRCodeEndpoint
                     $data = 'https://example.com/?test=' . time();
                     $settings = [
                         'qrSize' => 'medium',
-                        'qrColor' => '#674FBF',
+                        'qrColor' => Brand::HEX,
                         'qrBackground' => '#F4F4FF',
                         'qrStyle' => 'rounded'
                     ];

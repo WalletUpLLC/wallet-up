@@ -2,6 +2,8 @@
 
 namespace WalletUpPro\Core\Admin\Integrations;
 
+use WalletUpPro\Core\Brand;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -126,14 +128,14 @@ class OnboardingPromoter
             .wup-promo-banner {
                 display:flex; align-items:center; gap:12px; flex-wrap:wrap;
                 margin:16px 0; padding:14px 18px;
-                background:rgba(103,79,191,0.06);
-                border:1px solid rgba(103,79,191,0.22);
-                border-left:4px solid #674FBF; border-radius:8px;
+                background:rgba(' . Brand::RGB . ',0.06);
+                border:1px solid rgba(' . Brand::RGB . ',0.22);
+                border-left:4px solid ' . Brand::HEX . '; border-radius:8px;
                 color:#2c2540;
             }
-            .wup-promo-banner .wup-promo-strong { font-weight:600; color:#674FBF; }
+            .wup-promo-banner .wup-promo-strong { font-weight:600; color:' . Brand::HEX . '; }
             .wup-promo-banner .wup-promo-msg { flex:1 1 240px; }
-            .wup-promo-banner .button-primary { background:#674FBF; border-color:#674FBF; box-shadow:none; }
+            .wup-promo-banner .button-primary { background:' . Brand::HEX . '; border-color:' . Brand::HEX . '; box-shadow:none; }
             .wup-promo-banner .button-primary:hover { background:#5a45a8; border-color:#5a45a8; }
             .wup-promo-banner .button-primary[disabled] { opacity:0.7; }
         ';

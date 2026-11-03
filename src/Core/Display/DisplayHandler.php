@@ -4,6 +4,7 @@ namespace WalletUpPro\Core\Display;
 use WalletUpPro\Services\QRCodeService;
 use WalletUpPro\Core\Error\ErrorHandler;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -11,6 +12,8 @@ if (!defined('ABSPATH')) {
 
 class DisplayHandler
 {
+    public const IMPRESSION_ACTION = 'wallet_up_impression';
+
     /** @var DisplayHandler|null */
     private static $instance = null;
 
@@ -114,16 +117,9 @@ class DisplayHandler
 
             $blocks['zelle'] = $this->generateZelleHelper($method);
 
-            $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
-            $isBot = $ua !== '' && preg_match('/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|headless|monitor|pingdom|uptime/i', $ua);
-            $nonVisitor = $isBot || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST);
-            if (self::$previewOverride === null && empty($data['skip_impression']) && !$nonVisitor && class_exists(\WalletUpPro\Core\Analytics\AnalyticsHandler::class)) {
-                try {
-                    $analytics = \WalletUpPro\Core\Analytics\AnalyticsHandler::getInstance();
-                    $analytics->recordImpression($method, intval($post_id), $mode, $data['post_title'] ?? '');
-                } catch (\Exception $e) {
-                }
-            }
+            $beacon = empty($data['skip_impression'])
+                ? self::countImpression((string) $method, intval($post_id), (string) $mode, (string) ($data['post_title'] ?? ''), intval($data['order_id'] ?? 0))
+                : '';
 
             if ($this->confirmFormApplies($data)) {
                 $wcOrderId = intval($data['order_id'] ?? 0);
@@ -137,7 +133,7 @@ class DisplayHandler
                 }
             }
 
-            return $this->composeConfirmationBlocks($blocks);
+            return $this->composeConfirmationBlocks($blocks) . $beacon;
         } catch (Exception $e) {
             $this->errorHandler->log('Display generation error: ' . $e->getMessage());
             return $this->formatError('display_error', $e->getMessage());
@@ -145,6 +141,40 @@ class DisplayHandler
     }
 
     public const CONFIRMATION_BLOCKS = ['payment', 'reference', 'zelle', 'form'];
+
+    public static function impressionSignature(string $method, int $postId, string $mode): string
+    {
+        return substr(hash_hmac('sha256', $method . '|' . $postId . '|' . $mode, wp_salt('nonce')), 0, 32);
+    }
+
+    public static function countImpression(string $method, int $postId, string $mode, string $postTitle = '', int $orderId = 0): string
+    {
+        if ($method === '' || self::$previewOverride !== null || !class_exists(\WalletUpPro\Core\Analytics\AnalyticsHandler::class)) {
+            return '';
+        }
+        try {
+            \WalletUpPro\Core\Analytics\AnalyticsHandler::getInstance()->recordImpression($method, $postId, $mode, $postTitle, $orderId);
+        } catch (\Exception $e) {
+        }
+        return $orderId === 0 ? self::impressionBeacon($method, $postId, sanitize_key($mode)) : '';
+    }
+
+    public static function impressionBeacon(string $method, int $postId, string $mode): string
+    {
+        $fields = wp_json_encode([
+            'action' => self::IMPRESSION_ACTION,
+            'method' => $method,
+            'post_id' => (string) $postId,
+            'mode' => $mode,
+            'sig' => self::impressionSignature($method, $postId, $mode),
+        ]);
+        $key = wp_json_encode($method . '|' . $postId);
+        $endpoint = wp_json_encode(admin_url('admin-ajax.php'));
+        return '<script>(function(){var w=window,k=' . $key . ';w._walletupImpressions=w._walletupImpressions||{};'
+            . 'if(w._walletupImpressions[k]||!navigator.sendBeacon){return;}w._walletupImpressions[k]=1;'
+            . 'var d=' . $fields . ',f=new FormData();Object.keys(d).forEach(function(n){f.append(n,d[n]);});'
+            . 'navigator.sendBeacon(' . $endpoint . ',f);})();</script>';
+    }
 
     public static function methodDisplayName(string $methodId): string
     {
@@ -162,7 +192,7 @@ class DisplayHandler
         if (class_exists(\WalletUpPro\Core\Config\PaymentMethodsConfig::class)) {
             return \WalletUpPro\Core\Config\PaymentMethodsConfig::getBrandColor($methodId);
         }
-        return '#674FBF';
+        return Brand::HEX;
     }
 
     public static function methodLogoUrl(string $methodId): string
@@ -218,8 +248,8 @@ class DisplayHandler
             $qr_source_args = [
                 'qrSize' => $qr_size,
                 'size' => $qr_size,
-                'qrColor' => $settings['qrColor'] ?? $settings['color'] ?? '#674FBF',
-                'color' => $settings['qrColor'] ?? $settings['color'] ?? '#674FBF',
+                'qrColor' => $settings['qrColor'] ?? $settings['color'] ?? Brand::HEX,
+                'color' => $settings['qrColor'] ?? $settings['color'] ?? Brand::HEX,
                 'qrBackground' => $bg_color,
                 'background' => $bg_color,
                 'qrBorder' => $border_style,
@@ -382,7 +412,7 @@ class DisplayHandler
 
             $qr_settings = [
                 'qrSize' => $qr_size,
-                'qrColor' => $display_settings['qrColor'] ?? $display_settings['color'] ?? '#674FBF',
+                'qrColor' => $display_settings['qrColor'] ?? $display_settings['color'] ?? Brand::HEX,
                 'qrBackground' => $display_settings['qrBackground'] ?? $display_settings['background'] ?? '#FFFFFF',
             ];
 
@@ -503,7 +533,7 @@ class DisplayHandler
     private function generateLink($url, $amount, $method, $settings, $tracking_attr)
     {
         try {
-            $link_color = $settings['qrColor'] ?? '#674FBF';
+            $link_color = $settings['qrColor'] ?? Brand::HEX;
             $bg_color = $settings['qrBackground'] ?? '#FFFFFF';
             $border_style = $settings['qrBorder'] ?? false;
             $style_type = $settings['qrStyle'] ?? 'square';
@@ -733,7 +763,7 @@ class DisplayHandler
             '<div style="text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.06);">'
             . '<a href="%s" target="_blank" rel="noopener noreferrer" style="font-size:10px;color:#9CA3AF;'
             . 'text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.02em;">'
-            . '%s <span style="color:#674FBF;font-weight:600;">WalletUp</span></a></div>',
+            . '%s <span style="color:' . Brand::HEX . ';font-weight:600;">WalletUp</span></a></div>',
             esc_url($url),
             esc_html__('Powered by', 'walletup')
         );
@@ -1033,7 +1063,7 @@ class DisplayHandler
     {
         return [
             'qrSize' => $settings['qrSize'] ?? $settings['size'] ?? 'medium',
-            'qrColor' => $settings['qrColor'] ?? $settings['color'] ?? '#674FBF',
+            'qrColor' => $settings['qrColor'] ?? $settings['color'] ?? Brand::HEX,
             'qrBackground' => $settings['qrBackground'] ?? $settings['background'] ?? '#FFFFFF',
             'qrBorder' => $settings['qrBorder'] ?? $settings['border'] ?? false,
             'qrStyle' => $settings['qrStyle'] ?? $settings['style'] ?? 'square',
@@ -1111,25 +1141,11 @@ class DisplayHandler
                     nonce: '<?php echo esc_js($nonce); ?>',
                     endpoint: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
                     trackingData: <?php echo wp_json_encode($trackingData, JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK); ?>,
-                    impressionSent: false,
                     requestQueue: [],
                     isProcessing: false,
 
                     init() {
-                        this.trackImpression();
                         this.setupClickHandler();
-                    },
-
-                    trackImpression() {
-                        const key = 'walletup_imp_' + this.method + '_' + this.trackingData.post_id;
-                        if (this.impressionSent || (window._walletupImpressions && window._walletupImpressions[key])) {
-                            return;
-                        }
-                        this.impressionSent = true;
-                        if (!window._walletupImpressions) window._walletupImpressions = {};
-                        window._walletupImpressions[key] = true;
-
-                        this.sendEvent('impression');
                     },
 
                     setupClickHandler() {

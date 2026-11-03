@@ -1,6 +1,8 @@
 <?php
 namespace WalletUpPro\Core\Config;
 
+use WalletUpPro\Core\Brand;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -96,7 +98,7 @@ class PaymentMethodsConfig
             'type' => 'traditional',
             'class' => 'WalletUpPro\Payments\WalupPay',
             'icon_color' => 'purple-600',
-            'brand_color' => '#674FBF',
+            'brand_color' => Brand::HEX,
             'validation_pattern' => '/^@?([a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]){3,30}$/'
         ],
 
@@ -384,7 +386,7 @@ class PaymentMethodsConfig
 
     public static function getBrandColor(string $methodId): string
     {
-        return self::PAYMENT_METHODS[$methodId]['brand_color'] ?? '#674FBF';
+        return self::PAYMENT_METHODS[$methodId]['brand_color'] ?? Brand::HEX;
     }
 
     public static function getMethodClass(string $methodId): ?string

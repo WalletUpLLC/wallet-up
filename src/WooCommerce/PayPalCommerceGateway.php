@@ -160,6 +160,9 @@ class PayPalCommerceGateway extends \WC_Payment_Gateway
         if ($this->enabled !== 'yes') {
             return false;
         }
+        if (class_exists('\\WalletUpPro\\WooCommerce\\StoreCheckout') && !\WalletUpPro\WooCommerce\StoreCheckout::masterOn()) {
+            return false;
+        }
         if (class_exists('\WalletUpPro\Core\Payments\Availability\MethodAvailability') && \WalletUpPro\Core\Payments\Availability\MethodAvailability::automatedOff(\WalletUpPro\Core\Config\AutomatedApiConfig::PAYPAL_COMMERCE)) {
             return false;
         }

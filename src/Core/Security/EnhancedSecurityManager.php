@@ -482,7 +482,7 @@ class EnhancedSecurityManager extends BaseSingleton
         $table_name = $wpdb->prefix . 'wallet_up_security_events';
         
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safely derived from wpdb prefix.
-        if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") !== $table_name) {
+        if (!\WalletUpPro\Core\Database\SchemaCache::tableExists($table_name)) {
             $this->createSecurityEventsTable();
         }
         
@@ -555,7 +555,7 @@ class EnhancedSecurityManager extends BaseSingleton
         $table_name = $wpdb->prefix . 'wallet_up_security_events';
         
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is safely derived from wpdb prefix.
-        if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") !== $table_name) {
+        if (!\WalletUpPro\Core\Database\SchemaCache::tableExists($table_name)) {
             return [];
         }
         

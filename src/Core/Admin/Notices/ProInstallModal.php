@@ -82,10 +82,10 @@ final class ProInstallModal {
                     </svg>
                 </span>
 
-                <h2 id="wup-pro-modal-title"><?php esc_html_e( 'Your Pro licence is active. One step left.', 'walletup' ); ?></h2>
+                <h2 id="wup-pro-modal-title"><?php esc_html_e( 'Your Pro license is active. One step left.', 'walletup' ); ?></h2>
 
                 <p id="wup-pro-modal-body">
-                    <?php /* translators: %s: Pro product name */ echo esc_html( sprintf( __( 'This site is still running the free version. Download %s and install it over this one to unlock your Pro features. Your licence, settings and payment methods all carry across.', 'walletup' ), WALLET_UP_PRO_PRODUCT_NAME ) ); ?>
+                    <?php /* translators: %s: Pro product name */ echo esc_html( sprintf( __( 'This site is still running the free version. Download %s and install it over this one to unlock your Pro features. Your license, settings and payment methods all carry across.', 'walletup' ), WALLET_UP_PRO_PRODUCT_NAME ) ); ?>
                 </p>
 
                 <ol class="wup-pro-modal__steps">
@@ -121,18 +121,18 @@ final class ProInstallModal {
             .wup-pro-modal__card{background:#fff;border-radius:14px;max-width:520px;width:100%;
                 padding:32px;box-shadow:0 24px 60px rgba(15,23,42,.28);text-align:left}
             .wup-pro-modal__mark{display:inline-flex;align-items:center;justify-content:center;
-                width:46px;height:46px;border-radius:12px;background:#f1edfd;color:#674FBF;margin-bottom:18px}
+                width:46px;height:46px;border-radius:12px;background:#f1edfd;color:<?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>;margin-bottom:18px}
             .wup-pro-modal__card h2{margin:0 0 10px;font-size:20px;line-height:1.35;color:#0f172a}
             .wup-pro-modal__card p{margin:0 0 16px;font-size:14px;line-height:1.65;color:#475569}
             .wup-pro-modal__steps{margin:0 0 22px 18px;padding:0;font-size:13px;line-height:1.9;color:#475569}
             .wup-pro-modal__actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px}
-            .wup-pro-modal__cta{background:#674FBF;color:#fff;border-radius:8px;padding:11px 20px;
+            .wup-pro-modal__cta{background:<?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>;color:#fff;border-radius:8px;padding:11px 20px;
                 font-size:14px;font-weight:600;text-decoration:none;display:inline-block}
             .wup-pro-modal__cta:hover,.wup-pro-modal__cta:focus{background:#563da8;color:#fff}
-            .wup-pro-modal__link{font-size:13px;color:#674FBF;text-decoration:none}
+            .wup-pro-modal__link{font-size:13px;color:<?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>;text-decoration:none}
             .wup-pro-modal__later{font-size:13px;color:#64748b;text-decoration:underline;margin-left:auto}
             .wup-pro-modal__note{margin:18px 0 0;font-size:12px;color:#94a3b8}
-            .wup-pro-modal :focus-visible{outline:2px solid #674FBF;outline-offset:2px}
+            .wup-pro-modal :focus-visible{outline:2px solid <?php echo esc_attr(\WalletUpPro\Core\Brand::HEX); ?>;outline-offset:2px}
         </style>
         <script>
             ( function () {

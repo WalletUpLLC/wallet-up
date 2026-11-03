@@ -18,7 +18,7 @@ class CashAppApiGateway extends \WC_Payment_Gateway
     public function __construct()
     {
         $this->id = 'wallet_up_cashapp_api';
-        $this->method_title = __('WalletUp — Cash App Pay API', 'walletup');
+        $this->method_title = __('WalletUp — Cash App Pay (automatic)', 'walletup');
         $this->icon = \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl('cashapp_api');
         $this->method_description = __('Configured under Wallet Up → Seller. Credentials live in Wallet Up → Payments → Automated Payments.', 'walletup');
         $this->has_fields = true;
@@ -47,7 +47,7 @@ class CashAppApiGateway extends \WC_Payment_Gateway
     {
         $sellerUrl = admin_url('admin.php?page=wallet-up-seller#cashapp-api');
         ?>
-        <h2><?php esc_html_e('Cash App Pay API', 'walletup'); ?> <small style="color:#6b7280;font-weight:400;">(<?php esc_html_e('Wallet Up', 'walletup'); ?>)</small></h2>
+        <h2><?php esc_html_e('Cash App Pay (automatic)', 'walletup'); ?> <small style="color:#6b7280;font-weight:400;">(<?php esc_html_e('Wallet Up', 'walletup'); ?>)</small></h2>
         <div style="margin:16px 0;padding:20px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;border-radius:12px;">
             <h3 style="margin:0 0 6px;color:#4c1d95;font-size:1.05em;"><?php esc_html_e('Configured in Wallet Up', 'walletup'); ?></h3>
             <p style="margin:0 0 12px;color:#4b5563;font-size:0.95em;line-height:1.5;">
@@ -107,9 +107,7 @@ class CashAppApiGateway extends \WC_Payment_Gateway
 
     public function hasCredentials(): bool
     {
-        return !empty($this->config['client_id'])
-            && !empty($this->config['api_key'])
-            && !empty($this->config['location_id']);
+        return \WalletUpPro\Payments\CashAppPayAPI::hasCheckoutCredentials($this->config);
     }
 
     public function needs_setup(): bool
@@ -120,6 +118,12 @@ class CashAppApiGateway extends \WC_Payment_Gateway
     public function is_available(): bool
     {
         if ($this->enabled !== 'yes') {
+            return false;
+        }
+        if (class_exists('\\WalletUpPro\\WooCommerce\\StoreCheckout') && !\WalletUpPro\WooCommerce\StoreCheckout::masterOn()) {
+            return false;
+        }
+        if (\WalletUpPro\Core\Payments\Availability\MethodAvailability::automatedOff(\WalletUpPro\Core\Config\AutomatedApiConfig::CASHAPP_API)) {
             return false;
         }
         return $this->hasCredentials();

@@ -46,7 +46,8 @@ class WalletUpMethodGateway extends \WC_Payment_Gateway
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->enabled = $this->get_option('enabled', 'yes');
+        $this->enabled = StoreCheckout::methodOn((string) $method_id) ? 'yes' : 'no';
+        $this->settings['enabled'] = $this->enabled;
 
         $walletUpTitle = WooCommerceMethodSettings::get($method_id, 'title', '');
         $rawTitle = !empty($walletUpTitle)
@@ -122,10 +123,7 @@ class WalletUpMethodGateway extends \WC_Payment_Gateway
             return false;
         }
 
-        if (!\WalletUpPro\Core\Payments\MethodStatusResolver::isReady($this->method_id)) {
-            return false;
-        }
-        if (!\WalletUpPro\Core\Payments\Availability\MethodAvailability::shows((string) $this->method_id, 'store')) {
+        if (!in_array((string) $this->method_id, StoreCheckout::individualIds(), true)) {
             return false;
         }
 
@@ -194,7 +192,7 @@ class WalletUpMethodGateway extends \WC_Payment_Gateway
                 $display_mode,
                 $payment_url,
                 $this->method_id,
-                $settings['wcQRSettings'] ?? [],
+                WooCommerceConfig::storeDisplaySettings(),
                 [
                     'amount' => $amount,
                     'method' => $this->method_id,
@@ -354,7 +352,7 @@ class WalletUpMethodGateway extends \WC_Payment_Gateway
 
     private function get_method_icon(): string
     {
-        return \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($this->method_id);
+        return WooCommerceMethodSettings::iconUrl((string) $this->method_id);
     }
     private function ensureTransactionTableReady(): bool
     {
@@ -367,12 +365,12 @@ class WalletUpMethodGateway extends \WC_Payment_Gateway
         $tableName = $wpdb->prefix . 'walletup_payment_transactions';
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fresh schema check required.
-        $result = (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $tableName));
+        $result = \WalletUpPro\Core\Database\SchemaCache::tableExists($tableName);
 
         if (!$result) {
             do_action('walletup_create_payment_transactions_table');
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            $result = (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $tableName));
+            $result = \WalletUpPro\Core\Database\SchemaCache::tableExists($tableName);
 
             if (!$result) {
                 if (isset($this->errorHandler)) {

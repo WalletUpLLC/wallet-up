@@ -46,11 +46,8 @@ class MembershipManager extends BaseSingleton
 
     public static function tablesExist(): bool
     {
-        global $wpdb;
-        $t = self::tiersTable();
-        $m = self::membersTable();
-        return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $t)) === $t
-            && $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $m)) === $m;
+        return \WalletUpPro\Core\Database\SchemaCache::tableExists(self::tiersTable())
+            && \WalletUpPro\Core\Database\SchemaCache::tableExists(self::membersTable());
     }
 
     public static function schemaCurrent(): bool

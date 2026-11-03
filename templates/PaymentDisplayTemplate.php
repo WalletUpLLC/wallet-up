@@ -86,7 +86,7 @@ class PaymentDisplayTemplate
 
         if (!empty($methodDetails['description'])) {
             $html .= sprintf(
-                '<span class="wallet-up-method-description" style="display: block; font-size: 0.875em; color: #666; margin-top: 4px;">%s</span>',
+                '<span class="wallet-up-method-description" style="display: block; font-size: 0.875em; color: #777; margin-top: 4px;">%s</span>',
                 esc_html($methodDetails['description'])
             );
         }

@@ -125,9 +125,9 @@ final class NonprofitOffer
     {
         if ($code === 'NOT_APPROVED') {
             self::refresh();
-            return __('This organization is no longer in the nonprofit program, so the licence cannot be activated.', 'walletup');
+            return __('This organization is no longer in the nonprofit program, so the license cannot be activated.', 'walletup');
         }
-        return __('Your licence is not ready yet. Please try again in a few minutes.', 'walletup');
+        return __('Your license is not ready yet. Please try again in a few minutes.', 'walletup');
     }
 
     private static function awaitingConfirmation(): bool
@@ -378,7 +378,7 @@ final class NonprofitOffer
             wp_send_json_error(['message' => __('Your application is not approved yet.', 'walletup')], 409);
         }
         if (self::otherLicence()) {
-            wp_send_json_error(['message' => /* translators: %s: Pro product name */ sprintf(__('This site already uses a %s licence. Reply to your approval email and we will move it to your lifetime licence and stop the old plan, so you are not charged again.', 'walletup'), WALLET_UP_PRO_PRODUCT_NAME), 'activation' => 'existing'], 409);
+            wp_send_json_error(['message' => /* translators: %s: Pro product name */ sprintf(__('This site already uses a %s license. Reply to your approval email and we will move it to your lifetime license and stop the old plan, so you are not charged again.', 'walletup'), WALLET_UP_PRO_PRODUCT_NAME), 'activation' => 'existing'], 409);
         }
         if (self::premiumCode()) {
             if (!self::licensed()) {
@@ -388,7 +388,7 @@ final class NonprofitOffer
                 }
                 $outcome = self::activateHere($licence['key']);
                 if ($outcome === 'failed') {
-                    wp_send_json_error(['message' => __('We could not activate your licence. Please try again, or use the code from your email at walletup.app.', 'walletup')], 400);
+                    wp_send_json_error(['message' => __('We could not activate your license. Please try again, or use the code from your email at walletup.app.', 'walletup')], 400);
                 }
                 wp_send_json_success(['activation' => $outcome]);
             }
@@ -400,7 +400,7 @@ final class NonprofitOffer
         }
         $outcome = self::licensed() ? 'done' : self::activateHere($licence['key']);
         if ($outcome === 'failed') {
-            wp_send_json_error(['message' => __('We could not activate your licence. Please try again, or use the code from your email at walletup.app.', 'walletup')], 400);
+            wp_send_json_error(['message' => __('We could not activate your license. Please try again, or use the code from your email at walletup.app.', 'walletup')], 400);
         }
         if ($outcome === 'confirm') {
             wp_send_json_success(['activation' => 'confirm']);

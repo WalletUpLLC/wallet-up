@@ -2,7 +2,6 @@
 namespace WalletUpPro\WooCommerce\Express;
 
 use WalletUpPro\Core\Config\PaymentMethodsConfig;
-use WalletUpPro\Core\Payments\MethodStatusResolver;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -34,9 +33,8 @@ class ExpressMethodRanking
      */
     public static function rank(array $ctx = []): array
     {
-        $snapshot   = MethodStatusResolver::snapshot();
-        $candidates = array_values(array_filter($snapshot['configured'] ?? [], static function ($id) {
-            return MethodStatusResolver::storeShows((string) $id) && \WalletUpPro\Core\Payments\Availability\MethodAvailability::shows((string) $id, 'express');
+        $candidates = array_values(array_filter(\WalletUpPro\WooCommerce\StoreCheckout::visibleP2p(), static function ($id) {
+            return \WalletUpPro\Core\Payments\Availability\MethodAvailability::shows((string) $id, 'express');
         }));
         if (empty($candidates)) {
             return [];
@@ -100,7 +98,7 @@ class ExpressMethodRanking
 
         $table = $wpdb->prefix . 'wallet_up_analytics';
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-        if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table)) !== $table) {
+        if (!\WalletUpPro\Core\Database\SchemaCache::tableExists($table)) {
             return $scores;
         }
 
@@ -153,7 +151,7 @@ class ExpressMethodRanking
 
     private static function methodIcon(string $id): string
     {
-        return \WalletUpPro\Core\Display\DisplayHandler::methodLogoUrl($id);
+        return \WalletUpPro\WooCommerce\WooCommerceMethodSettings::iconUrl($id);
     }
 
     private static function normalizeDevice(string $device): string

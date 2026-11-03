@@ -6,6 +6,7 @@ use WalletUpPro\Core\BaseSingleton;
 use WalletUpPro\Core\PaymentRegistry;
 use WalletUpPro\Core\Config\PaymentMethodsConfig;
 use Exception;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -75,15 +76,26 @@ class WooCommerceConfig extends BaseSingleton
 
     public const DEFAULT_SETTINGS = [
         'enabled' => 'yes',
-        'title' => 'WalletUpPro Pay',
+        'title' => 'WalletUp Pay',
         'description' => 'Pay with your preferred mobile payment app',
         'instructions' => 'Please ensure you have completed your payment using the QR code above.',
         'display_mode' => 'qr'
     ];
 
+    public const DISPLAY_KEYS = [
+        'size' => 'qrSize',
+        'color' => 'qrColor',
+        'background' => 'qrBackground',
+        'border' => 'qrBorder',
+        'style' => 'qrStyle',
+        'show_default_message' => 'showDefaultMessage',
+        'hide_message' => 'hideMessage',
+        'custom_message' => 'customMessage',
+    ];
+
     public const DEFAULT_QR_SETTINGS = [
         'size' => 'medium',
-        'color' => '#674FBF',
+        'color' => Brand::HEX,
         'background' => '#FFFFFF',
         'border' => false,
         'style' => 'square',
@@ -111,6 +123,47 @@ class WooCommerceConfig extends BaseSingleton
         ],
         'display_modes' => ['qr', 'button', 'link']
     ];
+
+    public const LEGACY_DEFAULT_TITLES = ['WalletUpPro Pay'];
+
+    public static function defaultTitle(): string
+    {
+        return __('WalletUp Pay', 'walletup');
+    }
+
+    public static function replaceLegacyTitle(): void
+    {
+        $master = get_option(self::OPTION_KEYS['settings'], []);
+        if (is_array($master) && in_array($master['title'] ?? null, self::LEGACY_DEFAULT_TITLES, true)) {
+            $master['title'] = self::defaultTitle();
+            update_option(self::OPTION_KEYS['settings'], $master);
+        }
+        $gateway = get_option(self::OPTION_KEYS['gateway_settings'], []);
+        if (is_array($gateway) && in_array($gateway['title'] ?? null, self::LEGACY_DEFAULT_TITLES, true)) {
+            StoreCheckout::mergeP2pSettings(['title' => self::defaultTitle()]);
+        }
+    }
+
+    public static function storeDisplaySettings(): array
+    {
+        $qr = array_replace(self::DEFAULT_QR_SETTINGS, (array) get_option(self::OPTION_KEYS['qr_settings'], []));
+        $store = [
+            'size' => (string) $qr['size'],
+            'color' => (string) $qr['color'],
+            'background' => (string) $qr['background'],
+            'border' => (bool) $qr['border'],
+            'style' => (string) $qr['style'],
+            'show_default_message' => (bool) $qr['show_default_message'],
+            'hide_message' => (bool) $qr['hide_message'],
+            'custom_message' => (string) $qr['custom_message'],
+        ];
+        $display = [];
+        foreach (self::DISPLAY_KEYS as $storeKey => $displayKey) {
+            $display[$displayKey] = $store[$storeKey];
+            $display[$storeKey] = $store[$storeKey];
+        }
+        return array_replace((array) get_option('wallet_up_display_settings', []), $display);
+    }
 
     public static function shouldShowQrOnCheckout(): bool
     {
@@ -145,6 +198,7 @@ class WooCommerceConfig extends BaseSingleton
     public function initializeSettings(): void
     {
         try {
+            self::replaceLegacyTitle();
             $wc_settings = get_option(self::OPTION_KEYS['settings'], []);
             $qr_settings = get_option(self::OPTION_KEYS['qr_settings'], []);
             $gateway_settings = $this->getWooCommerceGatewaySettings();
@@ -192,7 +246,6 @@ class WooCommerceConfig extends BaseSingleton
 
             $gateway = $gateways['wallet_up'];
             return [
-                'enabled' => $gateway->enabled,
                 'title' => $gateway->title,
                 'description' => $gateway->description,
                 'instructions' => $gateway->get_option('instructions', self::DEFAULT_SETTINGS['instructions']),
@@ -341,8 +394,7 @@ class WooCommerceConfig extends BaseSingleton
         if (!$this->checkWooCommerceAvailability()) {
             return;
         }
-        $gateways = WC()->payment_gateways()->payment_gateways();
-        if (!isset($gateways['wallet_up'])) {
+        if (\WalletUpPro\Core\Settings\SettingsRegistry::isAvailabilityV2()) {
             return;
         }
         foreach ($method_settings as $method_id => $status) {
@@ -351,7 +403,7 @@ class WooCommerceConfig extends BaseSingleton
             if ($show && !$this->registry->isMethodEnabled($method_id)) {
                 $this->registry->enableMethod($method_id);
             }
-            $gateways['wallet_up']->update_option('enable_' . $method_id, $show ? 'yes' : 'no');
+            StoreCheckout::setMethodOn($method_id, $show);
         }
         $this->clearCache();
     }
@@ -402,13 +454,7 @@ class WooCommerceConfig extends BaseSingleton
     private function updateGatewaySettings(array $settings): void
     {
         if ($this->checkWooCommerceAvailability()) {
-            $gateways = WC()->payment_gateways()->payment_gateways();
-            if (isset($gateways['wallet_up'])) {
-                $gateway = $gateways['wallet_up'];
-                foreach ($settings as $key => $value) {
-                    $gateway->update_option($key, $value);
-                }
-            }
+            StoreCheckout::mergeP2pSettings(array_diff_key($settings, ['enabled' => true]));
         }
     }
 

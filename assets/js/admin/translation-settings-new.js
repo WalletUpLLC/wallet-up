@@ -476,7 +476,7 @@
                 <div class="lang-progress" data-lang="${lang.language}">
                     <span>${lang.language}: </span>
                     <span class="status">Pending</span>
-                    <span class="stats" style="float: right; color: #666;"></span>
+                    <span class="stats" style="float: right; color: #777;"></span>
                 </div>
             `).join('');
             

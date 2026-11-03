@@ -3,6 +3,7 @@ namespace WalletUpPro\Core\Migration;
 
 use WalletUpPro\Core\Database\DatabaseManager;
 use WalletUpPro\Core\Error\ErrorHandler;
+use WalletUpPro\Core\Brand;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
@@ -678,7 +679,7 @@ class MigrationManager
             'display_mode' => 'qr',
             'qr_settings' => [
                 'size' => 'medium',
-                'color' => '#674FBF',
+                'color' => Brand::HEX,
                 'background' => '#F4F4FF',
                 'border' => false,
                 'style' => 'rounded'
