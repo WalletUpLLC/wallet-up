@@ -249,6 +249,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved: The setup assistant says plainly what the free plan does and does not do with WooCommerce and WPForms, before you enter any details.
 * Improved: Each business type pre-selects one payment method in setup, so one username is enough to finish.
 * Improved: The WordPress.org listing, tags and live preview describe the free plugin; WooCommerce checkout placement is labelled as Pro.
+
 = 6.3.11 - November 2, 2026 =
 * Improved (Pro): The order confirmation page and every store payment display use the QR code appearance you set in Seller.
 * Improved (Pro): Impressions count each visitor who sees a payment option once per page and half hour, and leave out your own visits and admin previews.

@@ -18,8 +18,8 @@
   function root() { return document.getElementById('wallet-up-admin-root'); }
   /* Anchors match the English, Spanish and French strings shipped in the compiled app (6.7.0). */
   var RX = {
-    welcome: /^(Welcome to Wallet Up|Bienvenue (dans|sur) Wallet Up|Bienvenid[oa] a Wallet Up)$/,
-    ready: /(ready to accept payments|prêt à recevoir des paiements|list[oa] para (aceptar|recibir) pagos)/i,
+    welcome: /^(Welcome to Wallet Up|Bienvenue (dans|sur) Wallet Up|Te damos la bienvenida a Wallet Up|Bienvenid[oa] a Wallet Up)$/,
+    ready: /(ready to accept payments|prêt à recevoir des paiements|Ya puedes recibir pagos|list[oa] para (aceptar|recibir) pagos)/i,
     skip: /(Just go to dashboard|Ir al panel|Aller au tableau de bord)/,
     dashboard: /^(Dashboard|Panel|Tableau de bord)$/,
     checks: /^(Dashboard|Panel|Tableau de bord|Payments|Pagos|Paiements|Payment Methods)$/,
