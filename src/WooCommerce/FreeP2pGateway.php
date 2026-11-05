@@ -30,7 +30,7 @@ class FreeP2pGateway extends \WC_Payment_Gateway
     {
         $this->id                 = self::ID;
         $this->method_title       = __('Wallet Up: Cash App, Venmo, PayPal or Zelle', 'walletup');
-        $this->method_description = __('Shows one of your Wallet Up payment methods at checkout. The customer pays in their app and confirms; the order waits on hold until you see the money. Pro adds the other methods, grouped display, discounts and automatic verification.', 'walletup');
+        $this->method_description = __('Shows one of your Wallet Up payment methods at checkout. The customer pays in their app and confirms; the order waits on hold until you see the money.', 'walletup');
         $this->has_fields         = false;
         $this->supports           = ['products'];
 
@@ -73,7 +73,7 @@ class FreeP2pGateway extends \WC_Payment_Gateway
                 'type'        => 'select',
                 'options'     => $choices,
                 'default'     => 'cashapp',
-                'description' => __('The method must have a username saved and be switched on under Wallet Up → Payments. One method is included in the free plan; Pro adds the rest.', 'walletup'),
+                'description' => __('The method must have a username saved and be switched on under Wallet Up → Payments.', 'walletup'),
                 'desc_tip'    => false,
             ],
             'title' => [

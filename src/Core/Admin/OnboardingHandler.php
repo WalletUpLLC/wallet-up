@@ -595,9 +595,7 @@ class OnboardingHandler
                             $notEnabled[] = $methodId; // the gateway would hide it: these apps pay out in US dollars only
                         } elseif ($wants && in_array($methodId, self::FREE_METHOD_IDS, true) && \WalletUpPro\Core\Payments\MethodStatusResolver::isConfigured($methodId)) {
                             if ($chosen === '') {
-                                $chosen = $methodId;
-                            } else {
-                                $notEnabled[] = $methodId; // second and later methods at checkout are Pro
+                                $chosen = $methodId; // the free plan places the first configured method; the box names it
                             }
                         } elseif ($wants) {
                             $notEnabled[] = $methodId;

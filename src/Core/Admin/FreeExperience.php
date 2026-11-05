@@ -76,7 +76,6 @@ final class FreeExperience
                 'notifyHelp'   => __('Sent by your own site; turn them off any time under Settings → Notifications.', 'walletup'),
                 'geoUsOnly'    => __('%s work in the United States only.', 'walletup'),
                 'geoWorks'     => __('PayPal.me works where you are.', 'walletup'),
-                'geoPro'       => __('Pro adds Interac, PayID, BPAY and mobile money for other countries.', 'walletup'),
                 'imInUs'       => __("I'm in the US", 'walletup'),
                 'notUs'        => __('Change country', 'walletup'),
                 'zelleHow'     => __('Zelle has no pay link. Visitors see your Zelle email or phone and the amount, with a copy button. If your bank app can show a Zelle QR code, upload it under Wallet Up → Payments and visitors can scan that instead.', 'walletup'),

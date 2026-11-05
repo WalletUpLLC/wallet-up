@@ -167,21 +167,24 @@ class PaymentRegistry
         }
     }
 
+    /**
+     * A method this plan does not include never shows an upgrade box to visitors (6.7.0 audit):
+     * visitors get an HTML comment, administrators a plain note with no link.
+     */
     public static function upgradeNotice(string $methodId): string
     {
         $name = PaymentMethodsConfig::getMethodName($methodId) ?: $methodId;
-        $url  = \WalletUpPro\wallet_up_upgrade_url();
-        $link = '<a href="' . esc_url($url) . '" style="color:' . Brand::HEX . ';font-weight:600;">';
-
+        if (!current_user_can('manage_options')) {
+            return sprintf('<!-- wallet-up: %s is not available on this plan -->', esc_html($methodId));
+        }
         return sprintf(
-            '<div class="walletup-upgrade-notice" style="padding:16px;border:1px solid #e2e8f0;border-radius:8px;text-align:center;color:#4a5568;">%s</div>',
-            sprintf(
-                /* translators: 1: payment method name, 2: link opening tag, 3: link closing tag */
-                esc_html__('%1$s is available in %2$sWalletUp Pro%3$s.', 'walletup'),
-                esc_html($name),
-                $link,
-                '</a>'
-            )
+            '<div class="walletup-shortcode-notice" style="padding:14px 16px;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:10px;color:#4c1d95;font-size:14px;line-height:1.5;"><strong>%s</strong> %s</div>',
+            esc_html__('Wallet Up:', 'walletup'),
+            esc_html(sprintf(
+                /* translators: %s: payment method name */
+                __('%s is not part of this plugin. Pick Cash App, Venmo, PayPal.me or Zelle for this spot. Only administrators see this note.', 'walletup'),
+                $name
+            ))
         );
     }
 

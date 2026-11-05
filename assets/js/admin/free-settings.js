@@ -132,7 +132,7 @@
     var wrap = el('div', 'space-y-6'); wrap.id = ID;
     wrap.appendChild(localeCard());
     if (!cfg.isPremium) { wrap.appendChild(notifyCard()); }
-    wrap.appendChild(brandingCard());
+    if (cfg.isPremium) { wrap.appendChild(brandingCard()); } // the credit-line switch is a Pro setting; the free plan is not shown a locked one
     wrap.appendChild(setupCard());
     container.appendChild(wrap);
   }

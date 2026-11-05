@@ -541,6 +541,10 @@ wallet_up_fs()->add_filter( 'is_submenu_visible', function ( $is_visible, $menu_
     if ( $menu_id === 'affiliation' && ! wallet_up_fs()->can_use_premium_code() ) {
         return false;
     }
+    // 6.7.0 audit: the free build presents Pro in one place, the Explore Pro page; the page itself stays registered.
+    if ( $menu_id === 'pricing' && ( ! defined( 'WALLET_UP_IS_PRO_BUILD' ) || ! WALLET_UP_IS_PRO_BUILD ) ) {
+        return false;
+    }
     return $is_visible;
 }, 10, 2 );
 

@@ -270,25 +270,16 @@ class BlockRegistrar
                 esc_html__('Wallet Up:', 'walletup'),
                 esc_html(self::methodLabel($method)),
                 esc_html__('is turned off. Turn it on under', 'walletup'),
-                esc_url(admin_url('admin.php?page=wallet-up-payments')),
+                esc_url(admin_url('admin.php?page=wallet-up')),
                 esc_html__('Wallet Up → Payments', 'walletup')
             );
         }
-        if (function_exists('\WalletUpPro\wallet_up_is_preview_sandbox') && \WalletUpPro\wallet_up_is_preview_sandbox()) {
-            return sprintf(
-                '<div class="walletup-block-admin-notice">%s <strong>%s</strong>. %s</div>',
-                esc_html__('Wallet Up:', 'walletup'),
-                esc_html(self::methodLabel($method)),
-                esc_html__('is available in Pro.', 'walletup')
-            );
-        }
+        // A method this plan does not include: a plain note for administrators, no upgrade link (6.7.0 audit).
         return sprintf(
-            '<div class="walletup-block-admin-notice">%s <strong>%s</strong>. %s <a href="%s" target="_blank" rel="noopener">%s</a></div>',
+            '<div class="walletup-block-admin-notice">%s <strong>%s</strong> %s</div>',
             esc_html__('Wallet Up:', 'walletup'),
             esc_html(self::methodLabel($method)),
-            esc_html__('is available in Pro.', 'walletup'),
-            esc_url(\WalletUpPro\wallet_up_upgrade_url()),
-            esc_html__('Upgrade to Pro', 'walletup')
+            esc_html__('is not part of this plugin. Pick Cash App, Venmo, PayPal.me or Zelle in this block. Only administrators see this note.', 'walletup')
         );
     }
 
@@ -326,6 +317,9 @@ class BlockRegistrar
         $methods = [];
         foreach ($allMethods as $id => $label) {
             $isPro = !in_array($id, (array) PaymentMethodsConfig::FREE_METHOD_IDS, true);
+            if (!$isPremium && $isPro) {
+                continue; // the free editor offers only what the free plugin renders (6.7.0 audit)
+            }
             $methods[] = [
                 'id'        => $id,
                 'label'     => $label,
@@ -352,7 +346,7 @@ class BlockRegistrar
             'isPremium'  => $isPremium,
             'configUrl'  => admin_url('admin.php?page=wallet-up-payments'),
             'formsUrl'   => admin_url('admin.php?page=wallet-up-donations'),
-            'upgradeUrl' => (function_exists('\WalletUpPro\wallet_up_is_preview_sandbox') && \WalletUpPro\wallet_up_is_preview_sandbox()) ? '' : \WalletUpPro\wallet_up_upgrade_url(),
+            'upgradeUrl' => '',
         ];
     }
 

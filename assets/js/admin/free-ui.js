@@ -40,7 +40,7 @@
     var box = el('div', 'mt-4 p-3 rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-900'); box.id = 'wup-geo-line';
     if (abroad) {
       box.appendChild(el('strong', '', fmt(t.geoLine, g.countryName || g.country) + ' '));
-      box.appendChild(el('span', '', (g.doesNotWork && g.doesNotWork.length ? fmt(t.geoUsOnly, names(g.doesNotWork)) + ' ' : '') + (t.geoWorks || '') + ' ' + (t.geoPro || '')));
+      box.appendChild(el('span', '', (g.doesNotWork && g.doesNotWork.length ? fmt(t.geoUsOnly, names(g.doesNotWork)) + ' ' : '') + (t.geoWorks || '')));
     } else {
       box.appendChild(el('span', '', t.geoUnknown || ''));
     }

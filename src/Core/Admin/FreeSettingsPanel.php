@@ -55,7 +55,6 @@ final class FreeSettingsPanel
             'nonce'        => wp_create_nonce('wallet_up_admin_nonce'),
             'isPremium'    => self::isPremium(),
             'hideBranding' => get_option(self::OPTION, 'no') === 'yes',
-            'upgradeUrl'   => function_exists('WalletUpPro\\wallet_up_upgrade_url') ? \WalletUpPro\wallet_up_upgrade_url() : 'https://walletup.app/pricing/',
             'geo'          => class_exists('\\WalletUpPro\\Core\\Geo\\SiteLocale') ? \WalletUpPro\Core\Geo\SiteLocale::hint() : [],
             'countryOverride' => (string) get_option('wallet_up_site_country', ''),
             'currency'     => \WalletUpPro\Core\Config\PaymentMethodsConfig::siteCurrency(),
@@ -72,8 +71,6 @@ final class FreeSettingsPanel
                 'branding'        => __('Branding', 'walletup'),
                 'brandingLabel'   => __('Show "Powered by WalletUp" under payment cards', 'walletup'),
                 'brandingHelp'    => __('The small credit line under every QR code, button and pay link on your site.', 'walletup'),
-                'brandingPro'     => __('Removing the credit line is part of Pro.', 'walletup'),
-                'upgrade'         => __('See Pro', 'walletup'),
                 'saved'           => __('Saved.', 'walletup'),
                 'setup'           => __('Setup assistant', 'walletup'),
                 'setupHelp'       => __('Walk through the setup again to change your business type, payment methods or default amount. Nothing is deleted.', 'walletup'),
@@ -98,7 +95,7 @@ final class FreeSettingsPanel
             wp_send_json_error(['message' => __('Permission denied', 'walletup')], 403);
         }
         if (!self::isPremium()) {
-            wp_send_json_error(['message' => __('Removing the credit line is part of Pro.', 'walletup'), 'code' => 'pro'], 403);
+            wp_send_json_error(['message' => __('This setting is not available on this plan.', 'walletup'), 'code' => 'plan'], 403);
         }
         $hide = isset($_POST['hide']) && sanitize_key(wp_unslash($_POST['hide'])) === '1';
         update_option(self::OPTION, $hide ? 'yes' : 'no', false);

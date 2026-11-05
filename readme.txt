@@ -189,7 +189,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 == Screenshots ==
 
 1. Admin Dashboard - configure payment methods in seconds
-2. WooCommerce Checkout - Cash App, Venmo, PayPal as payment options (Pro)
+2. WooCommerce Checkout - one of your methods as a payment option (all of them with Pro)
 3. QR Code Payment Display - customers scan to pay
 4. Payment Method Configuration - enter your username, done
 5. WooCommerce Order Confirmation - itemized order with automatic per-method discount (Pro)
@@ -216,6 +216,7 @@ Yes. Free users can post in the [WordPress.org support forum](https://wordpress.
 * Improved: Notifications have an off switch under Settings and a link in every email; confirmation emails are capped at ten a day; sharing your email with our licensing service is a separate, default-off choice.
 * Improved: The Welcome step offers a country chooser when the site's country cannot be told from its settings, and the free-plan additions work on Spanish and French admin screens.
 * Fixed: The old eight-second "Admin interface failed to load" alert with Cloudflare advice is gone; the plain-HTML fallbacks replace it.
+* Changed: The free plugin shows only what it does. Locked Pro entries, disabled "Available in Pro" fields, PRO badges, upgrade banners and "See Pro" buttons are gone from the free admin, the setup assistant, the block editor and visitor pages; Pro is described in one place, the Explore Pro page.
 * Improved: A visitor's order confirmation must carry the order key, and the payment method is validated, so nobody can annotate another customer's order or send text into your inbox.
 
 = 6.6.0 - November 4, 2026 =

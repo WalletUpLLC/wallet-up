@@ -221,9 +221,9 @@ class IntegrationDetector
                 'pageMatch' => function ($page, $screen) {
                     return $page !== '' && strpos($page, 'wpforms') === 0;
                 },
-                'freeBody' => __('The free plan does not add Wallet Up payment fields to WPForms. You can place a Cash App, Venmo, PayPal.me or Zelle code or link next to any form with a block or shortcode; form fields are part of Pro.', 'walletup'),
-                'freeCta'  => __('See Pro', 'walletup'),
-                'freeUrl'  => $upgrade('wpforms'),
+                'freeBody' => __('Wallet Up does not add payment fields to WPForms. Place a Cash App, Venmo, PayPal.me or Zelle code or link next to any form with the Payment Button block or a shortcode.', 'walletup'),
+                'freeCta'  => __('Open Wallet Up', 'walletup'),
+                'freeUrl'  => admin_url('admin.php?page=wallet-up'),
                 'proBody'  => __('Add a Wallet Up payment field to WPForms in one click.', 'walletup'),
                 'proCta'   => __('Connect to WPForms', 'walletup'),
                 'proAction'=> 'wallet_up_attach_wpforms',
@@ -265,7 +265,7 @@ class IntegrationDetector
                 'onEmptyBody'   => __('Wallet Up is on, but no payment methods are set to show at your WooCommerce checkout yet.', 'walletup'),
                 'onEmptyCta'    => __('Set up methods', 'walletup'),
                 'onEmptyUrl'    => admin_url('admin.php?page=wallet-up-seller'),
-                'freeBody' => __('Wallet Up can show one of your payment methods at your WooCommerce checkout for free. Pro adds the rest, grouped display, per-method discounts and automatic verification.', 'walletup'),
+                'freeBody' => __('Wallet Up can show one of your payment methods at your WooCommerce checkout.', 'walletup'),
                 'freeCta'  => __('Turn it on', 'walletup'),
                 'freeUrl'  => admin_url('admin.php?page=wc-settings&tab=checkout&section=wallet_up_p2p'),
                 'proBody'  => __('Enable Wallet Up at your WooCommerce checkout — one click.', 'walletup'),

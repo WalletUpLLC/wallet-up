@@ -291,7 +291,7 @@ final class DeactivationOffer
             ],
         ];
 
-        if (self::canOfferPro()) {
+        if (self::canOfferPro() && self::isProBuild()) {
             $panels[self::REASON_NEED_FEATURE]['page']   = self::pricingPage();
             $panels[self::REASON_NEED_FEATURE]['action'] = __('See what Pro adds', 'walletup');
             $panels[self::REASON_FOUND_BETTER]['page']   = self::pricingPage();
@@ -401,14 +401,10 @@ final class DeactivationOffer
         $proBuild    = self::isProBuild();
         $v2OnlyPage  = in_array($page, [self::PAGE_PAYMENTS, self::PAGE_DONATIONS, self::PAGE_MEMBERSHIPS], true);
 
-        if (!$proBuild && $v2OnlyPage) {
-            if (!empty($pitch['pro'])) {
-                $page   = self::pricingPage();
-                $action = __('See it in Pro', 'walletup');
-            } else {
-                $page   = self::PAGE_ONBOARDING;
-                $action = __('Set it up', 'walletup');
-            }
+        if (!$proBuild && ($v2OnlyPage || !empty($pitch['pro']))) {
+            // The free build never answers a deactivation with a pricing page (6.7.0 audit).
+            $page   = self::PAGE_ONBOARDING;
+            $action = __('Set it up', 'walletup');
         } elseif (!empty($pitch['pro']) && $ctx['can_upgrade']) {
             $page   = self::pricingPage();
             $action = __('See it in Pro', 'walletup');
